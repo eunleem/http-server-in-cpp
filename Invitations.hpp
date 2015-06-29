@@ -13,10 +13,11 @@
   History
     June 12, 2014
       Created
+    Jun 29, 2015
+      Simple version has been finalized
 
   ToDos
-    
-
+    Description handling? such as edit.
 
   Milestones
     1.0
