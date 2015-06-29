@@ -1,0 +1,299 @@
+#sect-header {
+  min-height: 100px;
+
+  transition: height 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86); 
+  /*border-bottom: 3px solid #DDD;*/
+}
+
+#sect-header > div {
+}
+
+#sect-header #lblTodayDate {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777;
+}
+
+#sect-message {
+  background-color: #62C2CC;
+  color: white;
+  font-size: 2.5em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#sect-tips {
+  background-color: #E4F6F8;
+  height: auto;
+  color: #666;
+  text-align: left;
+}
+
+#sect-tips .wrap > h1 {
+  color: #069;
+  margin-bottom: 20px;
+}
+
+#sect-message2 {
+  color: #2C6700;
+  text-align: left;
+  min-height: 100px;
+}
+
+#sect-message2 > .wrap > h1 {
+  font-family: 'Nanum Pen Script';
+  font-weight: normal;
+  font-size: 2.4em;
+  
+}
+
+#sect-message3 {
+  background-color: #D22042;
+  color: white;
+  text-align: center;
+  min-height: 100px;
+}
+
+.panel.closed {
+  min-height: 30px !important;
+  height: 30px !important;
+  cursor: default !important;
+  transition: all 500ms ease-in-out;
+}
+
+.panel.closed > .wrap {
+  opacity: 0 !important;
+  transition: all 500ms ease-in-out;
+}
+
+#sect-posts {
+  min-height: 100%;
+  width: 80%;
+  max-width: 900px;
+  min-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#sect-posts > .wrap {
+  text-align: left;
+}
+
+#sect-posts > .wrap > .currenttimezone {
+  margin-left: 30px;
+  font-size: 1.0em;
+}
+
+.panel > .wrap > h1 {
+  font-size: 2em;
+  margin: 0;
+}
+
+#sect-posts > .wrap > h1 {
+  color: #E66665;
+  text-align: center;
+}
+
+#sect-posts > .wrap > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#sect-posts > .wrap > ul > li {
+  padding; 0;
+  margin: 0px 0px 0px 90px;
+}
+
+
+.story > time {
+  position: relative;
+  left: -85px;
+  top: 24px;
+  font-size: medium;
+  color: #999;
+}
+
+.story > h2 {
+  margin: 0;
+  padding: 0;
+  font-size: large;
+  font-weight: bold;
+  cursor: pointer;
+  color: #4C4B5A;
+}
+
+.story > h2.selected::before {
+  content: "> ";
+}
+
+.story .author {
+  font-size: 0.7em;
+
+}
+
+.story > .idea-info {
+  position: relative;
+  font-size: small;
+  color: #4C4B5A;
+}
+
+.story > .idea-info > img {
+  height: 15px;
+  width: auto;
+  vertical-align: bottom;
+}
+
+#boxRefresh {
+  margin-top: 50px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#boxRefresh img {
+  width: 30px;
+  height: 30px;
+}
+
+
+#boxRefresh button {
+  background: none;
+  width: 150px;
+  font-size: 0.7em;
+  font-weight: bold;
+  background-color: #FF8D47;
+  color: white;
+  transition: all 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86); 
+  border-radius: 20px;
+  height: 50px;
+}
+
+#boxWrite {
+  margin-top: 50px;
+  text-align: center;
+}
+
+#boxWrite .time {
+  position: relative;
+  left: -50px;
+  text-align: left;
+  font-size: 0.8em;
+  color: #555;
+}
+
+#boxWrite .time > time {
+  color: #E66665;
+  font-size: 1.2em;
+}
+
+#txtIdea {
+  outline: none;
+  width: 80%;
+  max-width: 700px;
+  min-height: 150px;
+  font-size: 1em;
+  margin-top: 10px;
+  text-align: left;
+  font-family: 'Open Sans', "Nanum Gothic", "Malgun Gothic", san-serif;
+  background: #fff;
+  background: -webkit-gradient(linear, 0 0, 0 100%, from(#999), color-stop(4%, transparent)) 0 0px;
+  background: -webkit-linear-gradient(top, #999 0%, transparent 4%) 0 0px;
+  background: -moz-linear-gradient(top, #999 0%, transparent 4%) 0  0px;
+  background: -ms-linear-gradient(top, #999 0%, transparent 4%) 0 0px;
+  background: -o-linear-gradient(top, #999 0%, transparent 4%) 0 0px;
+  background: linear-gradient(top, #999 0%, transparent 4%) 0 0px;
+
+  -webkit-background-size: 100% 30px;
+  -moz-background-size: 100% 30px;
+  -ms-background-size: 100% 30px;
+  -o-background-size: 100% 30px;
+  background-size: 100% 30px;
+  border-bottom: none;
+  color: #574531;
+  font-size: 18px;
+  line-height: 30px;
+  padding: 1px 20px;
+}
+
+#btnIdeaPost {
+  background-color: #E66665;
+  color: white;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 1.7em;
+}
+
+#lblPostMessage {
+  height: 50px;
+  line-height: 50px;
+  font-size: 120%;
+}
+
+#boxFeedback {
+  margin-top: 30px;
+  line-height: 200%;
+  font-size: medium;
+  overflow: hidden;
+}
+
+#boxFeedback > #boxFeedbackPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 10%;
+  height: 40%;
+  width: 50%;
+  min-width: 400px;
+  max-width: 600px;
+  min-height: 200px;
+  z-index: -1;
+  opacity: 0;
+  text-align: center;
+  background-color: white;
+  box-shadow: 1px 1px 10px #000;
+  transition: all 300ms;
+
+  overflow: auto;
+}
+
+#boxFeedback > #boxFeedbackPopup.active {
+  opacity: 1 !important;
+  z-index: 50 !important;
+  transition: all 500ms;
+}
+
+#boxFeedback > #boxFeedbackPopup > textarea {
+  width: 80%;
+  min-height: 100px;
+  height: 50%;
+}
+
+#boxFeedback > #boxFeedbackPopup > button {
+  color: white;
+  font-weight: bold;
+  height: 50px;
+  width: 80px;
+  margin: 10px 40px;
+}
+
+#boxFeedback > #boxFeedbackPopup > button#btnFeedbackSend {
+  background-color: #E66665;
+}
+
+#boxFeedback > #boxFeedbackPopup > button#btnFeedbackCancel {
+  background-color: #A9B2B1;
+}
+
+
+  background-color: #A9B2B1;
+#sect-about > .wrap > h1 {
+  color: #2C6700;
+}
+
+#sect-about {
+  min-height: 30%;
+  background-color: #F1FAC0;
+
+}

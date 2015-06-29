@@ -1,0 +1,1116 @@
+.panel {
+  position: relative;
+  font-size: 1.2em;
+  transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  min-height: 110%;
+  background-size: cover;
+  background-position: center;
+}
+
+.panel-inner-wrap {
+  text-align: center;
+  position: relative;
+  top: 0%;
+  width: 96%;
+  margin-left: 2%;
+  margin-right: 2%;
+  padding: 30px 0;
+}
+
+
+.popup-box  {
+  display: none;
+  z-index: 1001;
+  position: fixed;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255,255,255, 1);
+  overflow: auto;
+}
+
+.popup-box .popup-title  {
+  height: 100px;
+  width: 96%;
+  padding-left: 4%;
+  background-color: rgba(100,100,100,1);
+  color: white;
+  text-align: left;
+  font-size: 3em;
+  line-height: 100px;
+  font-weight: bold;
+}
+
+.popup-box .popup-content  {
+  position: absolute;
+  top: 120px;
+  bottom: 0;
+  width: 100%;
+  overflow: auto;
+}
+
+.popup-box .popup-content button  {
+  margin-bottom: 30px;
+}
+
+.popup-box .popup-close  {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100px;
+  padding: 0px 30px;
+  font-size: 2em;
+  background-color: rgba(140,140,140,1);
+  color: white;
+  text-align: center;
+  line-height: 100px;
+  cursor: pointer;
+}
+
+.popup-box .popup-close:hover  {
+
+}
+
+.ripple-phrases {
+  background-color: #F1FAC0;
+  min-height: 20%;
+}
+
+.ripple-phrases .panel-inner-wrap > h1 {
+  margin: 20px 0;
+  font-size: 5em;
+}
+
+.log-entry {
+  margin: 10px;
+}
+
+.log-entry > time {
+  font-weight: bold;
+  font-style: italic;
+}
+
+#sect-nav {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 500;
+  color: rgba(170, 170, 170, 1);
+  padding: 10px 7px;
+  border-left: 4px solid orange;
+  border-bottom-right-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  opacity: 0.2;
+  transition: opacity 300ms ease-out;
+}
+
+#sect-nav:hover {
+  opacity: 1;
+}
+
+#sect-nav > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-nav > ul > li {
+  margin-bottom: 10px;
+}
+
+#sect-nav > ul > li > a{
+  cursor: pointer;
+}
+
+#sect-header {
+  min-height: 100px;
+
+  transition: height 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86); 
+  /*border-bottom: 3px solid #DDD;*/
+}
+
+#sect-header > div{
+}
+
+#sect-header #lblTodayDate {
+  font-size: 2.3em;
+  font-weight: bold;
+  color: #777;
+}
+
+#sect-daystart {
+  min-height: 0;
+  height: 100%;
+  transition: height 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86); 
+}
+
+#sect-daystart .panel-inner-wrap {
+}
+
+#sect-daystart #boxDayStartMessages {
+
+}
+
+#sect-daystart #boxDayStartMessages > div {
+  margin-top: 30px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#sect-daystart #boxDayStartMessages > div:first-of-type {
+  font-size: 4em;
+  color: #06BCC2;
+}
+
+#sect-daystart #boxDayStartMessages > div:nth-of-type(2) {
+  font-size: 3.6em;
+  color: #9C0;
+}
+
+#sect-daystart #boxDayStartMessages > div:nth-of-type(3) {
+  font-size: 3.2em;
+  color: #7B4A12;
+}
+
+#sect-warning {
+  background: linear-gradient(to bottom, #FF3333 0%, rgba(240,47,23,1) 47%, rgba(255,255,255,1) 79%, rgba(255,255,255,1) 100%);
+  min-height: 200%;
+  color: white;
+}
+
+#sect-warning .panel-inner-wrap {
+}
+
+#sect-warning #lblStop {
+  font-weight: bold;
+  font-size: 9em;
+}
+
+#sect-warning #lblWarningMessage {
+  margin-top: 5%;
+  font-weight: bold;
+  font-size: 3em;
+}
+
+#sect-warning #lblStartWorking {
+  margin-top: 90%;
+  font-weight: bold;
+  font-size: 3em;
+  cursor: pointer;
+  color: #92CD00;
+}
+
+#sect-prayer {
+  background: linear-gradient(to bottom, #06BCC2 0%, #049DBF);
+  color: #FFF;
+
+}
+
+#sect-prayer p {
+  margin-top: 80px;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+#sect-believe {
+  background: linear-gradient(to bottom, #444 0%, #000000);
+  color: #FFF;
+  height: 150%;
+}
+
+#sect-believe h1 {
+  margin-top: 20%;
+  font-size: 10em;
+  font-family: Nanum Gothic;
+  font-weight: normal;
+}
+
+#sect-goal-month {
+  background-color: white;
+  min-height: 100%;
+}
+
+#sect-goal-month #lblThisMonth {
+  font-size: 2.3em;
+  font-weight: bold;
+  color: #06BCC2;
+}
+#sect-goal-month #lblDaysLeftMonth {
+  font-size: 1.4em;
+}
+
+#sect-goal-month #boxMonthlyGoal {
+  margin-top: 30px;
+}
+
+#sect-goal-month #boxMonthlyGoal #lblMonthlyGoal {
+  font-size: 2.8em;
+  color: #333;
+}
+
+#sect-goal-month #boxMonthlyGoal > div {
+  min-width: 400px;
+  max-width: 1000px;
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+}
+
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent {
+  color: #333;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent > p:first-of-type {
+  font-size: 1.2em;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent p {
+  text-indent: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent h2 {
+  margin: 10px 0 0 0;
+  color: #036;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent h3 {
+  margin: 10px 0 0 0;
+  color: #444;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent h4 {
+  margin: 10px 0 0 0;
+  font-style: italic;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent ol {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent ul {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalContent blockquote {
+  font-family: Droid Serif, Serif;
+  text-align: center;
+  font-size: 1.5em;
+  font-style: italic;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalOptions {
+  margin-top: 20px;
+  text-align: right;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalOptions > a {
+  margin: 0px 10px;
+}
+
+#popboxMonthlyGoalSet {
+  text-align: center;
+}
+
+#popboxMonthlyGoalSet .popup-content > textarea {
+  margin-top: 0;
+  width: 80%;
+  min-height: 35px;
+  line-height: 140%;
+  background: transparent;
+  font-size: 1.4em;
+  font-family: Open Sans;
+}
+
+#popboxMonthlyGoalSet .popup-content > textarea:first-of-type {
+  width: 90%;
+  font-size: 3em;
+  text-align: center;
+  border-bottom-width: 4px;
+  background: transparent;
+  text-indent: 0;
+}
+
+#popboxMonthlyGoalSet .popup-content > textarea:nth-of-type(2) {
+  margin-top: 20px;
+  min-height: 100px;
+}
+
+#popboxMonthlyGoalSet .popup-content > button {
+  margin-top: 80px;
+  font-size: 3em;
+  width: 70%;
+  padding-bottom: 15px;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments {
+  display: none;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments h2 {
+  font-size: 1.3em;
+  font-weight: normal;
+  color: #999;
+  padding: 0;
+  margin:0;
+  text-align: center;
+  cursor: pointer;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments h2 #lblMonthlyGoalCommentCount {
+  font-size: 0.6em;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments #boxMonthlyGoalCommentList {
+  height: 0;
+  overflow: hidden;
+  transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments #boxMonthlyGoalCommentList ul {
+  margin: 10px 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments #boxMonthlyGoalCommentList ul li {
+  font-size: 0.9em;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments #boxMonthlyGoalCommentList ul li .box-timestamp {
+  width: 100%;
+  text-align: center;
+  color: #999;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments #boxMonthlyGoalCommentList ul li .box-comment {
+  width: 100%;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalComments #boxMonthlyGoalCommentList ul li:after {
+  content:"";
+  display:block;
+  clear: both;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalCommentWrite {
+  margin-top: 15px;
+  text-align: center;
+}
+
+#sect-goal-month #boxMonthlyGoal #boxMonthlyGoalCommentWrite #txtMonthlyGoalComment {
+  text-align: center;
+  width: 50%;
+}
+
+#sect-ripple-phrases {
+  background-color: #F1FAC0;
+  min-height: 20%;
+}
+
+#sect-ripple-phrases .panel-inner-wrap {
+}
+
+#sect-ripple-phrases .panel-inner-wrap > h1 {
+  color: #4D9379;
+  margin: 20px 0;
+  font-size: 5em;
+}
+
+#sect-goal-week {
+  background-color: #F4F1E0;
+}
+
+#sect-goal-week .panel-inner-wrap > h1 {
+  text-align: left;
+  margin-top: 20px;
+  font-size: 2em;
+  font-style: italic;
+  text-transform: uppercase;
+  color: #666;
+}
+
+#sect-goal-week .panel-inner-wrap > h2 {
+  margin: 0;
+  padding: 0;
+  font-size: 3em;
+  color: #F14C38;;
+}
+
+#sect-goal-week #boxWeeklyGoal {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0px;
+  margin-top: 0;
+  padding: 0px 20px 20px 20px;
+  /*border-bottom: 2px solid #999;*/
+
+  /*transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);*/
+}
+
+#sect-goal-week #boxWeeklyGoal > div {
+  min-width: 400px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  text-align: left;
+}
+
+#sect-goal-week #boxWeeklyGoal #boxWeeklyGoalContent {
+  color: #666;
+  max-width: 800px;
+}
+
+#sect-goal-week #boxWeeklyGoal #boxWeeklyGoalContent > h3 {
+  margin: 20px 0 10px 0;
+  padding: 0;
+}
+
+#sect-goal-week #boxWeeklyGoal #boxWeeklyGoalContent p {
+  margin-top: 0;
+  text-indent: 15px;
+}
+
+#sect-goal-week #boxWeeklyGoal #boxWeeklyGoalContent p:first-of-type {
+  font-size: 1.2em;
+}
+
+
+#sect-goal-week #boxWeeklyGoal #boxWeeklyGoalContent #txtWeeklyGoalContent  ul {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-left: 20px;
+}
+
+#sect-goal-week #boxWeeklyGoal #boxWeeklyGoalContent #txtWeeklyGoalContent  ol {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-left: 30px;
+}
+
+
+#sect-goal-week #boxWeeklyGoal #boxWeeklyGoalContent h4 {
+  margin: 10px 0 0 0;
+  padding: 0;
+  color: #4D9379;
+}
+
+#sect-goal-week #boxWeeklyGoalOptions {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: right;
+  padding: 0 20px;
+}
+
+#popboxWeeklyGoalSet .popup-content {
+  text-align: center;
+}
+
+#popboxWeeklyGoalSet .popup-content > textarea {
+  margin-top: 0;
+  width: 80%;
+  height: 35px;
+  line-height: 140%;
+  background: transparent;
+  font-size: 1.4em;
+  font-family: Open Sans;
+}
+
+#popboxWeeklyGoalSet .popup-content > textarea:first-of-type {
+  width: 90%;
+  height: 80px;
+  font-size: 3em;
+  color: #F14C38;;
+  text-align: center;
+  border-bottom-width: 4px;
+  background: transparent;
+  text-indent: 0;
+}
+
+#popboxWeeklyGoalSet .popup-content > textarea:nth-of-type(2) {
+  margin-top: 20px;
+  min-height: 100px;
+}
+
+#popboxWeeklyGoalSet .popup-content > h3 {
+  margin-top: 30px;
+  margin-bottom: 0;
+  margin-left: 8%;
+  font-size: 1.7em;
+  color: #555;
+
+  text-align: left;
+}
+
+#popboxWeeklyGoalSet .popup-content > button {
+  margin-top: 80px;
+  font-size: 3em;
+  width: 70%;
+  padding-bottom: 15px;
+}
+
+#sect-goal-week #boxWeeklyActions {
+  text-align: center;
+}
+
+#sect-goal-week #boxWeeklyProgress {
+  font-size: 2em;
+  color: #999;
+}
+
+#sect-goal-week #boxDayWrap {
+  position: relative;
+  text-align: center;
+
+}
+
+#sect-goal-week #boxDayWrap .weekly-day {
+  margin: 0px auto;
+  border: solid 1px #CCC;
+  border-radius: 10px;
+  display: none;
+  padding: 20px;
+  min-width: 400px;
+  width: 70%;
+}
+
+#sect-goal-week #boxDayWrap > h3 {
+  margin: 30px 0 10px 0;
+  padding: 0;
+  font-size: 2em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+#sect-goal-week #boxDayWrap > h3:hover {
+  text-decoration: underline;
+}
+
+#sect-goal-week #boxDayWrap .weekly-day > h3 + div {
+  padding: 15px;
+  text-align: left;
+  transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  display: none;
+}
+
+#sect-goal-week #boxDayWrap .weekly-day > div > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-goal-week #boxDayWrap .weekly-day > div > ul > li {
+
+}
+
+#sect-goal-week #boxDayWrap .weekly-day > div > .incomplete > li > .menu {
+  opacity: 0.6;
+  width: 20px;
+  height: 14px;
+  margin-right: 5px;
+  cursor: pointer;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAbCAYAAAAZMl2nAAABI0lEQVR42uyWMUtCURiGvxsnIm5wt3DUVpdAaOkXXJeyxSVwNHR1cQtcnJya+gONpfgDgnJJHKQf0CKIm0FdQ4Lr+8K5q+P5znA/eO5wl/fh8J2XY+I4jkTkAdRAKG7nFzyDtsFnAG5FZ8Is+wDciP5UKfLtgciaIl2QKkowu8cdeQILcA1OHEv82GV9N/bHm0VtgjRNxYfxRwSF5oVItiPH4AIcOs7fginYUKQMxqCodBhf4Io98qgowSnRgSIVD1bknCIzD0TmFLkDK0WJJWhyWT/Bmb01xrHEP/gASRacgNe8WfOK31Pxl2w3EDnO5+twCCYUqdvHUaB0GB3QYI/0FSXEZt9T5NSDFSlQZOSByIuxFR/Yx/ORY4E/SoDWToABAJogOZfDnOGqAAAAAElFTkSuQmCC);
+  background-size: 20px 14px;
+}
+
+#sect-goal-week #boxDayWrap .weekly-day > div > .completed {
+  margin-top: 10px; 
+
+}
+
+#sect-goal-week #boxDayWrap .weekly-day > div > .completed > li {
+  margin-left: 30px;
+  text-decoration: line-through;
+
+}
+
+#sect-today {
+  background-color: #E4F6F8;
+  color: #069;
+}
+
+#sect-today .panel-inner-wrap > h1 {
+  text-align: left;
+  font-size: 2em;
+  font-style: italic;
+  text-transform: uppercase;
+  color: #069;
+}
+
+
+
+#sect-today #boxTasks {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-today #boxTasks > li {
+  display: block;
+  margin: 10px 0;
+  text-align: center;
+  min-width: 400px;
+}
+
+#sect-today #boxTasks > .task > h1 {
+  padding: 4px 40px 5px 40px;
+  margin-bottom: 0;
+  font-size: 3em;
+  color: #333;
+  cursor: pointer;
+}
+
+#sect-today #boxTasks > .task > h1:hover {
+  color: #666;
+}
+
+#sect-today #boxTasks > .task > .txtTaskTitle {
+  background-color: transparent;
+  text-align: center;
+  font-size: 3em;
+  font-weight: bold;
+  width: calc(90% - 40px);
+  min-width: 400px;
+  padding: 0 20px;
+  color: #444;
+  line-height: 1.5em;
+  font-family: Open Sans, Nanum Gothic;
+}
+
+#sect-today #boxTasks > .task > .txtTaskTitle:hover {
+  color: #222;
+}
+
+#sect-today #boxTasks > .task > .task-options {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  margin: 0px 0 0 0;
+}
+
+#sect-today #boxTasks > .task > .task-options > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-today #boxTasks > .task > .task-options > ul > li {
+  display: inline-block;
+  margin: 0px 20px 0px 20px;
+  font-size: 1.3em;
+}
+
+#sect-today #boxTasks > .task > .task-detail {
+  display: none;
+  overflow: auto;
+  margin-top: 0;
+  margin-bottom: 30px;
+  padding-top: 0;
+  /*transition: height 500ms cubic-bezier(0.645, 0.045, 0.355, 1);*/
+  transition: opacity 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description > h2:first-of-type {
+  margin: 0 0 0 0;
+  padding: 0;
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description > h2 {
+  margin: 0px 0 0 0;
+  padding: 0;
+  font-size: 1.5em;
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description {
+
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description textarea {
+  font-size: 1em;
+  text-align: center;
+  font-family: Open Sans, Nanum Gothic;
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description > .lblTaskDescription {
+  color: #333;
+
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description > .description-options {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  margin: 10px;
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description > .description-options > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-today #boxTasks > .task > .task-detail > .description > .description-options > ul > li {
+  display: inline-block;
+  margin: 0px 20px 0px 20px;
+  font-size: 1.2em;
+}
+
+
+#sect-today #boxTasks > .task > .task-detail input[type="text"] {
+  background-color: transparent;
+  text-align: center;
+  font-size: 1.3em;
+  width: 40%;
+  min-width: 400px;
+  padding: 0 20px;
+  line-height: 1.5em;
+}
+
+#sect-today #boxTasks > .task > .task-detail input[type="text"]:hover {
+
+}
+
+#sect-today #boxTasks > .task > .task-detail textarea {
+  background-color: transparent;
+  text-align: left;
+  font-size: 1.3em;
+  font-family: Open Sans;
+  width: 60%;
+  min-width: 500px;
+  padding: 1.1em 20px 0 20px;
+  border-bottom-color: #555;
+  line-height: 1.5em;
+}
+
+#sect-today #boxTasks > .task > .task-detail textarea:hover {
+
+}
+
+#sect-today #boxAddTask {
+  margin-top: 50px;
+}
+
+#sect-writing {
+  /*
+  background-color: #EECD86;
+  color: #3D3242;
+  background-color: #DED29E;;
+  background-color: #DCCCAA;
+  background-color: #F4F0CB;
+  */
+  background-color: #F8F3D6;
+  color: #685642;
+}
+/*
+  background-color: #F8F3D6;
+
+  color: #685642;
+ 
+  color: #B7C68B; // Coffee Green
+  color: #95A760; // Darker 1
+  color: #71823E; // Darker 2
+  color: #487538; // Lively Green.
+
+  color: #6C4C77; // Purple
+  color: #846C8D; // Lighter
+
+  color: #515A7A; // Light Navy
+ */
+
+#sect-writing .panel-inner-wrap > h1 {
+  /*
+  font-family: Lobster;
+  font-weight: normal;
+  text-transform: uppercase;
+  */
+  font-size: 5em;
+  font-family: 'Nanum Brush Script', serif;
+  font-weight: normal;
+
+}
+
+#sect-writing .panel-inner-wrap h2 {
+  font-family: 'Nanum Brush Script', serif;
+  font-size: 3em;
+  font-weight: normal;
+}
+
+#sect-writing #boxWriting .penscript {
+  font-size: 1.8em;
+  font-family: 'Nanum Pen Script', serif;
+  color: #71823E; // Darker 2
+
+}
+
+#sect-writing #boxWriting .brushscript {
+  font-size: 2em;
+  font-family: 'Nanum Brush Script', serif;
+}
+
+#sect-writing #boxWriting textarea {
+  min-height: 300px;
+  background: transparent;
+  background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
+  background-size: 100% 50px;
+  border-bottom: none;
+  font-family: 'Nanum Pen Script', serif;
+  font-size: 30px;
+  color: #685642;
+  line-height: 50px;
+  padding: 10px 20px;
+  width: 50%;
+
+}
+
+#sect-journal {
+  /*
+  background-color: #EECD86;
+  color: #3D3242;
+  background-color: #DED29E;;
+  background-color: #DCCCAA;
+  background-color: #F4F0CB;
+  overflow-x: auto;
+  */
+  background-color: #FFF;
+  color: #000;
+  min-height: 100%;
+  overflow: auto;
+  transition: background-color 1000ms linear;
+}
+
+#sect-journal .panel-inner-wrap > h1 {
+  /*
+  font-family: Lobster;
+  font-weight: normal;
+  text-transform: uppercase;
+  */
+  margin: 0;
+  padding: 0;
+  font-size: 3em;
+  color: #444;
+}
+
+#sect-journal #boxJournal > #boxJournalWriteTime {
+  text-align: left;
+  font-size: 3em;
+  color: #999;
+  font-family: Lobster;
+}
+
+#sect-journal #boxJournal > #boxJournalWriteMode {
+  position: relative;
+  z-index: 100;
+  top: -40px;
+
+}
+
+#sect-journal #boxJournal > #boxJournalWriteMode > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-journal #boxJournal > #boxJournalWriteMode > ul > li {
+  display: inline-block;
+  margin: 0px 20px 0px 20px;
+  font-size: 2em;
+}
+
+#sect-journal #boxJournal > textarea {
+  /*
+
+  background: transparent;
+  background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
+  background-size: 100% 80px;
+  font-family: 'Nanum Pen Script', serif;
+  line-height: 80px;
+  min-height: 900px;
+   */
+  position: relative;
+  z-index: 10;
+  background: transparent;
+  top: -100px;
+  font-size: 4em;
+  color: #333;
+  margin-top: 20px;
+  padding: 1.5em 30px 0 30px;
+  min-width: 600px;
+  width: 90%;
+  border-bottom: 0;
+  resize: none;
+  overflow: visible;
+}
+
+
+#sect-journal #boxJournal > .textareaUnderline {
+  /*
+  background: transparent;
+  background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
+  background-size: 100% 80px;
+  font-family: 'Nanum Pen Script', serif;
+  line-height: 80px;
+  min-height: 900px;
+   */
+  position: relative;
+  background: transparent;
+  top: -220px;
+  height: 0px;
+  border-top: 4px solid #999;
+}
+
+#sect-journal #boxJournal > .textareaUnderline .boxCharCounter {
+  position: absolute;
+  left: 0px;
+  top: -50px;
+  color: #AAA;
+  text-align: right;
+  font-size: 2em;
+}
+
+#sect-journal #boxJournal > .textareaUnderline #btnJournalSubmit {
+  position: absolute;
+  top: -50px;
+  right: 0px;
+  height: 40px;
+  width: 40px;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite {
+  position: relative;
+  top: -200px;
+  text-align: left;
+}
+
+#sect-journal #boxJournal input[type="text"] {
+  /*
+  background: transparent;
+  background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
+  background-size: 100% 80px;
+  font-family: 'Nanum Pen Script', serif;
+  line-height: 80px;
+   */
+  font-size: 200px;
+  color: #333;
+  padding: 10px 30px;
+  min-width: 600px;
+  width: 90%;
+  display:none;
+}
+
+
+#sect-journal #boxJournal > .boxUnderWrite #boxJournalPosted {
+  position: relative;
+  z-index: 1000;
+  top: -20px;
+  padding-top: 40px;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li {
+  display: block;
+  margin: 30px auto;
+  min-width: 600px;
+  width: 90%;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li > .journal-entry-time {
+  font-size: 1.5em;
+  color: #666;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li > .journal-entry-content {
+  margin-left: 20px;
+  font-size: 2em;
+}
+
+
+#sect-green {
+  background-color: #F1FAC0;
+  font-size: 5em;
+  color: #2C6700; // DARK GREEN
+
+}
+
+#sect-color {
+  /*
+  background-color: #62C2CC; // Baby Blue 
+  background-color: #4DC5D6; // Baby Blue Cooler
+  background-color: #7B4A12; // DDONG Color
+  background-color: #D31D8C; // Hot Pink. Too vibrant
+  background-color: #F17022; // Dirty Orange
+  background-color: #F68B1F; // Brighter Orange.
+  background-color: #2C6700; // DARK GREEN
+  background-color: #587058; // Moss?? COlor
+  background-color: #587498;
+  background-color: #E86850; // Cyanne.
+  */
+  font-size: 5em;
+  background-color: #E86850;
+  color: white;
+
+}
+
+
+#sect-flow {
+  background-color: #FFFFCC;
+}
+
+#sect-flow .panel-inner-wrap > h1 {
+  margin-top: 20px;
+  font-size: 3em;
+  font-style: italic;
+  text-transform: uppercase;
+  color: #F14C38;
+}
+
+#sect-flow .panel-inner-wrap #boxFlowWrap > h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-size: 1.5em;
+  color: #1C73BA;
+}
+
+#sect-flow .panel-inner-wrap #boxFlowWrap > .flow-answer {
+  font-size: 1.2em;
+  color: #666;
+}
+
+#sect-dayend {
+  min-height: 200%;
+  background: linear-gradient(to bottom, #0F3B5F 10%, #042947 50%, #01192C);
+  color: white;
+}
+
+#sect-dayend .dayend-messages {
+  color: white;
+}
+
+#sect-dayend .dayend-messages:first-of-type {
+  margin-top: 10%;
+  font-size: 4em;
+}
+
+#sect-footer {
+  min-height: 300px;
+  background: linear-gradient(to bottom, #01192C, #000);
+  color: white;
+  font-size: 7em;
+}

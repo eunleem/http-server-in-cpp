@@ -1,0 +1,311 @@
+body, html{
+  height: 100%;
+  font-size: 1em;
+}
+body {
+  margin: 0;
+  padding: 0 0;
+  font-family: Open Sans, 'Nanum Gothic', Sans-Serif;
+}
+
+.indent15
+{
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+h1 {
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: #0191C8;
+  cursor: pointer;
+  transition : color 200ms ease-out;
+  text-decoration: none;
+}
+a:hover {
+  color: #FF5716;
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+}
+
+.vertical-middle {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.vertical-middle-littleup {
+  position: relative;
+  top: 45%;
+  transform: translateY(-50%);
+}
+.line-through {
+  text-decoration: line-through;
+}
+.color-white {
+  color: #FFF;
+}
+.color-grey {
+  color: #4C4B5A;
+}
+.color-red {
+  color: #D22042;
+}
+.color-orange {
+  color: #FF5716;
+}
+.color-blue {
+  color: #1C73BA;
+}
+.color-yellow {
+  color: #FFD602;
+}
+.color-purple {
+  color: #752762;
+}
+.color-cayenne {
+  color: #E66665;
+}
+.color-comfrey {
+  color: #4D9379;
+}
+.color-paloma {
+  color: #A9B2B1;
+}
+.color-turquoise {
+  color: #06BCC2 !important;
+}
+.color-turquoise-sky {
+  color: #049DBF;
+}
+.color-aqua {
+  color: #30C4C9;
+}
+.color-tuquoise-pale {
+  color: #AFEEEE;
+}
+.color-green {
+  color: #A4B808;
+}
+.bgcolor-white {
+  background-color: #FFF;
+}
+
+.bgcolor-red {
+  background-color: #D22042;
+}
+.bgcolor-orange {
+  background-color: #FF5716;
+}
+.bgcolor-blue {
+  background-color: #1C73BA;
+}
+.bgcolor-yellow {
+  background-color: #FFD602;
+}
+.bgcolor-purple {
+  background-color: #752762;
+}
+.bgcolor-cayenne {
+  background-color: #E66665;
+}
+.bgcolor-comfrey {
+  background-color: #4D9379;
+}
+.bgcolor-paloma {
+  background-color: #A9B2B1;
+}
+.bgcolor-turquoise {
+  background-color: #06BCC2;
+}
+.bgcolor-turquoise-sky {
+  background-color: #049DBF;
+}
+.bgcolor-turquoise-pale {
+  background-color: #AFEEEE;
+}
+.bgcolor-aqua {
+  background-color: #30C4C9;
+}
+.bgcolor-green {
+  background-color: #A4B808;
+}
+
+
+#sect-entries-box {
+  position: fixed;
+  top: 0;
+  left: auto;
+  right: 0;
+  width: 40%;
+  min-width: 500px;
+  min-height: 80px;
+  max-height: 80%;
+  overflow-y: auto;
+  border-left: 1px solid #AAA;
+  border-bottom: 1px solid #AAA;
+  background: rgba(255,255,255,0.8);
+  z-index: 100;
+  border-bottom-left-radius: 20px;
+}
+
+#sect-entries-box #boxxx {
+  overflow-y: auto;
+  height: 70px;
+
+  transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+#sect-planner-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  min-width: 500px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+#sect-planner-box h1 {
+  font-size: 2em;
+}
+
+#sect-planner-box #planner-wrap {
+  margin: 20px 0 20px 20px;
+}
+
+#sect-entries {
+  margin: 20px 10px 0px 10px;
+}
+
+#sect-entry-write {
+  margin: 20px 10px 0px 10px;
+}
+
+#txtJournalWrite {
+  width: 85%;
+  min-width: 400px;
+  padding: 3px 5px 0px 5px;
+  color: #555;
+  line-height: 150%;
+  font-family: Open Sans, Nanum Gothic;
+  font-size: 12pt;
+}
+
+#btnJournalPostSubmit {
+}
+
+.journal-year {
+  font-size: 32pt;
+  font-weight: bold;
+  margin: 5px;
+}
+
+.day {
+  position: relative;
+  padding-top: 30px;
+  margin-bottom: 20px;
+}
+.journal-date {
+  position: absolute;
+  top: 0px;
+  font-size: 14pt;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-bottom: 9px;
+}
+
+.journal-weekday {
+  font-size: 14pt;
+  margin-left: 5px;
+}
+
+
+.entry {
+  width: 95%;
+  min-width: 600px;
+  padding-bottom: 5px;
+  overflow: auto;
+}
+
+.journal-time {
+  float: left;
+  width: 80px;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.journal-time time {
+}
+
+.body {
+  width: 80%;
+  float: left;
+
+}
+.content {
+  border-left: 2px solid #999;
+  padding: 5px 10px;
+  transition : border 500ms ease-out;
+}
+.content:hover {
+  border-left-color: #F60;
+}
+.content-options {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+#sect-planner-box ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-planner-box ul li input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+input[type="text"] {
+  font-size: 1.1em;
+}
+
+input[type="text"], textarea
+{
+  border: 0px;
+  border-bottom: 2px solid #999;
+  padding: 5px 5px 0px 5px;
+  //transition: height 10ms ease-out;
+}
+
+textarea {
+  resize: vertical;
+  overflow-y: auto;
+  line-height: 1.1em;
+}
+
+input[type="text"]:hover, textarea:hover
+{
+  border-bottom-color:  #000;
+}
+
+input[type="text"]:disabled , textarea:disabled
+{
+  opacity: 0.5;
+  border-bottom-color:  #666;
+  background-color: #EEEEEE;
+}
+
+input[type="text"].error, textarea.error
+{
+  border-bottom-color: #D22042;
+}
+
+input[type="checkbox"] {
+  font-size: 50px;
+}

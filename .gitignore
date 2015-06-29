@@ -1,0 +1,12 @@
+# Ignore Object files
+*.o
+*.swp
+*.exe
+*.bak
+*.log
+gmon.out
+tags
+data/
+testdata/
+log/
+backup/
