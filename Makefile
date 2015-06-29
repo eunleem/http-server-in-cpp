@@ -96,5 +96,5 @@ Worker: HttpRequest.o HttpResponse.o HttpRequestPool.o HttpResponsePool.o HttpCo
 	@$(CC) $(OBJECT_FLAGS) $(INCLUDE_DIR) $(LIBRARY_DIR) $< $(LIBRARIES) -o $@
 
 clean:
-	@rm -rf *.o *.exe $(EXECUTABLE)
+	@rm -rf *.o *.exe *.bak
 	@echo "Object files and Executables are removed!"
