@@ -36,7 +36,6 @@ Invitations::Invitations(Config config) :
 }
 
 Invitations::~Invitations() {
-  DEBUG_FUNC_START;
 }
 
 bool Invitations::open() {
@@ -90,17 +89,23 @@ ssize_t Invitations::LoadAllFromStorage() {
   size_t count = 0;
 
   // #TODO: Redesign this logic.
-  while (this->dataFile_.eof() == false) {
+  while (this->dataFile_.good() == true) {
+    if (this->dataFile_.tellg() == fileSize) {
+      break;
+    } 
     Invitation invitation;
     this->dataFile_ >> invitation;
+    if (invitation.id == 0) {
+      // InvitationId == 0 meaning it's been deleted.
+      // Skipping on deleted invitation.
+      continue;
+    } 
+
     this->invitationById[invitation.id] = invitation;
     const std::string code(invitation.code, sizeof(invitation.code));
     this->invitationByCode[code] = &this->invitationById[invitation.id];
 
     count += 1;
-    if (this->dataFile_.tellg() == fileSize) {
-      break;
-    } 
   } 
 
   this->dataFile_.seekg(0);
@@ -121,7 +126,7 @@ const std::unordered_map<uint32_t, Invitation>& Invitations::GetInvitations() co
 }
 
 
-const Invitation& Invitations::GetInvitationById(const uint32_t invitId) {
+Invitation& Invitations::GetInvitationById(const uint32_t invitId) {
   auto it = this->invitationById.find(invitId);
 
   if (it == this->invitationById.end()) {
@@ -132,7 +137,11 @@ const Invitation& Invitations::GetInvitationById(const uint32_t invitId) {
   return it->second;
 }
 
-const Invitation& Invitations::GetInvitationByCode(const string& code) {
+Invitation& Invitations::GetInvitationByCode(const std::string& code) {
+  if (code.length() < 5) {
+    DEBUG_cerr << "Code is too short." << endl; 
+    throw Exception(ExceptionType::GETINVIT);
+  } 
   auto it = this->invitationByCode.find(code);
   if (it == this->invitationByCode.end()) {
     DEBUG_cerr << "Could not find invitation by code. Code: " << code << endl; 
@@ -142,11 +151,11 @@ const Invitation& Invitations::GetInvitationByCode(const string& code) {
   return *(it->second);
 }
 
-const Invitation& Invitations::CreateNew(
+Invitation& Invitations::CreateNew(
     uint32_t topicId,
-    const std::string& description,
+    //const std::string& description,
     uint16_t numTickets,
-    steadytime expiration)
+    datetime expiration)
 {
 #if 0
   if (topicId == 0) {
@@ -155,9 +164,9 @@ const Invitation& Invitations::CreateNew(
   } 
 #endif
 
-  if (steady_clock::now() >= expiration) {
-    DEBUG_cerr << "Expiration cannot be in the past." << endl; 
-    throw Exception(ExceptionType::CREATE);
+  if (system_clock::now() >= expiration) {
+    DEBUG_cerr << "WARNING! Expiration cannot be in the past." << endl; 
+    //throw Exception(ExceptionType::CREATE);
   } 
 
   if (numTickets == 0) {
@@ -167,20 +176,30 @@ const Invitation& Invitations::CreateNew(
 
   this->summary_.lastid += 1;
 
-  Invitation& invit = this->invitationById[this->summary_.lastid];
+  Invitation invit;
 
   invit.id = this->summary_.lastid;
   invit.topicId = topicId;
-  invit.description = description;
   invit.numTickets = numTickets;
   invit.numRemaining = numTickets;
   invit.expiration = expiration;
-  invit.created = steady_clock::now();
+  invit.created = system_clock::now();
 
-  std::string code = this->generateUniqueCode();
-  code.copy(invit.code, sizeof(invit.code));
+  const int COMPLEXITY = 4;
 
-  this->invitationByCode[code] = &invit;
+REGEN:
+  Util::String::RandomString(invit.code, sizeof(invit.code), COMPLEXITY);
+  std::string code(invit.code, sizeof(invit.code));
+  if (this->invitationByCode.find(code) != this->invitationByCode.end()) {
+    DEBUG_cout << "Regen..." << endl; 
+    goto REGEN;
+  } 
+
+  this->dataFile_.seekp(0, std::ios_base::end);
+  invit.pos = this->dataFile_.tellp();
+
+  this->invitationById[invit.id] = invit;
+  this->invitationByCode[code] = &this->invitationById[invit.id];
 
   bool isSaved = this->addInvitationToFile(invit);
   if (isSaved == false) {
@@ -193,65 +212,45 @@ const Invitation& Invitations::CreateNew(
   return this->invitationById[invit.id];
 }
 
-std::string Invitations::generateUniqueCode() {
-  std::string code;
-  for (int i = 0; i < 100; i++) {
-    std::string code = Util::String::RandomString(sizeof(Invitation::code));
-    auto itr = this->invitationByCode.find(code);
-    if (itr == this->invitationByCode.end()) {
-      // Successful
-      return code;
-    } 
-    DEBUG_cout << "Duplicate Invitation Code has been generated. Regenerating..." << endl; 
-  } 
 
-  DEBUG_cerr << "Could not generate Unique Code." << endl; 
-  return "";
-}
-
-ssize_t Invitations::RedeemTicket(const std::string& code) {
-  auto invit = this->GetInvitationByCode(code);
+size_t Invitations::RedeemTicket(const std::string& code) {
+  Invitation& invit = this->GetInvitationByCode(code);
   if (invit.numRemaining <= 0) {
     DEBUG_cerr << "No tickets available anymore." << endl; 
-    return -1;
+    throw Exception(ExceptionType::INVIT_OUT);
   } 
 
-  bool result = this->UpdateNumRemaining(invit.id, invit.numRemaining - 1);
-  if (result == false) {
-    return -1;
+  if (invit.expiration <= system_clock::now()) {
+    DEBUG_cerr << "Ticket Expired." << endl; 
+    throw Exception(ExceptionType::INVIT_EXP);
   } 
+
+  invit.numRemaining -= 1;
+
+  this->dataFile_.seekp(invit.pos, std::ios::beg);
+  this->dataFile_ << invit;
 
   return static_cast<ssize_t>(invit.numRemaining);
 }
 
-bool Invitations::UpdateNumRemaining(const uint32_t id, uint16_t numRemaining) {
-  auto it = this->invitationById.find(id);
-  if (it == this->invitationById.end()) {
-    DEBUG_cerr << "Invaild invitation Id. " << id << endl; 
-    throw Exception(ExceptionType::UPDATE);
-    return false; // Fallback command.
-  } 
-  this->invitationById[id].numRemaining = numRemaining;
-  return true;
-}
-
-bool Invitations::UpdateDescription(const uint32_t id, std::string& description) {
-  DEBUG_cerr << "Not Yet Implemented." << endl; 
-  throw NotYetImplementedException();
-
-  auto it = this->invitationById.find(id);
-  if (it == this->invitationById.end()) {
-    DEBUG_cerr << "Invaild invitation Id. " << id << endl; 
-    throw Exception(ExceptionType::UPDATE);
-    return false; // Fallback command.
-  } 
-  this->invitationById[id].description = description;
-  return true;
-}
-
 bool Invitations::Delete(const uint32_t id) {
-  DEBUG_cerr << "Not Yet Implemented." << endl; 
-  throw NotYetImplementedException();
+
+  auto itr = this->invitationById.find(id);
+  if (itr == this->invitationById.end()) {
+    DEBUG_cerr << "Delete failed. Invit does not exist." << endl; 
+    return false;
+  } 
+
+  itr->second.id = 0;
+  this->dataFile_ << itr->second;
+
+  auto invitcodeitr = this->invitationByCode.find(std::string(itr->second.code, sizeof(itr->second.code)));
+
+  this->invitationByCode.erase(invitcodeitr);
+  this->invitationById.erase(itr);
+
+  return true;
+
 
 #if 0
   auto it = this->invitationById.find(id);
@@ -265,7 +264,7 @@ bool Invitations::Delete(const uint32_t id) {
 }
 
 
-bool Invitations::addInvitationToFile(const Invitation& invitation) {
+bool Invitations::addInvitationToFile(Invitation& invitation) {
   DEBUG_FUNC_START;
   if (this->dataFile_.is_open() == false) {
     DEBUG_cerr << "Datafile is not open and cannot be added.." << endl; 
@@ -310,21 +309,46 @@ TEST(InvitationsTest, OpenAndClose) {
   ASSERT_TRUE(invitations.Close());
 }
 
+TEST(InvitationsTest, GetInvitByWrongIdAndCode) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+  EXPECT_THROW(invitations.GetInvitationById(100000), Invitations::Exception);
+  EXPECT_THROW(invitations.GetInvitationByCode("3993FD9VKD30dfddf123"), Invitations::Exception);
+
+  EXPECT_TRUE(invitations.Close());
+}
+
 
 TEST(InvitationsTest, CreateNew) {
   Invitations invitations(config);
 
   ASSERT_TRUE(invitations.Open());
 
-  steadytime expTime = std::chrono::steady_clock::now() + std::chrono::hours(24);
-  const Invitation& invit = invitations.CreateNew(0, "TestDescription", 10, expTime);
+  datetime expTime = std::chrono::system_clock::now() + std::chrono::hours(24);
+  Invitation& invit = invitations.CreateNew(0, 10, expTime);
   EXPECT_GT(invit.id, 0);
   EXPECT_EQ(0, invit.topicId);
-  EXPECT_EQ(std::strcmp("TestDescription", invit.description.c_str()), 0);
-
 
   EXPECT_TRUE(invitations.Close());
 }
+
+TEST(InvitationsTest, CreateNewExpired) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+  datetime expTime = std::chrono::system_clock::now();
+  Invitation& invit = invitations.CreateNew(0, 3, expTime);
+
+  std::string code(invit.code, sizeof(invit.code));
+  EXPECT_THROW(invitations.RedeemTicket(code), Invitations::Exception);
+
+  EXPECT_TRUE(invitations.Close());
+}
+
+
 
 std::string code;
 
@@ -333,26 +357,66 @@ TEST(InvitationsTest, GetInvitById) {
 
   ASSERT_TRUE(invitations.Open());
 
-  const Invitation& invit = invitations.GetInvitationById(1);
+  Invitation& invit = invitations.GetInvitationById(1);
   EXPECT_EQ(1, invit.id);
   EXPECT_EQ(0, invit.topicId);
-  ASSERT_EQ(std::strcmp("TestDescription", invit.description.c_str()), 0);
   code = std::string(invit.code, sizeof(invit.code));
+  DEBUG_cout << "code: " << code << endl; 
 
   EXPECT_TRUE(invitations.Close());
 }
 
 TEST(InvitationsTest, GetInvitByCode) {
-  ASSERT_GT(code.size(), 5);
+  ASSERT_GT(code.length(), 6);
 
   Invitations invitations(config);
 
   ASSERT_TRUE(invitations.Open());
 
-  const Invitation& invit = invitations.GetInvitationByCode(code);
+  Invitation& invit = invitations.GetInvitationByCode(code);
+  DEBUG_cout << "code: " << code << endl; 
+  DEBUG_cout << "invit.code: " << std::string(invit.code, sizeof(invit.code)) << endl; 
   EXPECT_EQ(1, invit.id);
   EXPECT_EQ(0, invit.topicId);
-  EXPECT_EQ(std::strcmp("TestDescription", invit.description.c_str()), 0);
+
+  EXPECT_TRUE(invitations.Close());
+}
+
+TEST(InvitationsTest, RedeemTicket) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+  try {
+    while (true) {
+      size_t numRemaining = invitations.RedeemTicket(code);
+      DEBUG_cout << "numRemaining: " << numRemaining << endl; 
+      EXPECT_GT(10, numRemaining);
+    } 
+  } catch (Invitations::Exception& ex) {
+    DEBUG_cerr << ex.what() << endl; 
+  } 
+  EXPECT_TRUE(invitations.Close());
+}
+
+TEST(InvitationsTest, Delete) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+
+  bool deleted = invitations.Delete(1);
+  EXPECT_TRUE(deleted);
+
+  EXPECT_TRUE(invitations.Close());
+}
+
+TEST(InvitationsTest, GetDeletedInvitById) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+  EXPECT_THROW(invitations.GetInvitationById(1), Invitations::Exception); 
 
   EXPECT_TRUE(invitations.Close());
 }
