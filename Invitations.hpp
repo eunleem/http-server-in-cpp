@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 29, 2015
+    Jun 30, 2015
   
   History
     June 12, 2014
@@ -18,6 +18,7 @@
 
   ToDos
     Description handling? such as edit.
+    CleanUp Functions
 
   Milestones
     1.0
@@ -71,12 +72,12 @@ public:
     id(0),
     topicId(0),
     numTickets(0),
-    numRemaining(0)
+    numRemaining(0),
+    pos(0)
   {
     memset(this->code, 0, sizeof(this->code));
   }
   invitid_t       id;
-  std::streampos  pos;
   uint32_t        topicId;
   char            code[12];
   uint16_t        numTickets;
@@ -84,34 +85,45 @@ public:
   datetime        created;
   datetime        expiration;
 
+  std::streampos  pos;
+
+  inline
+  std::string GetCode() const {
+    return std::string(this->code, sizeof(this->code));
+  }
+
+  inline
   void Print() const {
     DEBUG_cout << "Printing Invitation Row..." << endl; 
     DEBUG_cout << "  id: " << id << endl; 
-    DEBUG_cout << "  pos: " << pos << endl; 
     DEBUG_cout << "  topicId: " << topicId << endl; 
     DEBUG_cout << "  code: " << std::string(this->code, sizeof(code)) << endl; 
     DEBUG_cout << "  numTickets: " << (int)this->numTickets << endl; 
     DEBUG_cout << "  numRemaining: " << (int)this->numRemaining << endl; 
     DEBUG_cout << "  cretead: " << Util::Time::TimeToString(this->created) << endl; 
     DEBUG_cout << "  expiration: " << Util::Time::TimeToString(this->expiration) << endl; 
+    DEBUG_cout << "  pos: " << pos << endl; 
   }
 protected:
   std::ostream& Serialize(std::ostream& os) const override {
+    if (os.tellp() != this->pos) {
+      DEBUG_cerr << "Writing row in a wrong pos!" << endl; 
+    } 
     os.write((char*)&this->id, sizeof(this->id));
-    os.write((char*)&this->pos, sizeof(this->pos));
     os.write((char*)&this->topicId, sizeof(this->topicId));
     os.write((char*)this->code, sizeof(this->code));
     os.write((char*)&this->numTickets, sizeof(this->numTickets));
     os.write((char*)&this->numRemaining, sizeof(this->numRemaining));
     os.write((char*)&this->created, sizeof(this->created));
     os.write((char*)&this->expiration, sizeof(this->expiration));
+    //os.write((char*)&this->pos, sizeof(this->pos));
 
     return os;
   }
 
   std::istream& Deserialize(std::istream& is) override {
+    this->pos = is.tellg();
     is.read((char*)&this->id, sizeof(this->id));
-    is.read((char*)&this->pos, sizeof(this->pos));
     is.read((char*)&this->topicId, sizeof(this->topicId));
     is.read((char*)this->code, sizeof(this->code));
     is.read((char*)&this->numTickets, sizeof(this->numTickets));
@@ -211,6 +223,8 @@ protected:
   ssize_t     SaveAllToStorage() override;
 
   bool        addInvitationToFile(Invitation& invitation);
+
+  //ssize_t     cleanup(); 
 
 private:
   Config config_;

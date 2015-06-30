@@ -39,7 +39,7 @@ Invitations::~Invitations() {
 }
 
 bool Invitations::open() {
-  srand(time(NULL));
+  //srand(time(NULL));
 
   const std::string dataFilePath = this->config_.GetDataFilePath();
   DEBUG_cout << "Data File Path: " << dataFilePath << endl; 
@@ -98,6 +98,7 @@ ssize_t Invitations::LoadAllFromStorage() {
     if (invitation.id == 0) {
       // InvitationId == 0 meaning it's been deleted.
       // Skipping on deleted invitation.
+      DEBUG_cout << "Skipping deleted Invitation. count: " << count << endl; 
       continue;
     } 
 
@@ -127,14 +128,15 @@ const std::unordered_map<uint32_t, Invitation>& Invitations::GetInvitations() co
 
 
 Invitation& Invitations::GetInvitationById(const uint32_t invitId) {
-  auto it = this->invitationById.find(invitId);
-
-  if (it == this->invitationById.end()) {
+  auto itr = this->invitationById.find(invitId);
+  if (itr == this->invitationById.end()) {
     DEBUG_cerr << "Could not find invitation by id " << invitId << endl; 
     throw Exception(ExceptionType::GETINVIT);
-  } 
+  } else {
+    DEBUG_cout << "Invitation Found. id:" << itr->second.id << endl; 
+  }
 
-  return it->second;
+  return itr->second;
 }
 
 Invitation& Invitations::GetInvitationByCode(const std::string& code) {
@@ -191,15 +193,9 @@ REGEN:
   Util::String::RandomString(invit.code, sizeof(invit.code), COMPLEXITY);
   std::string code(invit.code, sizeof(invit.code));
   if (this->invitationByCode.find(code) != this->invitationByCode.end()) {
-    DEBUG_cout << "Regen..." << endl; 
+    DEBUG_cout << "Regen..." << endl;
     goto REGEN;
   } 
-
-  this->dataFile_.seekp(0, std::ios_base::end);
-  invit.pos = this->dataFile_.tellp();
-
-  this->invitationById[invit.id] = invit;
-  this->invitationByCode[code] = &this->invitationById[invit.id];
 
   bool isSaved = this->addInvitationToFile(invit);
   if (isSaved == false) {
@@ -207,7 +203,10 @@ REGEN:
     throw Exception(ExceptionType::CREATE);
   } 
 
-  DEBUG_cout << "Created new Invitation. Id: " << invit.id << endl; 
+  this->invitationById[invit.id] = invit;
+  this->invitationByCode[code] = &this->invitationById[invit.id];
+
+  DEBUG_cout << "Created new Invitation. Id: " << invit.id << endl;
 
   return this->invitationById[invit.id];
 }
@@ -242,6 +241,7 @@ bool Invitations::Delete(const uint32_t id) {
   } 
 
   itr->second.id = 0;
+  this->dataFile_.seekp(itr->second.pos, std::ios::beg);
   this->dataFile_ << itr->second;
 
   auto invitcodeitr = this->invitationByCode.find(std::string(itr->second.code, sizeof(itr->second.code)));
@@ -265,17 +265,18 @@ bool Invitations::Delete(const uint32_t id) {
 
 
 bool Invitations::addInvitationToFile(Invitation& invitation) {
-  DEBUG_FUNC_START;
-  if (this->dataFile_.is_open() == false) {
+  DEBUG if (this->dataFile_.is_open() == false) {
     DEBUG_cerr << "Datafile is not open and cannot be added.." << endl; 
-    return 0;
+    return false;
   } 
 
   this->dataFile_.seekp(0, std::ios_base::end);
+  invitation.pos = this->dataFile_.tellp();
   this->dataFile_ << invitation;
 
-  if (this->dataFile_.bad() == true) {
+  DEBUG if (this->dataFile_.bad() == true) {
     DEBUG_cerr << "DATAFILE WRITE BAD." << endl; 
+    return false;
   } 
 
   this->dataFile_.flush();
@@ -300,6 +301,7 @@ public:
 
 using ::testing::AtLeast;
 
+
 Invitations::Config config("./testdata/invitations/", "invitations.data");
 
 TEST(InvitationsTest, OpenAndClose) {
@@ -314,12 +316,13 @@ TEST(InvitationsTest, GetInvitByWrongIdAndCode) {
 
   ASSERT_TRUE(invitations.Open());
 
-  EXPECT_THROW(invitations.GetInvitationById(100000), Invitations::Exception);
+  EXPECT_THROW(invitations.GetInvitationById(9999999), Invitations::Exception);
   EXPECT_THROW(invitations.GetInvitationByCode("3993FD9VKD30dfddf123"), Invitations::Exception);
 
   EXPECT_TRUE(invitations.Close());
 }
 
+invitid_t invitid = 0;
 
 TEST(InvitationsTest, CreateNew) {
   Invitations invitations(config);
@@ -330,9 +333,33 @@ TEST(InvitationsTest, CreateNew) {
   Invitation& invit = invitations.CreateNew(0, 10, expTime);
   EXPECT_GT(invit.id, 0);
   EXPECT_EQ(0, invit.topicId);
+  EXPECT_GT(invit.GetCode().length(), 5);
+
+  invit.Print();
+
 
   EXPECT_TRUE(invitations.Close());
 }
+
+TEST(InvitationsTest, CreateAlot) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+  for (size_t i = 0; i < 2000; i++) {
+    datetime expTime = std::chrono::system_clock::now() + std::chrono::hours(24);
+    Invitation& invit = invitations.CreateNew(0, 10, expTime);
+    EXPECT_GT(invit.id, 0);
+    EXPECT_EQ(0, invit.topicId);
+    EXPECT_GT(invit.GetCode().length(), 5);
+  } 
+
+  invitid = static_cast<invitid_t>(Util::Test::RandomNumber(1000));
+
+  EXPECT_TRUE(invitations.Close());
+}
+
+
 
 TEST(InvitationsTest, CreateNewExpired) {
   Invitations invitations(config);
@@ -342,7 +369,7 @@ TEST(InvitationsTest, CreateNewExpired) {
   datetime expTime = std::chrono::system_clock::now();
   Invitation& invit = invitations.CreateNew(0, 3, expTime);
 
-  std::string code(invit.code, sizeof(invit.code));
+  std::string code = invit.GetCode();
   EXPECT_THROW(invitations.RedeemTicket(code), Invitations::Exception);
 
   EXPECT_TRUE(invitations.Close());
@@ -357,11 +384,10 @@ TEST(InvitationsTest, GetInvitById) {
 
   ASSERT_TRUE(invitations.Open());
 
-  Invitation& invit = invitations.GetInvitationById(1);
-  EXPECT_EQ(1, invit.id);
+  Invitation& invit = invitations.GetInvitationById(invitid);
+  EXPECT_EQ(invitid, invit.id);
   EXPECT_EQ(0, invit.topicId);
-  code = std::string(invit.code, sizeof(invit.code));
-  DEBUG_cout << "code: " << code << endl; 
+  code = invit.GetCode();
 
   EXPECT_TRUE(invitations.Close());
 }
@@ -374,10 +400,8 @@ TEST(InvitationsTest, GetInvitByCode) {
   ASSERT_TRUE(invitations.Open());
 
   Invitation& invit = invitations.GetInvitationByCode(code);
-  DEBUG_cout << "code: " << code << endl; 
-  DEBUG_cout << "invit.code: " << std::string(invit.code, sizeof(invit.code)) << endl; 
-  EXPECT_EQ(1, invit.id);
-  EXPECT_EQ(0, invit.topicId);
+  EXPECT_EQ(invitid, invit.id);
+  EXPECT_STREQ(code.c_str(), invit.GetCode().c_str());
 
   EXPECT_TRUE(invitations.Close());
 }
@@ -404,9 +428,8 @@ TEST(InvitationsTest, Delete) {
 
   ASSERT_TRUE(invitations.Open());
 
-
-  bool deleted = invitations.Delete(1);
-  EXPECT_TRUE(deleted);
+  EXPECT_TRUE(invitations.Delete(invitid));
+  EXPECT_THROW(invitations.GetInvitationById(invitid), Invitations::Exception); 
 
   EXPECT_TRUE(invitations.Close());
 }
@@ -416,12 +439,29 @@ TEST(InvitationsTest, GetDeletedInvitById) {
 
   ASSERT_TRUE(invitations.Open());
 
-  EXPECT_THROW(invitations.GetInvitationById(1), Invitations::Exception); 
+  EXPECT_THROW(invitations.GetInvitationById(invitid), Invitations::Exception); 
 
   EXPECT_TRUE(invitations.Close());
 }
 
+TEST(InvitationsTest, DeleteMultiple) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+  for (unsigned int i = 0; i < 100; i++) {
+    size_t randomid = Util::Test::RandomNumber(2000);
+    bool deleted = invitations.Delete(randomid);
+    //EXPECT_TRUE(deleted);
+    EXPECT_THROW(invitations.GetInvitationById(randomid), Invitations::Exception); 
+  } 
+
+  EXPECT_TRUE(invitations.Close());
+}
+
+
 int main (int argc, char** argv) {
+  srand(time(NULL));
   ::testing::InitGoogleMock(&argc, argv);
   return RUN_ALL_TESTS();
 }
