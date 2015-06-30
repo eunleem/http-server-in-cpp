@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 11, 2015
+    Jun 29, 2015
   
   History
     December 12, 2014
@@ -104,7 +104,7 @@ private:
 
   class Config {
   public:
-    Config(std::string dirPath = "./sessions/", std::string fileName = "sessions.data") :
+    Config(std::string dirPath = "./data/sessions/", std::string fileName = "sessions.data") :
       dirPath(dirPath),
       fileName(fileName)
     {
