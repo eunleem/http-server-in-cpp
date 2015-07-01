@@ -78,7 +78,13 @@ bool Invitations::open() {
     return false;
   } 
 
-  this->LoadAllFromStorage();
+  ssize_t loadedInvitations = this->LoadAllFromStorage();
+  if (loadedInvitations == 0) {
+    // No invitations, CREATE ONE.
+    Invitation& invit = this->CreateNew(0, "First Invitation", 1,
+        std::chrono::system_clock::now() + std::chrono::hours(12));
+    DEBUG_cout << "First Invitation Code: " << invit.GetCode() << endl;
+  } 
 
   return true;
 }
@@ -220,9 +226,11 @@ REGEN:
     throw Exception(ExceptionType::CREATE);
   } 
 
-  isSaved = this->addDescriptionFile(invit, description);
-  if (isSaved == false) {
-    throw Exception(ExceptionType::CREATE);
+  if (description.length() > 0) {
+    isSaved = this->addDescriptionFile(invit, description);
+    if (isSaved == false) {
+      throw Exception(ExceptionType::CREATE);
+    } 
   } 
 
   this->invitationById[invit.id] = invit;
@@ -311,7 +319,7 @@ bool Invitations::addDescriptionFile(const Invitation& invitation, const std::st
   std::string fileName = invitation.GetCode() + ".html";
 
   std::string filePath = dirPath + fileName;
-  DEBUG_cout << "filePath:" << filePath << endl; 
+  //DEBUG_cout << "filePath:" << filePath << endl; 
 
   bool isExisting = Util::File::IsFileExisting(filePath);
   if (isExisting == true) {
@@ -323,7 +331,7 @@ bool Invitations::addDescriptionFile(const Invitation& invitation, const std::st
 
   file.open(filePath, std::ios::out);
   if (file.is_open() == false) {
-    DEBUG_cerr << "Could not open description file." << endl; 
+    DEBUG_cerr << "Could not open description file. filePath: " << filePath << endl; 
     return false;
   } 
 
@@ -352,6 +360,7 @@ public:
 
 using ::testing::AtLeast;
 
+const size_t INVITATIONS_MAX = 100;
 
 Invitations::Config config("./testdata/invitations/", "invitations.data");
 
@@ -359,6 +368,20 @@ TEST(InvitationsTest, OpenAndClose) {
   Invitations invitations(config);
 
   ASSERT_TRUE(invitations.Open());
+  ASSERT_TRUE(invitations.Close());
+}
+
+TEST(InvitationsTest, FirstInvitation) {
+  Invitations invitations(config);
+
+  ASSERT_TRUE(invitations.Open());
+
+  Invitation& invit = invitations.GetInvitationById(1);
+  EXPECT_EQ(1, invit.id);
+  EXPECT_EQ(0, invit.topicId);
+  EXPECT_EQ(1, invit.numTickets);
+  EXPECT_EQ(1, invit.numRemaining);
+
   ASSERT_TRUE(invitations.Close());
 }
 
@@ -381,7 +404,7 @@ TEST(InvitationsTest, CreateNew) {
   ASSERT_TRUE(invitations.Open());
 
   datetime expTime = std::chrono::system_clock::now() + std::chrono::hours(24);
-  Invitation& invit = invitations.CreateNew(0, 10, expTime);
+  Invitation& invit = invitations.CreateNew(0, "", 10, expTime);
   EXPECT_GT(invit.id, 0);
   EXPECT_EQ(0, invit.topicId);
   EXPECT_GT(invit.GetCode().length(), 5);
@@ -397,15 +420,15 @@ TEST(InvitationsTest, CreateAlot) {
 
   ASSERT_TRUE(invitations.Open());
 
-  for (size_t i = 0; i < 2000; i++) {
+  for (size_t i = 0; i < INVITATIONS_MAX; i++) {
     datetime expTime = std::chrono::system_clock::now() + std::chrono::hours(24);
-    Invitation& invit = invitations.CreateNew(0, 10, expTime);
+    Invitation& invit = invitations.CreateNew(0, "", 10, expTime);
     EXPECT_GT(invit.id, 0);
     EXPECT_EQ(0, invit.topicId);
     EXPECT_GT(invit.GetCode().length(), 5);
   } 
 
-  invitid = static_cast<invitid_t>(Util::Test::RandomNumber(1000));
+  invitid = static_cast<invitid_t>(Util::Test::RandomNumber(INVITATIONS_MAX));
 
   EXPECT_TRUE(invitations.Close());
 }
@@ -418,7 +441,7 @@ TEST(InvitationsTest, CreateNewExpired) {
   ASSERT_TRUE(invitations.Open());
 
   datetime expTime = std::chrono::system_clock::now();
-  Invitation& invit = invitations.CreateNew(0, 3, expTime);
+  Invitation& invit = invitations.CreateNew(0, "", 3, expTime);
 
   std::string code = invit.GetCode();
   EXPECT_THROW(invitations.RedeemTicket(code), Invitations::Exception);
@@ -500,8 +523,8 @@ TEST(InvitationsTest, DeleteMultiple) {
 
   ASSERT_TRUE(invitations.Open());
 
-  for (unsigned int i = 0; i < 100; i++) {
-    size_t randomid = Util::Test::RandomNumber(2000);
+  for (unsigned int i = 0; i < (INVITATIONS_MAX / 10); i++) {
+    size_t randomid = Util::Test::RandomNumber(INVITATIONS_MAX);
     bool deleted = invitations.Delete(randomid);
     //EXPECT_TRUE(deleted);
     EXPECT_THROW(invitations.GetInvitationById(randomid), Invitations::Exception); 

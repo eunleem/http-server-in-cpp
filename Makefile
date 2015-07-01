@@ -70,7 +70,7 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(EXECUTABLE_FLAGS) $(INCLUDE_DIR) $(LIBRARY_DIR) $(OBJECTS) $(LIBRARIES) -o $@
 
 TestInvitations: $(ROOT_DIR)/liolib/Util.o
-	rm -f ./testdata/invitations/*
+	rm -rf ./testdata/invitations/*
 	@$(call UNITTEST,Invitations,$^,Invitations)
 
 TestLives: $(ROOT_DIR)/liolib/Util.o
