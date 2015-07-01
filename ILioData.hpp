@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 15, 2015
+    Jun 30, 2015
   
   History
     June 09, 2015
@@ -39,9 +39,10 @@
 
 #include "Sessions.hpp"
 #include "Lives.hpp"
-#include "Ideas.hpp"
+#include "Invitations.hpp"
+//#include "Ideas.hpp"
 
-#include "Journal.hpp"
+//#include "Journal.hpp"
 
 #include "liolib/Openable.hpp"
 
@@ -55,10 +56,14 @@ public:
 
 // ******** Exception Declaration *********
 enum class ExceptionType : std::uint8_t {
-  GENERAL
+  GENERAL,
+  SIGNUP,
+  LOGIN
 };
 #define ILIODATA_EXCEPTION_MESSAGES \
-  "ILioData Exception has been thrown."
+  "ILioData Exception has been thrown.", \
+  "SignUp failed.", \
+  "Login failed."
 
 class Exception : public std::exception {
 public:
@@ -78,12 +83,18 @@ private:
   ~ILioData();
 
 
-  Life& SignUp();
+  Invitation& AddInvitation(
+      const std::string& description,
+      size_t numTickets,
+      datetime expiration);
+
+  std::pair<const Life*, std::string> SignUp(std::string invitcode);
 
   Life& Login(std::string dna, std::string code);
 
-  //Invitation& AddInvitation();
-  //Invitation& UpdateInvitation();
+  Life& IsLoggedIn(std::string session);
+  bool IsAdmin(std::string session);
+
 
   //Idea& GetIdeaIds();
   //Idea& GetIdeaById();
@@ -96,12 +107,16 @@ private:
 protected:
   Life& CreateLife();
   Life& GetLifeByDnaAndSecretCode(std::string dna, std::string code);
+
+  bool open() override;
+  bool close() override;
   
 private:
   std::string dirPath_;
 
-  Journal journal_;
-  Sessions sessions_;
+  Sessions        sessions_;
+  Lives           lives_;
+  Invitations     invitations_;
   
 };
 
