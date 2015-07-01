@@ -45,7 +45,7 @@ bool Invitations::open() {
   DEBUG_cout << "Data File Path: " << dataFilePath << endl; 
 
   const bool IF_NOT_CREATE = true;
-  bool isExisting = Util::IsFileExisting(dataFilePath, IF_NOT_CREATE);
+  bool isExisting = Util::File::IsFileExisting(dataFilePath, IF_NOT_CREATE);
   if (isExisting == false) {
     DEBUG_cerr << "Could not create file. Critical Error." << endl; 
     return false;

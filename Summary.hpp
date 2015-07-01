@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    May 29, 2015
+    Jul 01, 2015
   
   History
     May 29, 2015
@@ -76,8 +76,8 @@ public:
   }
 
   bool LoadFromStorage() {
-    bool isExistent = Util::IsFileExistent(this->filePath, false);
-    if (isExistent == false) {
+    bool isExisting = Util::File::IsFileExisting(this->filePath, false);
+    if (isExisting == false) {
       this->lastid = 0;
       this->SaveToStorage();
     } 

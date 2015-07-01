@@ -151,7 +151,7 @@ ssize_t Sessions::SaveAllToStorage() {
 
 ssize_t Sessions::LoadAllFromStorage() {
   DEBUG_FUNC_START;
-  bool isExistent = Util::IsFileExistent(this->config_.GetFilePath());
+  bool isExistent = Util::File::IsFileExisting(this->config_.GetFilePath());
   if (isExistent == false) {
     DEBUG_cout << "File does not exist." << endl; 
     return -1;

@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 26, 2015
+    Jul 01, 2015
   
   History
     April 27, 2015
@@ -134,7 +134,7 @@ protected:
 
   bool isLockFileExisting(std::string dirPath) {
     std::string lockFilePath = dirPath + "table.lock";
-    return Util::IsFileExistent(lockFilePath);
+    return Util::File::IsFileExisting(lockFilePath);
   }
 
 
