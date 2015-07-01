@@ -8,13 +8,14 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 29, 2015
+    Jun 30, 2015
   
   History
     December 12, 2014
       Created
 
   ToDos
+    Add a function to erase expired sessions
     
 
 
@@ -65,10 +66,21 @@ public:
     expiration(std::chrono::steady_clock::now() + std::chrono::minutes(30))
   {}
 
-  Session(lifeid_t id, steadytime expiration =
-        std::chrono::steady_clock::now() + std::chrono::minutes(30)) :
+  Session(lifeid_t id,
+          steadytime expiration =
+            std::chrono::steady_clock::now() + std::chrono::minutes(30)) :
       lifeid(id),
       expiration(expiration)
+  {
+    if (expiration < std::chrono::steady_clock::now()) {
+      DEBUG_cerr << "Expiration cannot be later than NOW." << endl; 
+    } 
+  }
+
+  Session(lifeid_t id,
+          std::chrono::minutes expireAfter = std::chrono::minutes(30)) :
+      lifeid(id),
+      expiration(std::chrono::system_clock::now() + expireAfter)
   {
     if (expiration < std::chrono::steady_clock::now()) {
       DEBUG_cerr << "Expiration cannot be later than NOW." << endl; 
@@ -79,15 +91,19 @@ public:
   steadytime expiration;
 };
 
-class Sessions : public Table, public Openable {
+class Sessions : public Table {
 public:
 
 // ******** Exception Declaration *********
 enum class ExceptionType : std::uint8_t {
-  GENERAL
+  GENERAL,
+  NOT_FOUNT,
+  EXPIRED
 };
 #define SESSIONS_EXCEPTION_MESSAGES \
-  "Sessions Exception has been thrown."
+  "Sessions Exception has been thrown.", \
+  "Session Not Found.", \
+  "Session has expired."
 
 class Exception : public std::exception {
 public:
@@ -151,6 +167,7 @@ protected:
 
   bool            open() override;
   bool            close() override;
+
   
 private:
   std::string     generateNotDuplicatingCode();

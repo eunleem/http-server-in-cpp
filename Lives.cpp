@@ -29,7 +29,7 @@ Lives::Exception::type() const noexcept {
 // ===== Exception Implementation End ===== 
 
 
-Lives::Lives(std::string dataFileName, std::string dirPath) :
+Lives::Lives(std::string dirPath, std::string dataFileName) :
   summary_(dirPath),
   directoryPath_(dirPath),
   dataFileName_(dataFileName)
@@ -38,7 +38,6 @@ Lives::Lives(std::string dataFileName, std::string dirPath) :
 }
 
 Lives::~Lives() {
-  DEBUG_FUNC_START;
 }
 
 
@@ -46,7 +45,7 @@ bool Lives::open() {
   DEBUG_FUNC_START;
   srand(time(NULL));
 
-  if (Util::IsDirectoryExisting(this->directoryPath_.c_str()) == false) {
+  if (Util::IsDirectoryExisting(this->directoryPath_) == false) {
     // No Directory
     DEBUG_cerr << "Directory doesn't exist! path: " << this->directoryPath_ << endl; 
     return false;
@@ -64,6 +63,7 @@ bool Lives::open() {
       DEBUG_cerr << "Recovery Failed. Something serious has gone wrong! Halting opening process!" << endl; 
       return false;
     } 
+    this->deleteLockFile(this->directoryPath_);
   } 
 
   this->summary_.Open();
@@ -102,10 +102,10 @@ bool Lives::close() {
 
   this->summary_.Close();
 
+  this->deleteLockFile(this->directoryPath_);
+
   this->lifeById_.clear();
   this->lifeByDna_.clear();
-
-  this->deleteLockFile(this->directoryPath_);
 
   return true;
 }

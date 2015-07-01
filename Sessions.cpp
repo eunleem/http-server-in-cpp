@@ -49,13 +49,13 @@ Session& Sessions::GetSession(const std::string& code) {
   if (it == this->sessionsByCode_.end()) {
     // Not Found
     DEBUG_cout << "Session not found." << endl; 
-    throw Exception();
+    throw Sessions::Exception(ExceptionType::NOT_FOUNT);
   } 
 
   if (it->second.expiration < std::chrono::steady_clock::now()) {
     DEBUG_cout << "Session expired!" << endl; 
     this->RemoveSession(code);
-    throw Exception();
+    throw Sessions::Exception(ExceptionType::EXPIRED);
   } 
 
   return it->second;
@@ -165,7 +165,7 @@ ssize_t Sessions::LoadAllFromStorage() {
   } 
 
   ssize_t count = 0;
-  while (file.eof() == false) {
+  while (file.good() == true) {
 
     std::string key;
     ssize_t readCount = Util::File::ReadString<uint8_t>(file, key);
@@ -226,8 +226,8 @@ int main() {
 
   std::string sid;
 
+    Sessions::Config config("./testdata/sessions/", "sessions.data");
   {
-    Sessions::Config config("./", "sessions.test.data");
     Sessions session(config);
 
     auto time = std::chrono::system_clock::now();
@@ -241,7 +241,7 @@ int main() {
 
 
   {
-    Sessions session;
+    Sessions session(config);
     lifeid_t lifeId = session.GetSession(sid);
     DEBUG_cout << "LifeId: " << lifeId << endl; 
   }
