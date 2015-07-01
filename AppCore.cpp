@@ -32,14 +32,19 @@ AppCore::Exception::type() const noexcept {
 AppCore::AppCore()
 {
   DEBUG_FUNC_START; // Prints out function name in yellow
-  //this->lives_.Open();
-
+  this->data.Open();
 }
 
 AppCore::~AppCore() {
   DEBUG_FUNC_START;
 
-  this->clearFileCache();
+  try {
+    this->data.Close();
+    this->clearFileCache();
+
+  } catch (...) {
+    DEBUG_cerr << "Exception has been thrown in AppCore Destructor!" << endl; 
+  } 
 }
 
 bool AppCore::RemoveCache(const string& cacheName) {

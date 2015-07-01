@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 15, 2015
+    Jun 30, 2015
   
   History
     November 18, 2014
@@ -51,7 +51,7 @@
 #include "HttpPostData.hpp"
 
 
-#include "BLLayer.hpp"
+#include "ILioData.hpp"
 
 
 #include "liolib/JsonString.hpp"
@@ -121,7 +121,7 @@ private:
   //std::map<string, HttpResponse*> cachedResponses_;
 
 
-  //BLLayer data;
+  ILioData data;
 
 
   std::map<string, DataBlock<>> fileCache_;
