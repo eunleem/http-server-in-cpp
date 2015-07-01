@@ -116,7 +116,6 @@ protected:
     os.write((char*)&this->numRemaining, sizeof(this->numRemaining));
     os.write((char*)&this->created, sizeof(this->created));
     os.write((char*)&this->expiration, sizeof(this->expiration));
-    //os.write((char*)&this->pos, sizeof(this->pos));
 
     return os;
   }
@@ -207,7 +206,7 @@ private:
 
   Invitation& CreateNew(
       const uint32_t topicId,
-      //const std::string& description,
+      const std::string& description,
       uint16_t numTickets,
       datetime expiration);
 
@@ -223,6 +222,8 @@ protected:
   ssize_t     SaveAllToStorage() override;
 
   bool        addInvitationToFile(Invitation& invitation);
+
+  bool        addDescriptionFile(const Invitation& invitation, const std::string& description);
 
   //ssize_t     cleanup(); 
 

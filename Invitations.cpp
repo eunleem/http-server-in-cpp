@@ -155,7 +155,7 @@ Invitation& Invitations::GetInvitationByCode(const std::string& code) {
 
 Invitation& Invitations::CreateNew(
     uint32_t topicId,
-    //const std::string& description,
+    const std::string& description,
     uint16_t numTickets,
     datetime expiration)
 {
@@ -200,6 +200,11 @@ REGEN:
   bool isSaved = this->addInvitationToFile(invit);
   if (isSaved == false) {
     DEBUG_cerr << "Could not save invitation." << endl; 
+    throw Exception(ExceptionType::CREATE);
+  } 
+
+  isSaved = this->addDescriptionFile(invit, description);
+  if (isSaved == false) {
     throw Exception(ExceptionType::CREATE);
   } 
 
@@ -280,6 +285,35 @@ bool Invitations::addInvitationToFile(Invitation& invitation) {
   } 
 
   this->dataFile_.flush();
+
+  return true;
+}
+
+bool Invitations::addDescriptionFile(const Invitation& invitation, const std::string& description) {
+  std::string dirPath = this->config_.dirPath + "descriptions/";
+  std::string fileName = invitation.GetCode() + ".html";
+
+  std::string filePath = dirPath + fileName;
+  DEBUG_cout << "filePath:" << filePath << endl; 
+
+  bool isExisting = Util::File::IsFileExisting(filePath);
+  if (isExisting == true) {
+    DEBUG_cout << "Description file already exists! Creating backup it!" << endl; 
+    Util::File::Rename(filePath, filePath + "." + Util::Time::TimestampNum() + ".bak");
+  } 
+
+  std::fstream file;
+
+  file.open(filePath, std::ios::out);
+  if (file.is_open() == false) {
+    DEBUG_cerr << "Could not open description file." << endl; 
+    return false;
+  } 
+
+  file << description;
+
+  file.flush();
+  file.close();
 
   return true;
 }
