@@ -40,6 +40,23 @@ Invitations::~Invitations() {
 
 bool Invitations::open() {
   //srand(time(NULL));
+  
+  bool isDirExisting = Util::File::IsDirectoryExisting(this->config_.dirPath);
+  if (isDirExisting == false) {
+    DEBUG_cerr << "Directory " << this->config_.dirPath << " does not exist." << endl; 
+    return false;
+  } 
+
+  std::string descriptionDirPath = this->config_.dirPath + "descriptions";
+  isDirExisting = Util::File::IsDirectoryExisting(descriptionDirPath);
+  if (isDirExisting == false) {
+    bool isDirCreated = Util::File::CreateDirectory(descriptionDirPath);
+    if (isDirCreated == false) {
+      DEBUG_cerr << "Failed to create descriptions dir. halting..." << endl; 
+      return false;
+    } 
+    DEBUG_cout << "Created Descriptions folder" << endl; 
+  } 
 
   const std::string dataFilePath = this->config_.GetDataFilePath();
   DEBUG_cout << "Data File Path: " << dataFilePath << endl; 
