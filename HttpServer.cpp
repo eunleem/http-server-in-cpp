@@ -388,6 +388,9 @@ int HttpServer::killWorker(Worker* worker) {
 }
 
 void HttpServer::OnChildDeathSignal() {
+  DEBUG_cout << "Do Nothing!" << endl; 
+  return;
+
   Worker& worker = this->workers_.front();
   if (worker.status != ProcStatus::KILLING) {
     // Unexpected termination.
@@ -471,6 +474,7 @@ void sighandler(int signum) {
 
 
 int main() {
+  
   //http://stackoverflow.com/a/284443
   prctl(PR_SET_PDEATHSIG, SIGHUP);
 
