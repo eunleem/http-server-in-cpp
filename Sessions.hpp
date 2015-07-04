@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 30, 2015
+    Jul 01, 2015
   
   History
     December 12, 2014
@@ -80,7 +80,7 @@ public:
   Session(lifeid_t id,
           std::chrono::minutes expireAfter = std::chrono::minutes(30)) :
       lifeid(id),
-      expiration(std::chrono::system_clock::now() + expireAfter)
+      expiration(std::chrono::steady_clock::now() + expireAfter)
   {
     if (expiration < std::chrono::steady_clock::now()) {
       DEBUG_cerr << "Expiration cannot be later than NOW." << endl; 
