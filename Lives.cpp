@@ -29,6 +29,9 @@ Lives::Exception::type() const noexcept {
 // ===== Exception Implementation End ===== 
 
 
+const int Life::DNA_LENGTH = 4;
+
+
 Lives::Lives(std::string dirPath, std::string dataFileName) :
   summary_(dirPath),
   directoryPath_(dirPath),

@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 30, 2015
+    Jul 01, 2015
   
   History
     December 08, 2014
@@ -224,7 +224,6 @@ private:
   }
 };
 
-const int Life::DNA_LENGTH = 4;
 
 class LivesSummary : public Summary<lifeid_t> {
 public:
