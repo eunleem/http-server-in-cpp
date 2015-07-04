@@ -149,7 +149,7 @@ ssize_t Sessions::LoadAllFromStorage() {
   bool isExistent = Util::File::IsFileExisting(this->config_.GetFilePath());
   if (isExistent == false) {
     DEBUG_cout << "File does not exist." << endl; 
-    return -1;
+    return 0;
   } 
 
   std::fstream file;
