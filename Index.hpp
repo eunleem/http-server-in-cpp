@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 15, 2015
+    Jul 01, 2015
   
   History
     May 29, 2015
@@ -74,6 +74,7 @@ protected:
 
 class Index : public Openable {
 public:
+#if 0
 // ******** Exception Declaration *********
 enum class ExceptionType : std::uint8_t {
   GENERAL,
@@ -95,6 +96,7 @@ private:
   static const char* const    exceptionMessages_[];
 };
 // ******** Exception Declaration END*********
+#endif
 
   Index(std::string name, std::string dirPath) :
     dirPath_(dirPath),
@@ -149,6 +151,7 @@ protected:
 private:
 };
 
+#if 0
 // ===== Exception Implementation ===== 
 const char* const
 Index::Exception::exceptionMessages_[] = {
@@ -169,7 +172,7 @@ Index::Exception::type() const noexcept {
   return this->exceptionType_;
 }
 // ===== Exception Implementation End ===== 
-
+#endif
 
 }
 
