@@ -48,7 +48,7 @@ bool Lives::open() {
   DEBUG_FUNC_START;
   srand(time(NULL));
 
-  if (Util::IsDirectoryExisting(this->directoryPath_) == false) {
+  if (Util::File::IsDirectoryExisting(this->directoryPath_) == false) {
     // No Directory
     DEBUG_cerr << "Directory doesn't exist! path: " << this->directoryPath_ << endl; 
     return false;

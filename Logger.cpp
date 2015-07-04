@@ -127,7 +127,7 @@ int Logger::setLogDirectoryPath (string& logDirectoryPath) {
     logDirectoryPath.append("/");
   } 
   
-  if (Util::IsDirectoryExisting(logDirectoryPath) == false) {
+  if (Util::File::IsDirectoryExisting(logDirectoryPath) == false) {
     result = mkdir(logDirectoryPath.c_str(), 0770);
     if (result != OK) {
       // Creating Directory Failed.

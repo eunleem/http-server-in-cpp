@@ -32,11 +32,6 @@ Sessions::Sessions(Config config) :
 {
   DEBUG_FUNC_START; // Prints out function name in yellow
   std::srand(std::time(0)); 
-  bool isDirExistent = Util::IsDirectoryExistent(this->config_.GetDirPath());
-  if (isDirExistent == false) {
-    DEBUG_cerr << "Dir for sessions does not exist." << endl; 
-    return;
-  } 
 
   this->baseConfig_.loadAllOnOpen = true;
 }
@@ -190,13 +185,19 @@ ssize_t Sessions::LoadAllFromStorage() {
 
   file.close();
 
-  DEBUG_cout << "Loaded " << count << " sessions." << endl; 
-  DEBUG_cout << "Stored " << this->sessionsByCode_.size() << " sessions." << endl; 
+  DEBUG_cout << "There were " << count << " sessions in file." << endl; 
+  DEBUG_cout << "Restored " << this->sessionsByCode_.size() << " sessions into memory." << endl; 
 
   return count;
 }
 
 bool Sessions::open() {
+  bool isDirExistent = Util::File::IsDirectoryExisting(this->config_.GetDirPath());
+  if (isDirExistent == false) {
+    DEBUG_cerr << "Directory does not exist. dir: " << this->config_.GetDirPath() << endl; 
+    return false;
+  } 
+
   ssize_t numLoaded = this->LoadAllFromStorage();
   if (numLoaded == -1) {
     return false;

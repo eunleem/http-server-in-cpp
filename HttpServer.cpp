@@ -353,17 +353,17 @@ ssize_t HttpServer::transferFd (const int fd, int fdToTransfer,
 }
 
 bool HttpServer::CheckEnvironment() {
-  bool result = Util::IsDirectoryExisting(this->config_.keyDirPath.c_str());
+  bool result = Util::File::IsDirectoryExisting(this->config_.keyDirPath);
   if (result == false) {
     DEBUG_cerr << "Key Directory " << this->config_.keyDirPath << " does not exist." << endl; 
     return false;
   } 
-  result = Util::IsDirectoryExisting(this->config_.logDirPath.c_str());
+  result = Util::File::IsDirectoryExisting(this->config_.logDirPath);
   if (result == false) {
     DEBUG_cerr << "Log Directory " << this->config_.logDirPath << " does not exist." << endl; 
     return false;
   } 
-  result = Util::IsDirectoryExisting(this->config_.workerDirPath.c_str());
+  result = Util::File::IsDirectoryExisting(this->config_.workerDirPath);
   if (result == false) {
     DEBUG_cerr << "Worker Directory " << this->config_.workerDirPath << " does not exist." << endl; 
     return false;
