@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 01, 2015
+    Jul 06, 2015
   
   History
     December 08, 2014
@@ -102,6 +102,7 @@ public:
   }
 
   static const int DNA_LENGTH;
+  static const int SECRET_CODE_LENGTH;
 
   Life() : 
     id(0),
@@ -114,9 +115,8 @@ public:
     this->generateSalt();
   }
 
-  inline
   std::string GetDna() const {
-    return std::string(this->dna, strlen(dna));
+    return std::string(this->dna, Life::DNA_LENGTH);
   }
 
   inline
@@ -172,7 +172,7 @@ public:
   }
 
   bool GenerateDna() {
-    const int RANDOM_CHAR_COMPLEXITY = 1; // UpperCase Alphabets only
+    const int RANDOM_CHAR_COMPLEXITY = 2; // UpperCase Alphabets and Numbers only
 
     Util::String::RandomString((char*)this->dna, Life::DNA_LENGTH, RANDOM_CHAR_COMPLEXITY);
     return true;

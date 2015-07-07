@@ -29,7 +29,8 @@ Lives::Exception::type() const noexcept {
 // ===== Exception Implementation End ===== 
 
 
-const int Life::DNA_LENGTH = 4;
+const int Life::DNA_LENGTH = 6;
+const int Life::SECRET_CODE_LENGTH = 6;
 
 
 Lives::Lives(std::string dirPath, std::string dataFileName) :
@@ -120,8 +121,7 @@ std::pair<const Life*, std::string> Lives::CreateLife() {
     throw Exception(ExceptionType::NOT_OPEN);
   } 
 
-  const int RANDOM_CHAR_COMPLEXITY = 1; // UpperCase Alphabets only
-  const int SECRET_CODE_LENGTH = 4;
+  const int RANDOM_CHAR_COMPLEXITY = 2; // UpperCase Alphabets and Numbers only
 
   this->summary_.lastid += 1;
 
@@ -129,7 +129,7 @@ std::pair<const Life*, std::string> Lives::CreateLife() {
   life.id = this->summary_.lastid;
 
   std::string secret_code = Util::String::RandomString(
-      SECRET_CODE_LENGTH, RANDOM_CHAR_COMPLEXITY);
+      Life::SECRET_CODE_LENGTH, RANDOM_CHAR_COMPLEXITY);
 
   life.SetHashed(secret_code);
 
@@ -152,6 +152,7 @@ std::pair<const Life*, std::string> Lives::CreateLife() {
 
   DEBUG_cout << "CREATED NEW LIFE." << endl; 
   DEBUG_cout << "  SecretCode: " << secret_code << endl; 
+  DEBUG_cout << "  SecretCodeLength: " << secret_code.length() << endl; 
   DEBUG_cout << "  lifd.id: " << life.id << endl; 
   DEBUG_cout << "  life.dna: " << dna << "." << endl; 
   DEBUG_cout << "  life.salt: " << life.GetSalt() << "." << endl; 
