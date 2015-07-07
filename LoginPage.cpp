@@ -25,16 +25,19 @@ bool LoginPage::Process(HttpConnection* connection, ILioData* data) {
 
   HttpPostData posted(request.GetBody());
   std::string sessionid = request.GetCookie("sessionid").ToString();
-  DEBUG_cout << "sessionid: " << sessionid << endl; 
-  lifeid_t lifeid = data->GetLifeIdBySessionId(sessionid);
-  DEBUG_cout << "lifeid: " << lifeid << endl; 
-  if (lifeid > 0) {
-    response.SetBody(this->already_logged_in, strlen(this->already_logged_in), http::ContentType::JSON);
-    return true;
+  if (sessionid.length() > 0) {
+    DEBUG_cout << "sessionid: " << sessionid << endl; 
+    lifeid_t lifeid = data->GetLifeIdBySessionId(sessionid);
+    DEBUG_cout << "lifeid: " << lifeid << endl; 
+    if (lifeid > 0) {
+      response.SetBody(this->already_logged_in, strlen(this->already_logged_in), http::ContentType::JSON);
+      return true;
+    } 
   } 
 
   std::string code = posted.GetData("code").ToString();
-  if (code.length() < Life::DNA_LENGTH + Life::SECRET_CODE_LENGTH) {
+  size_t totalCodeLength = static_cast<size_t>(Life::DNA_LENGTH + Life::SECRET_CODE_LENGTH);
+  if (code.length() < totalCodeLength) {
     DEBUG_cerr << "Login Code is too short." << endl; 
 
     response.SetBody(this->login_failed, strlen(this->login_failed), http::ContentType::JSON);

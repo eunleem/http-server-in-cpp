@@ -6,103 +6,19 @@
   <script src="jquery.js" type="text/javascript"></script>
   <script src="util.js" type="text/javascript"></script>
   <script src="lets-engine.js" type="text/javascript"></script>
+  <script src="login.js" type="text/javascript"></script>
   <link href="lifeino.css" rel="stylesheet">
+  <link href="login.css" rel="stylesheet">
 </head>
 <body>
-  <style type="text/css">
-    #txtCode {
-      text-align: center;
-      width: 500px;
-    }
-
-    #btnLogin {
-      background-color: #E66665;
-      color: white;
-      font-weight: bold;
-      padding: 15px 10px 5px 10px;
-      transition: background-color 500ms ease-out;
-    }
-
-    #btnLogin:hover {
-      background-color: #F97776;
-
-    }
-  </style>
-
-  <script type="text/javascript">
-    $(function() {
-      loggedIn();
-
-      $("#btnLogin").click(function() {
-        var code = $("#txtCode").val().replace(/ /g, "");
-        $.ajax({
-          type: "POST",
-          url: "/login",
-          data: {
-            "code": code
-          }
-
-        }).fail(function(){
-          alert("failed");
-
-        }).done(function(result) {
-          console.log(result);
-          if (result["code"] == -1) {
-            alert("failed -1");
-
-          } else if (result["code"] == -2) {
-            alert("failed -2");
-
-          } else if (result["code"] == -3) {
-            alert("failed -3");
-
-          } else if (result["code"] == 0) {
-            document.location.href = "/main";
-          } else {
-            alert("failed else");
-
-          }
-        }).always(function() {
-        });
-
-      });
-    });
-
-function loggedIn() {
-  $.ajax({
-    type: "POST",
-    url: "/login"
-
-  }).fail(function(){
-    alert("failed");
-
-  }).done(function(result) {
-    console.log(result);
-    if (result["code"] == -1) {
-      jGet("#boxLogin").html("You are aleady Logged In!");
-
-    } else if (result["code"] == -2) {
-      alert("failed -2");
-
-    } else if (result["code"] == -3) {
-      alert("failed -3");
-
-    } else if (result["code"] == 0) {
-      alert("returned 0");
-    } else {
-      alert("failed else");
-    }
-  }).always(function() {
-  });
-}
-  </script>
   <section>
-    <div id="boxLogin" style="text-align: center;">
+    <div id="boxLogin">
+      Enter your account code below!<br>
       <input type="text" class="text" id="txtCode" name="code">
       <br>
       <button id="btnLogin">Let My Life be in O!</button>
     </div>
   </section>
-  
 </body>
 </html>
+
