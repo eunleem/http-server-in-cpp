@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 30, 2015
+    Jul 06, 2015
   
   History
     June 12, 2014
@@ -203,6 +203,7 @@ private:
 
   Invitation& GetInvitationById(const uint32_t id);
   Invitation& GetInvitationByCode(const std::string& code);
+  std::string GetInvitationDescriptionByCode(const std::string& code);
 
   Invitation& CreateNew(
       const uint32_t topicId,
@@ -224,6 +225,8 @@ protected:
   bool        addInvitationToFile(Invitation& invitation);
 
   bool        addDescriptionFile(const Invitation& invitation, const std::string& description);
+
+  std::string escapeForJson(const std::string& description);
 
   //ssize_t     cleanup(); 
 

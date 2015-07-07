@@ -125,6 +125,10 @@ ssize_t Invitations::LoadAllFromStorage() {
       continue;
     } 
 
+    DEBUG if (invitation.id == 1) {
+      DEBUG_cout << "Invitation Code for the Fist Invit : " << invitation.GetCode() << endl; 
+    } 
+
     this->invitationById[invitation.id] = invitation;
     const std::string code(invitation.code, sizeof(invitation.code));
     this->invitationByCode[code] = &this->invitationById[invitation.id];
@@ -174,6 +178,34 @@ Invitation& Invitations::GetInvitationByCode(const std::string& code) {
   } 
 
   return *(it->second);
+}
+
+std::string Invitations::GetInvitationDescriptionByCode(const std::string& code) {
+  std::string descriptionPath = this->config_.dirPath + "descriptions/" + code + ".html";
+  DEBUG_cout << "descriptionPath: " << descriptionPath << endl; 
+  bool isExisting = Util::File::IsFileExisting(descriptionPath);
+  if (isExisting == false) {
+    DEBUG_cout << "Description File does not exist." << endl; 
+    return "";
+  } 
+
+  std::fstream file;
+  file.open(descriptionPath, std::ios::in);
+  if (file.is_open() == false) {
+    DEBUG_cerr << "Could not open file." << endl; 
+    return "";
+  } 
+
+  ssize_t fileSize = Util::File::GetSize(file);
+  if (fileSize == -1) {
+    DEBUG_cerr << "Failed to get file Size." << endl; 
+    return "";
+  } 
+
+  char buf[fileSize];
+
+  file.read(buf, fileSize);
+  return std::string(buf, fileSize);
 }
 
 Invitation& Invitations::CreateNew(
@@ -335,12 +367,53 @@ bool Invitations::addDescriptionFile(const Invitation& invitation, const std::st
     return false;
   } 
 
-  file << description;
+  std::string escapedDescription = this->escapeForJson(description);
+
+  file << escapedDescription;
 
   file.flush();
   file.close();
 
   return true;
+}
+
+std::string Invitations::escapeForJson(const std::string& description) {
+  std::string escaped;
+  escaped.reserve(description.length() * 2);
+
+  size_t descriptionLength = description.length();
+  for (size_t pos = 0; descriptionLength > pos; pos++) {
+    char c = description[pos];
+    switch (c) {
+      case '\r':
+      case '\n':
+        escaped += "\\n";
+        break;
+      case '\"':
+        escaped += "\\\"";
+        break;
+      case '\t':
+        escaped += "\\t";
+        break;
+      case '\\':
+        escaped += "\\\\";
+        break;
+      case '<':
+        escaped += "&lt;";
+        break;
+      case '>':
+        escaped += "&gt;";
+        break;
+      case '&':
+        escaped += "&amp;";
+        break;
+      default:
+        escaped += c;
+        break;
+    } 
+  } 
+
+  return escaped;
 }
 
 }
