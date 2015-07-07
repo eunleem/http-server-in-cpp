@@ -177,7 +177,8 @@ bool HttpResponse::SetBody(string& body, http::ContentType type) {
   } 
 
   this->body = new char[body.length()];
-  strncpy(this->body, body.c_str(), body.length());
+  body.copy(this->body, body.length());
+  //strncpy(this->body, body.c_str(), body.length());
   this->bodySize = body.length();
   this->isTempBody = true;
   this->contentType = type;
