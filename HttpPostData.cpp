@@ -33,7 +33,6 @@ HttpPostData::HttpPostData(DataBlock<char*> data) :
   content_(data)
 {
   DEBUG_FUNC_START; // Prints out function name in yellow
-
 }
 
 HttpPostData::HttpPostData(char* data, size_t length) :
@@ -49,6 +48,10 @@ HttpPostData::~HttpPostData() {
 }
 
 DataBlock<char*> HttpPostData::GetData(const string& fieldName) {
+  if (this->content_.IsNull() == true) {
+    return DataBlock<char*>();
+  } 
+
   auto it = this->cached_.find(fieldName);
   if (it != this->cached_.end()) {
     return this->cached_[fieldName];
