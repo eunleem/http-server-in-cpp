@@ -68,8 +68,9 @@ std::string Sessions::AddSession(Session sessionData) {
 std::string Sessions::generateNotDuplicatingCode() {
   std::string code(16, 0);
 
+  const int RANDOM_CHAR_COMPLEXITY = 4;
   while (true) {
-    code = Util::String::RandomString(16);
+    code = Util::String::RandomString(16, RANDOM_CHAR_COMPLEXITY);
     if (this->sessionsByCode_.find(code) == this->sessionsByCode_.end()) {
       break;
     } 
