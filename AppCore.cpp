@@ -242,22 +242,24 @@ DataBlock<> AppCore::loadFile (const string& filePath) {
     return DataBlock<>(); // Null DataBlock
   } 
 
-  std::ifstream fileStream;
+  std::fstream file;
 
-  fileStream.open(filePath.c_str());
-  if(fileStream.is_open()) {
+  file.open(filePath, std::ios::in);
+  if(file.is_open() == true) {
     DEBUG_cout << "File Opened!" << endl; 
-    fileStream.seekg(0, std::ios::end);
-    size_t fileSize = fileStream.tellg();
-    
-    DEBUG_cout << "FileSize: " << fileSize << endl; 
+    size_t fileSize = Util::File::GetSize(file);
+    if (fileSize == 0) {
+      DEBUG_cerr << "File is there but size is 0! Treating it as non-existing." << endl; 
+      file.close();
+      return DataBlock<>(); // Null DataBlock
+    } 
 
     char* memblock = new char[fileSize];
 
-    fileStream.seekg(0, std::ios::beg);
-    fileStream.read(memblock, fileSize);
+    file.seekg(0, std::ios::beg);
+    file.read(memblock, fileSize);
     DEBUG_cout << "File Loaded to memory." << endl; 
-    fileStream.close();
+    file.close();
 
     return DataBlock<>(memblock, 0, fileSize);
 

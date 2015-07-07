@@ -10,3 +10,6 @@ data/
 testdata/
 log/
 backup/
+workers/
+tables/
+key/
