@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 30, 2015
+    Jul 06, 2015
   
   History
     June 09, 2015
@@ -82,19 +82,21 @@ private:
   ILioData(std::string dirPath = "./data/");
   ~ILioData();
 
-
   Invitation& AddInvitation(
       const std::string& description,
       size_t numTickets,
       datetime expiration);
 
+  std::pair<Invitation&, std::string> GetInvitationByCode(std::string invitcode);
+
   std::pair<const Life*, std::string> SignUp(std::string invitcode);
 
-  Life& Login(std::string dna, std::string code);
+  std::pair<std::string, Session&> Login(std::string dna, std::string code);
 
-  Life& IsLoggedIn(std::string session);
+  lifeid_t GetLifeIdBySessionId(std::string session);
+  Life& GetLifeById(lifeid_t id);
+
   bool IsAdmin(std::string session);
-
 
   //Idea& GetIdeaIds();
   //Idea& GetIdeaById();

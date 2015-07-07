@@ -69,6 +69,19 @@ Invitation& ILioData::AddInvitation(
   return invit;
 }
 
+std::pair<Invitation&, std::string> ILioData::GetInvitationByCode(std::string invitcode) {
+  Invitation& invit =  this->invitations_.GetInvitationByCode(invitcode); // THROWS
+  
+  if (invit.expiration <= std::chrono::system_clock::now()) {
+    throw Invitations::Exception(Invitations::ExceptionType::INVIT_EXP);
+  } 
+  if (invit.numRemaining == 0) {
+    throw Invitations::Exception(Invitations::ExceptionType::INVIT_OUT);
+  } 
+
+  std::string description = this->invitations_.GetInvitationDescriptionByCode(invitcode);
+  return std::pair<Invitation&, std::string>(invit, description);
+}
 
 std::pair<const Life*, std::string> ILioData::SignUp(std::string invitcode) {
   this->invitations_.RedeemTicket(invitcode); // THROWS 
@@ -77,40 +90,49 @@ std::pair<const Life*, std::string> ILioData::SignUp(std::string invitcode) {
   return newLife;
 }
 
-Life& ILioData::Login(std::string dna, std::string code) {
+std::pair<std::string, Session&> ILioData::Login(std::string dna, std::string code) {
   const Life* life = this->lives_.GetLifeByDnaAndSecretCode(dna, code);
   if (life == nullptr) {
     throw Exception(ExceptionType::LOGIN);
   } 
 
   Session session(life->id, std::chrono::minutes(120));
-  this->sessions_.AddSession(session);
+  std::string sessionId = this->sessions_.AddSession(session);
 
-  return const_cast<Life&>(*life);
+  return std::pair<std::string, Session&>(sessionId, session);
 }
 
-Life& ILioData::IsLoggedIn(std::string sid) {
+lifeid_t ILioData::GetLifeIdBySessionId(std::string sid) {
+  if (sid.length() < 6) {
+    DEBUG_cout << "SessionId is too short or empty. Assuming not Logged In." << endl; 
+    return 0;
+  } 
+
   try {
     Session& session = this->sessions_.GetSession(sid);
-    const Life* life = this->lives_.GetLifeById(session.lifeid);
-    return const_cast<Life&>(*life);
+    return session.lifeid;
 
   } catch (Sessions::Exception& ex) {
-    throw Exception();
-
-  } catch (Lives::Exception& ex) {
-    DEBUG_cerr << "Session exists but Life did not exist in Lives table." << endl; 
-
-  } catch (...) {
-    throw Exception();
+    DEBUG_cout << "ex.what(): " << ex.what() << endl; 
+    return 0;
   }
 
-  throw Exception();
+  return 0;
+}
+
+Life& ILioData::GetLifeById(lifeid_t lifeid) {
+  // THROWS Lives::Exception on failed look up.
+  const Life* life = this->lives_.GetLifeById(lifeid);
+  return const_cast<Life&>(*life);
 }
 
 bool ILioData::IsAdmin(std::string sid) {
   try {
-    Life& life = this->IsLoggedIn(sid);
+    lifeid_t lifeid = this->GetLifeIdBySessionId(sid);
+    if (lifeid == 0) {
+      return false;
+    } 
+    Life& life = this->GetLifeById(lifeid);
     if (life.group == Life::Group::ME) {
       return true;
     } 
@@ -120,6 +142,7 @@ bool ILioData::IsAdmin(std::string sid) {
 
   return false;
 }
+
 //ILioData::
 
 }
