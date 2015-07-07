@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invitation from Life in O</title>
+  <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link href='//fonts.googleapis.com/earlyaccess/nanumgothic.css' rel='stylesheet' type='text/css'>
+  <script src="jquery.js" type="text/javascript"></script>
+  <script src="util.js" type="text/javascript"></script>
+  <script src="lets-engine.js" type="text/javascript"></script>
+  <script src="invitation.js" type="text/javascript"></script>
+  <link href="lifeino.css" rel="stylesheet">
+  <link href="invitation.css" rel="stylesheet">
+</head>
+<body>
+<script type="text/javascript">
+  $(function() {
+    var gen = Invitation.fn.Genesis();
+    gen.Initialize();
+    //var obj = jGet("#boxInvitationCode");
+  });
+</script>
+  <header>
+    <h1 style="color: #666; text-align: center;">초대장</h1>
+  </header>
+  <section id="sect-cover" class="panel">
+    <div class="wrap">
+      초대 코드를 가지고 계신 분들에 한하여 공개됩니다.<br>
+      코드 입력 후, OPEN 버튼을 눌러주세요.
+      <div id="boxInvitationCode">
+        <input type="text" id="txtInvitationCode" class="text" value="Invitation Code">
+        <div id="boxInvitationOpenMessage">
+          <span id="lblInvitationOpenMessage" class="message disabled">&nbsp;</span>
+        </div>
+        <button id="btnInvitationOpen">OPEN</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="sect-invitation" class="panel">
+    <div class="wrap">
+      <p id="lblInvitationDescription" style="color: #555; line-height: 240%;">
+        테스팅에 응해주셔서 감사해요!<br>
+        부담없는 테스팅을 위해 특별한 가입절차가 없고 익명으로 포스팅할 수 있습니다!<br>
+        들어오셔서 마음속에 있는 이야기 아무이야기나 포스팅해주시고 가세요!<br>
+        초대받은 소수의 분들만 볼 수 있고 포스팅할 수 있기 때문에 이왕이면<br>
+        다른데서는 할 수 없는 그런 이야기들 포스팅 해주시면 감사해요!<br>
+        계정을 포함한 모든 데이터는 3시간 내에 모두 소멸시켜요!<br>
+        <br>
+        그럼!<br>
+        <br>
+      </p>
+      <p style="color: #999; font-size: 0.7em;">
+        아래의 JOIN 버튼을 누르시면 따로 가입절차 없이 임시계정이 만들어 집니다.
+      </p>
+      <div id="boxInvitationJoinMessage">
+        <span id="lblInvitationJoinMessage" class="message disabled">&nbsp;</span>
+      </div>
+      <button id="btnInvitationJoin">JOIN</button>
+    </div>
+  </section>
+
+  <section id="sect-newlife" class="panel">
+    <div class="wrap">
+      <h3 style="color: #666;">임시계정코드</h3>
+      <h1 id="lblAccountTempkey" style="font-family: DejaVu Sans Mono, consolas, monospace;"></h1>
+      <p id="lblAccountTempkeyDescription" style="color: #555; line-height: 170%; font-size: 0.7em;">
+        임시계정이 생성되었어요!<br>
+        위의 코드는 로그인에 사용됩니다.<br>
+        코드를 복사하셔서 노트 프로그램에 저장하시거나<br>
+        브라우저의 페이지 저장 기능을 사용하여 페이지를 저장하셔도 됩니다.<br>
+        모바일의 경우 스크린샷을 찍는 방법으로 손쉽게 코드를 저장하실 수 있습니다.<br>
+        <br>
+        현재 테스팅 기간임으로 모든 계정과 데이터를 몇 시간에 한번씩 초기화 시킵니다.<br>
+        짧게. 코드 저장하셔도 ㅠㅠ 쓸데가 없어요. 하지 말아주세요.<br>
+      </p>
+      <p style="color: #999; font-size: 0.7em;">
+        아래의 START 버튼을 누르시면 메인 페이지가 열립니다.
+      </p>
+      <button id="btnAccountStart">START</button>
+    </div>
+  </section>
+
+  
+</body>
+</html>

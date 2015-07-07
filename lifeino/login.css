@@ -1,0 +1,16 @@
+#txtCode {
+  text-align: center;
+  width: 500px;
+}
+
+#btnLogin {
+  background-color: #E66665;
+  color: white;
+  font-weight: bold;
+  padding: 15px 10px 5px 10px;
+  transition: background-color 500ms ease-out;
+}
+
+#btnLogin:hover {
+  background-color: #F97776;
+}

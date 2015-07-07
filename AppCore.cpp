@@ -124,9 +124,25 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
     return true;
 
   } else {
+
+
     if (request->GetRequestMethod() == http::RequestMethod::GET) {
+      if (uri.substr(0, strlen("/login")) == "/login") {
+        return this->CreateFileResponse(connection, "./lifeino/login.html");
+
+      } else if (uri.substr(0, strlen("/invitation")) == "/invitation") {
+        return this->CreateFileResponse(connection, "./lifeino/invitation.html");
+      }
 
     } else if (request->GetRequestMethod() == http::RequestMethod::POST) {
+      if (uri.substr(0, strlen("/login")) == "/login") {
+        LoginPage page;
+        return page.Process(connection, &this->data);
+
+      } else if (uri.substr(0, strlen("/invitation")) == "/invitation") {
+        InvitationPage page;
+        return page.Process(connection, &this->data);
+      }
 
     } else {
       DEBUG_cerr << "Unsupported RequestMethod!" << (int) request->GetRequestMethod() << endl; 

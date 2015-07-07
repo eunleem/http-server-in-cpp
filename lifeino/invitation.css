@@ -1,0 +1,183 @@
+body > header {
+  text-align: center;
+  padding-top: 15px;
+}
+
+body > header > h1 {
+  color: #666;
+}
+
+#sect-cover {
+}
+
+#sect-cover .wrap {
+}
+
+#sect-invitation {
+  display: none;
+}
+
+#sect-newlife {
+  display: none;
+}
+
+.fade-out {
+  animation: fade-out-Frames ease-in 500ms;
+  animation-iteration-count: 1;
+  animation-fill-mode: forward;
+  transform-origin: 50% 50%;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation: fade-out-Frames ease-in 500ms;
+  -webkit-animation-fill-mode: forward;
+  -webkit-transform-origin: 50% 50%;
+}
+
+.fade-in {
+  animation: fade-in-Frames ease-out 700ms;
+  animation-iteration-count: 1;
+  transform-origin: 50% 50%;
+  animation-fill-mode: forward;
+  -webkit-animation: fade-in-Frames ease-out 700ms;
+  -webkit-animation-iteration-count: 1;
+  -webkit-transform-origin: 50% 50%;
+  -webkit-animation-fill-mode: forward;
+}
+
+@keyframes fade-out-Frames {
+  0% {
+    opacity: 1;
+    transform: translate(0px, 0px);
+    -webkit-transform: translate(0px, 0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0px, 50px);
+    -webkit-transform: translate(0px, 50px);
+  }
+}
+@-webkit-keyframes fade-out-Frames {
+  0% {
+    opacity: 1;
+    transform: translate(0px, 0px);
+    -webkit-transform: translate(0px, 0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0px, 50px);
+    -webkit-transform: translate(0px, 50px);
+  }
+}
+
+@keyframes fade-in-Frames {
+  0% {
+    opacity: 0;
+    transform: translate(0px, 50px);
+    -webkit-transform: translate(0px, 50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0px, 0px);
+    -webkit-transform: translate(0px, 0px);
+  }
+}
+@-webkit-keyframes fade-in-Frames {
+  0% {
+    opacity: 0;
+    transform: translate(0px, 50px);
+    -webkit-transform: translate(0px, 50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0px, 0px);
+    -webkit-transform: translate(0px, 0px);
+  }
+}
+
+#boxInvitationCode {
+  margin-top: 30px;
+}
+
+#boxInvitationOpenMessage {
+  margin-top: 15px;
+}
+
+#txtInvitationCode {
+  text-align: center;
+}
+
+.message {
+  font-size: 0.8em;
+  transition: opacity 300ms ease-out;
+  -webkit-transition: opacity 300ms ease-out;
+}
+
+.disabled {
+  opacity: 0;
+  transition: opacity 5000ms ease-out;
+  -webkit-transition: opacity 5000ms ease-out;
+}
+
+#btnInvitationOpen {
+  padding: 5px 40px;
+  background-color: #049DBF;
+  color: white;
+  transition: background-color 300ms ease-out;
+  -webkit-transition: background-color 300ms ease-out;
+}
+
+#btnInvitationOpen:hover {
+  background-color: #26AECF;
+  transition: background-color 100ms ease-out;
+  -webkit-transition: background-color 100ms ease-out;
+}
+
+#btnInvitationOpen:disabled {
+  background-color: #CCC;
+  transition: background-color 1000ms ease-out;
+  -webkit-transition: background-color 1000ms ease-out;
+}
+
+
+#btnInvitationJoin {
+  padding: 5px 40px;
+  background-color: #049DBF;
+  color: white;
+  transition: background-color 300ms ease-out;
+  -webkit-transition: background-color 300ms ease-out;
+}
+
+#btnInvitationJoin:hover {
+  background-color: #26AECF;
+  transition: background-color 100ms ease-out;
+  -webkit-transition: background-color 100ms ease-out;
+}
+
+#btnInvitationJoin:disabled {
+  background-color: #CCC;
+  transition: background-color 1000ms ease-out;
+  -webkit-transition: background-color 1000ms ease-out;
+}
+
+#btnAccountStart {
+  padding: 5px 40px;
+  background-color: #049DBF;
+  color: white;
+  transition: background-color 300ms ease-out;
+  -webkit-transition: background-color 300ms ease-out;
+}
+
+#btnAccountStart:hover {
+  background-color: #26AECF;
+  transition: background-color 100ms ease-out;
+  -webkit-transition: background-color 100ms ease-out;
+}
+
+#btnAccountStart:disabled {
+  background-color: #CCC;
+  transition: background-color 1000ms ease-out;
+  -webkit-transition: background-color 1000ms ease-out;
+}
+
+#btnWhyTempAccount {
+  cursor: help;
+}

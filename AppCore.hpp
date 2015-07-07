@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 30, 2015
+    Jul 05, 2015
   
   History
     November 18, 2014
@@ -52,6 +52,9 @@
 
 
 #include "ILioData.hpp"
+
+#include "LoginPage.hpp"
+#include "InvitationPage.hpp"
 
 
 #include "liolib/JsonString.hpp"
@@ -99,7 +102,7 @@ protected:
 
   //bool NotFound(HttpConnection*);
   //bool ServerError(HttpConnection*);
-  //
+  
   bool securityCheck(HttpConnection* connection);
 
   const char* test_page = "This is Test Page.";
@@ -124,9 +127,11 @@ private:
   ILioData data;
 
 
-  std::map<string, DataBlock<>> fileCache_;
+
   bool CreateFileResponse(HttpConnection* connection, const string& filePath);
   DataBlock<> loadFile(const string& filePath);
+
+  std::map<string, DataBlock<>> fileCache_;
   size_t clearFileCache();
 
   inline
