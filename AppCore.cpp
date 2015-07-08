@@ -110,8 +110,15 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
 
   if (uri.rfind(".") != string::npos) {
     // #TODO Temporary security code.
-    if (uri == "/admin.html") {
-      return false;
+    std::string sessionid = request->GetCookie("sessionid").ToString();
+    DEBUG_cout << "SessionId: " << sessionid << endl; 
+    bool isAdmin = this->data.IsAdmin(sessionid);
+    DEBUG_cout << "ISADMIN: " << std::boolalpha << isAdmin << std::dec << endl; 
+    if (isAdmin == false) {
+      if (uri.substr(0, strlen("/admin")) == "/admin") {
+        DEBUG_cout << "NON ADMIN TRYING TO GET ADMIN RESOURCES." << endl; 
+        return false;
+      } 
     } 
 
     // File Request.
@@ -132,6 +139,9 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
 
       } else if (uri.substr(0, strlen("/invitation")) == "/invitation") {
         return this->CreateFileResponse(connection, "./lifeino/invitation.html");
+
+      } else if (uri.substr(0, strlen("/admin")) == "/admin") {
+        return this->CreateFileResponse(connection, "./lifeino/admin.html");
       }
 
     } else if (request->GetRequestMethod() == http::RequestMethod::POST) {
@@ -141,6 +151,10 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
 
       } else if (uri.substr(0, strlen("/invitation")) == "/invitation") {
         InvitationPage page;
+        return page.Process(connection, &this->data);
+
+      } else if (uri.substr(0, strlen("/admin")) == "/admin") {
+        AdminPage page;
         return page.Process(connection, &this->data);
       }
 

@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 05, 2015
+    Jul 07, 2015
   
   History
     November 18, 2014
@@ -55,6 +55,7 @@
 
 #include "LoginPage.hpp"
 #include "InvitationPage.hpp"
+#include "AdminPage.hpp"
 
 
 #include "liolib/JsonString.hpp"
