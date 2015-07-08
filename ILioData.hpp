@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 06, 2015
+    Jul 07, 2015
   
   History
     June 09, 2015
@@ -96,7 +96,8 @@ private:
   lifeid_t GetLifeIdBySessionId(std::string session);
   Life& GetLifeById(lifeid_t id);
 
-  bool IsAdmin(std::string session);
+
+
 
   //Idea& GetIdeaIds();
   //Idea& GetIdeaById();
@@ -106,6 +107,11 @@ private:
   //Idea& UpdateIdea();
 
 
+  bool IsAdmin(const std::string& session);
+
+  const std::unordered_map<uint32_t, Invitation>& GetInvitations() const;
+
+  const std::unordered_map<lifeid_t, Life>& GetLives() const;
 protected:
   Life& CreateLife();
   Life& GetLifeByDnaAndSecretCode(std::string dna, std::string code);

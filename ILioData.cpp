@@ -126,23 +126,46 @@ Life& ILioData::GetLifeById(lifeid_t lifeid) {
   return const_cast<Life&>(*life);
 }
 
-bool ILioData::IsAdmin(std::string sid) {
+
+//ILioData::
+
+
+
+
+bool ILioData::IsAdmin(const std::string& sid) {
   try {
     lifeid_t lifeid = this->GetLifeIdBySessionId(sid);
     if (lifeid == 0) {
+      DEBUG_cout << "LifeId is O" << endl; 
       return false;
     } 
-    Life& life = this->GetLifeById(lifeid);
-    if (life.group == Life::Group::ME) {
+    if (lifeid == 1) {
+      DEBUG_cout << "LifeId is 1. ADMIN!" << endl; 
       return true;
     } 
+#if 0
+    Life& life = this->GetLifeById(lifeid);
+    if (life.group == Life::Group::ME ||
+        life.id == 1) {
+      return true;
+    } 
+#endif
+    DEBUG_cerr << "WHAT??? LifeId: " << lifeid << endl; 
   } catch (...) {
+    DEBUG_cerr << "ERROR CAUGHT! NO ADMIN." << endl; 
     return false;
   } 
 
   return false;
 }
 
+const std::unordered_map<uint32_t, Invitation>& ILioData::GetInvitations() const {
+  return this->invitations_.GetInvitations();
+}
+
+const std::unordered_map<lifeid_t, Life>& ILioData::GetLives() const {
+  return this->lives_.GetLives();
+}
 //ILioData::
 
 }
