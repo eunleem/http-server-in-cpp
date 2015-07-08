@@ -111,9 +111,7 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
   if (uri.rfind(".") != string::npos) {
     // #TODO Temporary security code.
     std::string sessionid = request->GetCookie("sessionid").ToString();
-    DEBUG_cout << "SessionId: " << sessionid << endl; 
     bool isAdmin = this->data.IsAdmin(sessionid);
-    DEBUG_cout << "ISADMIN: " << std::boolalpha << isAdmin << std::dec << endl; 
     if (isAdmin == false) {
       if (uri.substr(0, strlen("/admin")) == "/admin") {
         DEBUG_cout << "NON ADMIN TRYING TO GET ADMIN RESOURCES." << endl; 
@@ -136,11 +134,25 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
     if (request->GetRequestMethod() == http::RequestMethod::GET) {
       if (uri.substr(0, strlen("/login")) == "/login") {
         return this->CreateFileResponse(connection, "./lifeino/login.html");
+      }
 
-      } else if (uri.substr(0, strlen("/invitation")) == "/invitation") {
+      if (uri.substr(0, strlen("/invitation")) == "/invitation") {
         return this->CreateFileResponse(connection, "./lifeino/invitation.html");
+      }
 
-      } else if (uri.substr(0, strlen("/admin")) == "/admin") {
+
+      if (uri.substr(0, strlen("/main")) == "/main") {
+        return this->CreateFileResponse(connection, "./lifeino/main.html");
+      } 
+
+
+
+      if (uri.substr(0, strlen("/admin")) == "/admin") {
+        std::string sessionid = request->GetCookie("sessionid").ToString();
+        bool isAdmin = this->data.IsAdmin(sessionid);
+        if (isAdmin == false) {
+          return false;
+        } 
         return this->CreateFileResponse(connection, "./lifeino/admin.html");
       }
 
@@ -148,12 +160,14 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
       if (uri.substr(0, strlen("/login")) == "/login") {
         LoginPage page;
         return page.Process(connection, &this->data);
-
-      } else if (uri.substr(0, strlen("/invitation")) == "/invitation") {
+      }
+      
+      if (uri.substr(0, strlen("/invitation")) == "/invitation") {
         InvitationPage page;
         return page.Process(connection, &this->data);
-
-      } else if (uri.substr(0, strlen("/admin")) == "/admin") {
+      }
+      
+      if (uri.substr(0, strlen("/admin")) == "/admin") {
         AdminPage page;
         return page.Process(connection, &this->data);
       }
