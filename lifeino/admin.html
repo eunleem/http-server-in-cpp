@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Page</title>
+  <script src="jquery.js" type="text/javascript"></script>
+  <script src="util.js" type="text/javascript"></script>
+  <script src="lets-engine.js" type="text/javascript"></script>
+  <script src="admin.js" type="text/javascript"></script>
+  <link href="lifeino.css" rel="stylesheet">
+</head>
+<body>
+  <section id="sect-invitations" class="panel">
+    <div class="wrap">
+      <h1>Invitations</h1>
+      <table id="tblInvitations">
+        <thead>
+        <tr>
+          <td>Id</td>
+          <td>Code</td>
+          <td>Tickets</td>
+          <td>Expiration</td>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+      <h2>Add Inviation</h2>
+      <div>
+        NumTickets: 
+        <input type="text" id="txtNewInvitNumTickets" value="10"><br>
+        Invitation expires after 
+        <input type="text" id="txtNewInvitExpHours" value="12"> hour(s)<br>
+        <button id="btnAddInvit">Add Invitation</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="sect-users">
+    <div class="wrap">
+      <h1>Users</h1>
+      <table id="tblUsers">
+        <thead>
+        <tr>
+          <td>LifeId</td>
+          <td>Status</td>
+          <td>Group</td>
+          <td>DNA</td>
+          <td>Created</td>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+
+    </div>
+  </section>
+  
+</body>
+</html>
