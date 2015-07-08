@@ -66,15 +66,19 @@ bool InvitationPage::Process(HttpConnection* connection, ILioData* data) {
 
     try {
       if (action == "open") {
-        std::pair<Invitation&, std::string> invitAndDescription = data->GetInvitationByCode(code);
-        DEBUG_cout << "Description:" << invitAndDescription.second << endl; 
-        if (invitAndDescription.second.length() == 0 ) {
+
+        Invitation invit;
+        std::string description;
+        //std::pair<Invitation&, std::string> invitAndDescription = data->GetInvitationByCode(code);
+        std::tie(invit, description) = data->GetInvitationByCode(code);
+        DEBUG_cout << "Description:" << description << endl; 
+        if (description.length() == 0 ) {
           response.SetBody(this->successful, strlen(this->successful), http::ContentType::JSON);
           return true;
         } 
 
         std::string responseJson = "{ \"code\": 0, \"description\": \"" +
-          invitAndDescription.second + "\"}";
+          description + "\"}";
 
         response.SetBody(responseJson, http::ContentType::JSON);
         return true;
