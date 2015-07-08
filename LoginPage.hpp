@@ -57,7 +57,6 @@ public:
 protected:
   
 private:
-  bool isLoggedIn(ILioData* data);
 
   const char* already_logged_in = "{\"code\": 1, \"message\": \"Already Logged In.\"}";
   const char* successful_login = "{\"code\": 0}";
