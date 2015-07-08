@@ -248,11 +248,11 @@ function join(code) {
       enableButton(jGet("#btnInvitationJoin"));
 
     } else if (result["code"] == -2) {
-      invalidCode("초대장 코드는 올바르나 모든 초대장이 소모되었습니다.<br>너무 속상해 하지 마세요! 다음에 또 기회가 있을거에요!");
+      invalidCode("초대장 코드는 올바르나 마감시간이 지났습니다.<br>너무 속상해 하지마세요! 다음에 또 기회가 있을거에요!");
       enableButton(jGet("#btnInvitationJoin"));
 
     } else if (result["code"] == -3) {
-      invalidCode("초대장 코드는 올바르나 마감시간이 지났습니다.<br>너무 속상해 하지마세요! 다음에 또 기회가 있을거에요!");
+      invalidCode("초대장 코드는 올바르나 모든 초대장이 소모되었습니다.<br>너무 속상해 하지 마세요! 다음에 또 기회가 있을거에요!");
       enableButton(jGet("#btnInvitationJoin"));
 
     } else {
