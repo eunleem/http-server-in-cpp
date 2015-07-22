@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 01, 2015
+    Jul 21, 2015
   
   History
     May 29, 2015
@@ -41,6 +41,8 @@
 
 #include "liolib/Serializable.hpp"
 #include "liolib/Openable.hpp"
+
+#include "liolib/Util.hpp"
 //#include "liolib/DataBlock.hpp"
 
 namespace lio {
@@ -66,11 +68,15 @@ protected:
   }
 
   std::istream& Deserialize(std::istream& is) override {
-    is.read((char*)&this->id, sizeof(this-id));
+    is.read((char*)&this->id, sizeof(this->id));
     is.read((char*)&this->pos, sizeof(this->pos));
     return is;
   }
 };
+
+
+
+
 
 class Index : public Openable {
 public:
@@ -115,10 +121,13 @@ protected:
   virtual
   bool open() {
     const std::string filePath = this->dirPath_ + this->indexName_;
-    this->indexFile_.open(this->indexName_,
+    if (Util::File::IsFileExisting(filePath, true) == false) {
+      DEBUG_cerr << "Could not create Index File." << endl; 
+    } 
+    this->indexFile_.open(filePath,
         std::ios::in | std::ios::out | std::ios::binary);
     if (this->indexFile_.is_open() == false) {
-      DEBUG_cerr << "Could not open index file." << endl; 
+      DEBUG_cerr << "Could not open index file. path: " << filePath << endl; 
       return false;
     } 
 
@@ -136,12 +145,12 @@ protected:
 
     const ssize_t savedCount = this->SaveAllToStorage();
     DEBUG_cout << "Saved " << savedCount << " index item(s) on close." << endl; 
-    return savedCount >= 0;
 
     this->indexFile_.flush();
     this->indexFile_.sync();
     this->indexFile_.close();
-    return true;
+
+    return savedCount >= 0;
   }
   
   std::string dirPath_;
