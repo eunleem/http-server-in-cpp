@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 07, 2015
+    Jul 21, 2015
   
   History
     June 09, 2015
@@ -40,7 +40,8 @@
 #include "Sessions.hpp"
 #include "Lives.hpp"
 #include "Invitations.hpp"
-//#include "Ideas.hpp"
+#include "Ideas.hpp"
+#include "Contents.hpp"
 
 //#include "Journal.hpp"
 
@@ -87,7 +88,7 @@ private:
       size_t numTickets,
       datetime expiration);
 
-  std::pair<Invitation&, std::string> GetInvitationByCode(std::string invitcode);
+  std::pair<Invitation&, std::string> GetInvitationByCode(const std::string& invitcode);
 
   std::pair<const Life*, std::string> SignUp(std::string invitcode);
 
@@ -97,12 +98,12 @@ private:
   Life& GetLifeById(lifeid_t id);
 
 
+  //ideaid_t PostIdea();
 
 
   //Idea& GetIdeaIds();
   //Idea& GetIdeaById();
 
-  //ideaid_t PostIdea();
 
   //Idea& UpdateIdea();
 

@@ -69,7 +69,7 @@ Invitation& ILioData::AddInvitation(
   return invit;
 }
 
-std::pair<Invitation&, std::string> ILioData::GetInvitationByCode(std::string invitcode) {
+std::pair<Invitation&, std::string> ILioData::GetInvitationByCode(const std::string& invitcode) {
   Invitation& invit =  this->invitations_.GetInvitationByCode(invitcode); // THROWS
   
   if (invit.expiration <= std::chrono::system_clock::now()) {
