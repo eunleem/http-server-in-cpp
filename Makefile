@@ -69,6 +69,12 @@ all: $(SOURCES) $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(EXECUTABLE_FLAGS) $(INCLUDE_DIR) $(LIBRARY_DIR) $(OBJECTS) $(LIBRARIES) -o $@
 
+TestContents: $(ROOT_DIR)/liolib/Util.o
+	@$(call UNITTEST,Contents,$^,Contents)
+
+TestIdeas: $(ROOT_DIR)/liolib/Util.o
+	@$(call UNITTEST,Ideas,$^,Ideas)
+
 TestInvitations: $(ROOT_DIR)/liolib/Util.o
 	rm -rf ./testdata/invitations/*
 	@$(call UNITTEST,Invitations,$^,Invitations)
