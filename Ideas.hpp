@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jun 05, 2015
+    Jul 21, 2015
   
   History
     September 23, 2014
@@ -54,9 +54,6 @@
 
 namespace lio {
 
-using std::string;
-using std::chrono::system_clock;
-
 typedef std::chrono::system_clock::time_point datetime;
 
 typedef uint32_t ideaid_t;
@@ -90,6 +87,20 @@ public:
   Idea();
   ~Idea();
 
+  static
+  size_t GetRowSize() {
+    return 
+      sizeof(Idea::id) +
+      sizeof(Idea::lifeId) +
+      sizeof(Idea::status) +
+      sizeof(Idea::relatedId) +
+      sizeof(Idea::type) +
+      sizeof(Idea::perm) +
+      sizeof(Idea::created) +
+      sizeof(Idea::title) +
+      sizeof(Idea::contentId);
+  }
+
   ideaid_t GetId() const;
   datetime GetCreatedTime() const;
   Type GetType() const;
@@ -98,6 +109,8 @@ public:
   std::string GetTitle() const;
   const char* GetTitleChar() const;
   uint32_t GetContentId() const;
+
+  std::streampos GetPos() const;
   bool IsDeleted() const;
   bool IsSynced() const;
 
@@ -105,12 +118,19 @@ public:
     DEBUG_cout << "IDEA" << endl; 
     DEBUG_cout << "id: " << this->id << endl; 
     DEBUG_cout << "lifeid: " << this->lifeId << endl; 
+    DEBUG_cout << "relatedId: " << this->relatedId << endl; 
     DEBUG_cout << "type: " << (int) this->type << endl; 
     DEBUG_cout << "perm: " << (int) this->perm << endl; 
-    DEBUG_cout << "created: " << Util::TimeToString(this->created) << endl; 
+    DEBUG_cout << "created: " << Util::Time::TimeToString(this->created) << endl; 
     DEBUG_cout << "title: " << this->title << endl; 
     DEBUG_cout << "contentId: " << this->contentId << endl; 
     DEBUG_cout << "isSynced: " << std::boolalpha << this->isSynced << std::noboolalpha << endl; 
+  }
+
+
+  bool Sync(std::fstream& file) { 
+    file << this;
+    return true;
   }
 
   void SetId(ideaid_t id);
@@ -120,32 +140,38 @@ public:
   void SetType(Type type);
   bool SetTitle(const string& title);
   void SetContentId(uint32_t contentId);
-  void SetIsSynced(bool isSynced);
 
-  //std::streampos WriteIdeaToFile(std::fstream& file);
-  //ideaid_t ReadIdeaFromFile(std::fstream& file);
 
   std::ostream& Serialize(std::ostream& os) const override {
     if (this->isSynced == true) {
       DEBUG_cout << "WARN: writing synced data..." << endl; 
     } 
+    if (this->pos == -1) {
+      DEBUG_cout << "POS is -1. Meaning it's a new Idea and needs to be added at the end." << endl; 
+      os.seekp(0, std::ios::end);
+      this->pos = os.tellp();
+    } else {
+      os.seekp(this->pos, std::ios::beg);
+    }
     os.write((char*)&this->id, sizeof(this->id));
-    os.write((char*)&this->lifeid, sizeof(this->lifeid));
+    os.write((char*)&this->lifeId, sizeof(this->lifeId));
     os.write((char*)&this->status, sizeof(this->status));
-    os.write((char*)&this->relatedid, sizeof(this->relatedid));
+    os.write((char*)&this->relatedId, sizeof(this->relatedId));
     os.write((char*)&this->type, sizeof(this->type));
     os.write((char*)&this->perm, sizeof(this->perm));
     os.write((char*)&this->created, sizeof(this->created));
     os.write((char*)this->title, sizeof(this->title));
     os.write((char*)&this->contentId, sizeof(this->contentId));
+    this->isSynced = true;
     return os;
   }
 
   std::istream& Deserialize(std::istream& is) override {
+    this->pos = is.tellg();
     is.read((char*)&this->id, sizeof(this->id));
-    is.read((char*)&this->lifeid, sizeof(this->lifeid));
+    is.read((char*)&this->lifeId, sizeof(this->lifeId));
     is.read((char*)&this->status, sizeof(this->status));
-    is.read((char*)&this->relatedid, sizeof(this->relatedid));
+    is.read((char*)&this->relatedId, sizeof(this->relatedId));
     is.read((char*)&this->type, sizeof(this->type));
     is.read((char*)&this->perm, sizeof(this->perm));
     is.read((char*)&this->created, sizeof(this->created));
@@ -160,13 +186,16 @@ private:
   ideaid_t id;
   lifeid_t lifeId;
   Status status;
-  ideaid_t relatedid;
+  ideaid_t relatedId;
   Type type;
   Permission perm;
   datetime created;
   char title[200];
   uint32_t contentId;
-  bool isSynced;
+
+  mutable std::streampos pos;
+  mutable bool isSynced;
+
 };
 
 
@@ -183,22 +212,27 @@ public:
 
 
 
-class IdeasIndex : public Index {
+class IdeasIndex {
 public:
-
-  IdeasIndex() :
-    Index("ideas.idx", "./data/ideas")
-  { }
+  IdeasIndex(const std::string& dataFileName,
+             const std::string& dirPath) 
+    : dataFileName_(dataFileName),
+      dirPath_(dirPath)
+  {
+    if (this->dirPath_.back() != '/') {
+      this->dirPath_.push_back('/');
+    } 
+  }
 
   IndexItem<ideaid_t>& GetIndexItemById(ideaid_t id) {
-    auto it = this->items.find(id);
-    if (it == this->items.end()) {
+    auto itr = this->items.find(id);
+    if (itr == this->items.end()) {
       // not found
       DEBUG_cerr << "Item not found." << endl; 
-      throw Exception(ExceptionType::INDEX_ITEM_NOT_FOUND);
+      throw std::exception();
     } 
 
-    return it->second;
+    return itr->second;
   }
 
   bool AddIndex(Idea& idea, std::streampos pos) {
@@ -211,38 +245,53 @@ public:
     return true;
   }
 
-  ssize_t LoadAllFromStorage() override {
+  ssize_t LoadAllFromStorage() {
 
-    this->indexFile_.seekg(0, std::ios::beg);
+    std::fstream dataFile;
+    dataFile.open(this->dirPath_ + this->dataFileName_, std::ios::in | std::ios::binary);
+    if (dataFile.is_open() == false) {
+      DEBUG_cerr << "Could not open data file. Path: " << this->dirPath_ + this->dataFileName_ << endl; 
+      return -1;
+    } 
 
-    for (uint64_t i = 0; this->header.numItems > i; i++) {
+    const ssize_t fileSize = Util::File::GetSize(dataFile);
+    const ssize_t rowSize = Idea::GetRowSize();
+    
+    if (fileSize % rowSize != 0) {
+      DEBUG_cerr << "FileSize % rowSize != 0 !!! Datafile might be corrupted!!!" << endl; 
+    } 
+
+    const size_t numRows = fileSize / rowSize;
+    DEBUG_cout << "numRows: " << numRows << endl; 
+
+    dataFile.seekg(0, std::ios::beg);
+    for (size_t i = 0; numRows > i; ++i) {
       IndexItem<ideaid_t> item;
-      file.read((char*)&item, sizeof(item));
-      //DEBUG_cout << "ReadItem: " << item.id << " " << item.contentSize << " " << item.pos << endl; 
+      Idea loadedIdea;
+
+      item.pos = dataFile.tellg();
+      dataFile >> loadedIdea;
+      item.id = loadedIdea.GetId();
+
+      DEBUG_cout << "ReadItem: " << item.id << " " << " " << item.pos << endl; 
+      
       this->items[item.id] = item;
     } 
 
     return true;
-
   }
 
-  ssize_t SaveAllToStorage() override {
-
-    this->indexFile_.seekp(0, std::ios::beg);
-
-    for (auto& item : this->items) {
-      //item.second.isSynced = true;
-      this->indexFile_.write((char*)&item.second, sizeof(item.second));
-    } 
-
-    file.flush();
-    DEBUG_cout << std::to_string(this->items.size()) << " index items have been written." << endl; 
+  ssize_t SaveAllToStorage() {
+    DEBUG_cout << "Nothing" << endl; 
 
     return true;
   }
 
 
   std::map<ideaid_t, IndexItem<ideaid_t>> items;
+
+  std::string dataFileName_;
+  std::string dirPath_;
 };
 
 class Ideas : public Table {
@@ -277,7 +326,7 @@ private:
   virtual
   ~Ideas();
 
-  Idea* GetIdeaById(ideaid_t ideaId);
+  Idea* GetIdeaById(const ideaid_t ideaId);
   std::vector<Idea*> GetIdeas(size_t from, size_t count);
   std::vector<Idea*> GetLastIdeas(size_t count);
   //vector<Idea*> GetIdeasByLifeId(lifeid_t lifeId, size_t from, size_t count);
@@ -289,10 +338,10 @@ private:
       Idea::Type type = Idea::Type::GENERAL
     );
   // DON'T ADD UPDATE IDEA. Can be done by updating referenced Idea object.
-  bool SyncIdea(ideaid_t id);
+  bool SyncIdea(const ideaid_t id);
   bool SyncIdeas();
 
-  bool SyncIndex();
+  //bool SyncIndex();
 
 protected:
   bool open() override;
@@ -300,17 +349,24 @@ protected:
 
   ssize_t LoadAllFromStorage() override;
   ssize_t SaveAllToStorage() override;
+
   
 private:
-  IdeasSummary summary_;
-  IdeasIndex index_;
+  std::string dirPath_;
+  std::string dataFileName_;
 
   std::string dataFilePath_;
+
+  //IdeasSummary summary_;
+  IdeasIndex index_;
+
+
+
 
   std::fstream dataFile_;
 
   std::unordered_map<ideaid_t, Idea> ideas_;
-  std::unordered_map<lifeid_t, Idea*> ideasByLifeId_;
+  //std::unordered_map<lifeid_t, Idea*> ideasByLifeId_;
   
 };
 
