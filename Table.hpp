@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 01, 2015
+    Jul 22, 2015
   
   History
     April 27, 2015
@@ -95,16 +95,16 @@ private:
   ~Table() {
     DEBUG_FUNC_START;
     if (this->status_ == Status::OPEN) {
-      DEBUG_cout << "Automatically closing table." << endl; 
-      this->Close();
+      DEBUG_cerr << "FORGOT TO CLOSE TABLE!!!" << endl; 
     } 
   }
 
   virtual
-  ssize_t SaveAllToStorage() = 0;
+  ssize_t LoadAllFromStorage() = 0;
 
   virtual
-  ssize_t LoadAllFromStorage() = 0;
+  ssize_t SaveAllToStorage() = 0;
+
 
   virtual
   ssize_t CreateBackup() {
@@ -127,18 +127,18 @@ protected:
   virtual
   bool close() override {
     DEBUG_cout << "BASE TABLE close() has been called!" << endl; 
-    this->SaveAllToStorage();
+    //this->SaveAllToStorage();
     return true;
   }
 
 
-  bool isLockFileExisting(std::string dirPath) {
+  bool isLockFileExisting(const std::string& dirPath) {
     std::string lockFilePath = dirPath + "table.lock";
     return Util::File::IsFileExisting(lockFilePath);
   }
 
 
-  bool createLockFile(std::string dirPath) {
+  bool createLockFile(const std::string& dirPath) {
     std::fstream lockFile;
     std::string lockFilePath = dirPath + "table.lock";
     lockFile.open(lockFilePath, std::ios::out);
@@ -152,7 +152,7 @@ protected:
     return true;
   }
 
-  bool deleteLockFile(std::string dirPath) {
+  bool deleteLockFile(const std::string& dirPath) {
     std::string lockFilePath = dirPath + "table.lock";
     int result = std::remove(lockFilePath.c_str());
     if (result > 0) {
