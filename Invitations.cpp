@@ -367,9 +367,9 @@ bool Invitations::addDescriptionFile(const Invitation& invitation, const std::st
     return false;
   } 
 
-  std::string escapedDescription = this->escapeForJson(description);
+  std::string jsonEncoded = Util::String::JsonEncode(description);
 
-  file << escapedDescription;
+  file << jsonEncoded;
 
   file.flush();
   file.close();
@@ -377,44 +377,6 @@ bool Invitations::addDescriptionFile(const Invitation& invitation, const std::st
   return true;
 }
 
-std::string Invitations::escapeForJson(const std::string& description) {
-  std::string escaped;
-  escaped.reserve(description.length() * 2);
-
-  size_t descriptionLength = description.length();
-  for (size_t pos = 0; descriptionLength > pos; pos++) {
-    char c = description[pos];
-    switch (c) {
-      case '\r':
-      case '\n':
-        escaped += "\\n";
-        break;
-      case '\"':
-        escaped += "\\\"";
-        break;
-      case '\t':
-        escaped += "\\t";
-        break;
-      case '\\':
-        escaped += "\\\\";
-        break;
-      case '<':
-        escaped += "&lt;";
-        break;
-      case '>':
-        escaped += "&gt;";
-        break;
-      case '&':
-        escaped += "&amp;";
-        break;
-      default:
-        escaped += c;
-        break;
-    } 
-  } 
-
-  return escaped;
-}
 
 }
 

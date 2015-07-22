@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 06, 2015
+    Jul 16, 2015
   
   History
     June 12, 2014
@@ -226,7 +226,6 @@ protected:
 
   bool        addDescriptionFile(const Invitation& invitation, const std::string& description);
 
-  std::string escapeForJson(const std::string& description);
 
   //ssize_t     cleanup(); 
 
