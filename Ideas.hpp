@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 21, 2015
+    Jul 23, 2015
   
   History
     September 23, 2014
@@ -93,12 +93,16 @@ public:
       sizeof(Idea::id) +
       sizeof(Idea::lifeId) +
       sizeof(Idea::status) +
-      sizeof(Idea::relatedId) +
+      //sizeof(Idea::relatedId) +
       sizeof(Idea::type) +
       sizeof(Idea::perm) +
       sizeof(Idea::created) +
-      sizeof(Idea::title) +
-      sizeof(Idea::contentId);
+      sizeof(Idea::contentId) +
+      sizeof(Idea::title);
+  }
+  static
+  size_t GetTitleSize() {
+    return sizeof(Idea::title);
   }
 
   ideaid_t GetId() const;
@@ -118,7 +122,7 @@ public:
     DEBUG_cout << "IDEA" << endl; 
     DEBUG_cout << "id: " << this->id << endl; 
     DEBUG_cout << "lifeid: " << this->lifeId << endl; 
-    DEBUG_cout << "relatedId: " << this->relatedId << endl; 
+    //DEBUG_cout << "relatedId: " << this->relatedId << endl; 
     DEBUG_cout << "type: " << (int) this->type << endl; 
     DEBUG_cout << "perm: " << (int) this->perm << endl; 
     DEBUG_cout << "created: " << Util::Time::TimeToString(this->created) << endl; 
@@ -156,12 +160,12 @@ public:
     os.write((char*)&this->id, sizeof(this->id));
     os.write((char*)&this->lifeId, sizeof(this->lifeId));
     os.write((char*)&this->status, sizeof(this->status));
-    os.write((char*)&this->relatedId, sizeof(this->relatedId));
+    //os.write((char*)&this->relatedId, sizeof(this->relatedId));
     os.write((char*)&this->type, sizeof(this->type));
     os.write((char*)&this->perm, sizeof(this->perm));
     os.write((char*)&this->created, sizeof(this->created));
-    os.write((char*)this->title, sizeof(this->title));
     os.write((char*)&this->contentId, sizeof(this->contentId));
+    os.write((char*)this->title, sizeof(this->title));
     this->isSynced = true;
     return os;
   }
@@ -171,12 +175,12 @@ public:
     is.read((char*)&this->id, sizeof(this->id));
     is.read((char*)&this->lifeId, sizeof(this->lifeId));
     is.read((char*)&this->status, sizeof(this->status));
-    is.read((char*)&this->relatedId, sizeof(this->relatedId));
+    //is.read((char*)&this->relatedId, sizeof(this->relatedId));
     is.read((char*)&this->type, sizeof(this->type));
     is.read((char*)&this->perm, sizeof(this->perm));
     is.read((char*)&this->created, sizeof(this->created));
-    is.read((char*)this->title, sizeof(this->title));
     is.read((char*)&this->contentId, sizeof(this->contentId));
+    is.read((char*)this->title, sizeof(this->title));
     this->isSynced = true;
     return is;
   }
@@ -186,12 +190,11 @@ private:
   ideaid_t id;
   lifeid_t lifeId;
   Status status;
-  ideaid_t relatedId;
   Type type;
   Permission perm;
   datetime created;
-  char title[200];
   uint32_t contentId;
+  char title[256];
 
   mutable std::streampos pos;
   mutable bool isSynced;
@@ -214,10 +217,10 @@ public:
 
 class IdeasIndex {
 public:
-  IdeasIndex(const std::string& dataFileName,
-             const std::string& dirPath) 
-    : dataFileName_(dataFileName),
-      dirPath_(dirPath)
+  IdeasIndex(const std::string& dirPath,
+             const std::string& dataFileName) 
+    : dirPath_(dirPath),
+      dataFileName_(dataFileName)
   {
     if (this->dirPath_.back() != '/') {
       this->dirPath_.push_back('/');
@@ -287,11 +290,10 @@ public:
     return true;
   }
 
+  std::string dirPath_;
+  std::string dataFileName_;
 
   std::map<ideaid_t, IndexItem<ideaid_t>> items;
-
-  std::string dataFileName_;
-  std::string dirPath_;
 };
 
 class Ideas : public Table {
@@ -320,8 +322,8 @@ private:
 // ******** Exception Declaration END*********
 
 
-  Ideas(const std::string& dataFileName = "ideas.data",
-        const std::string& dirPath = "./data/ideas/");
+  Ideas(const std::string& dirPath = "./data/ideas/",
+        const std::string& dataFileName = "ideas.data");
 
   virtual
   ~Ideas();

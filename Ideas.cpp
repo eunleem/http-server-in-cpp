@@ -25,12 +25,12 @@ Ideas::Exception::type() const noexcept {
 // ===== Exception Implementation End ===== 
 
 
-Ideas::Ideas(const std::string& dataFileName,
-             const std::string& dirPath) :
+Ideas::Ideas(const std::string& dirPath,
+             const std::string& dataFileName) :
   dirPath_(dirPath),
   dataFileName_(dataFileName),
   dataFilePath_(dirPath + dataFileName),
-  index_(dataFileName, dirPath)
+  index_(dirPath, dataFileName)
 {
   DEBUG_FUNC_START; // Prints out function name in yellow
 }
