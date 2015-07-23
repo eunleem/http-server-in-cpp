@@ -33,7 +33,9 @@ ILioData::ILioData(std::string dirPath) :
   dirPath_(dirPath),
   sessions_(Sessions::Config(dirPath + "sessions/")),
   lives_(dirPath + "lives/"),
-  invitations_(Invitations::Config(dirPath + "invitations/"))
+  invitations_(Invitations::Config(dirPath + "invitations/")),
+  ideas_(dirPath + "ideas/"),
+  contents_(dirPath + "contents/")
 {
   DEBUG_FUNC_START; // Prints out function name in yellow
 
@@ -48,6 +50,9 @@ bool ILioData::open() {
   this->sessions_.Open();
   this->lives_.Open();
   this->invitations_.Open();
+
+  this->ideas_.Open();
+  this->contents_.Open();
   return true;
 }
 
@@ -56,6 +61,9 @@ bool ILioData::close() {
   this->sessions_.Close();
   this->lives_.Close();
   this->invitations_.Close();
+
+  this->ideas_.Close();
+  this->contents_.Close();
 
   return true;
 }
@@ -127,6 +135,62 @@ Life& ILioData::GetLifeById(lifeid_t lifeid) {
 }
 
 
+ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
+    Idea::Type type, Idea::Permission perm) {
+
+  // Check if lifeId is non-zero
+  if (lifeId == 0) {
+    DEBUG_cerr << "lifeId is 0!!! Allowing it for now!" << endl;
+  }
+
+  if (content.length() > 50000) {
+    DEBUG_cerr << "Content is TOO long." << endl;
+    return 0;
+  }
+
+  bool isSafeUserInput = Util::String::IsUserInputSafe(content);
+  if (isSafeUserInput == false) {
+    DEBUG_cerr << "Content is not safe." << endl;
+    return 0;
+  }
+
+  // Check content for unsafe or invalid chars for json/html
+  //std::string encoded = Util::String::JsonEncode(content);
+  bool isSafeJson = Util::String::IsSafeForJson(content);
+  if (isSafeJson == false) {
+    DEBUG_cerr << "NOT SAFE FOR JSON!" << endl;
+    return 0;
+  }
+
+  contentid_t contentId = 0;
+
+  std::string ideatitle;
+
+  if (content.length() > Idea::GetTitleSize()) {
+    ideatitle = content.substr(0, Idea::GetTitleSize());
+    auto numBytesTrimmed = Util::String::TrimIncompleteUTF8(ideatitle);
+    DEBUG_cout << "Trimmed " << numBytesTrimmed << " bytes for UTF-8 string!"<< endl;
+
+    Content newContent;
+    newContent.SetContent(content);
+    newContent.SetType(Content::Type::GENERAL);
+
+    contentId = this->contents_.AddContent(newContent);
+
+  } else {
+    ideatitle = content;
+  }
+
+  ideaid_t newIdeaId = this->ideas_.AddIdea(lifeId, ideatitle, contentId);
+
+  if (newIdeaId == 0) {
+    DEBUG_cerr << "Could not Add Idea!" << endl;
+  }
+
+  return newIdeaId;
+}
+
+//ILioData::
 //ILioData::
 
 

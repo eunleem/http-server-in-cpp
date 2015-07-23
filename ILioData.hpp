@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 21, 2015
+    Jul 22, 2015
   
   History
     June 09, 2015
@@ -92,20 +92,20 @@ private:
 
   std::pair<const Life*, std::string> SignUp(std::string invitcode);
 
-  std::pair<std::string, Session&> Login(std::string dna, std::string code);
+  std::pair<std::string, Session&>    Login(std::string dna, std::string code);
 
-  lifeid_t GetLifeIdBySessionId(std::string session);
-  Life& GetLifeById(lifeid_t id);
+  lifeid_t                            GetLifeIdBySessionId(std::string session);
 
-
-  //ideaid_t PostIdea();
+  Life&                               GetLifeById(lifeid_t id);
 
 
-  //Idea& GetIdeaIds();
-  //Idea& GetIdeaById();
+  ideaid_t PostIdea(
+      lifeid_t lifeId,
+      std::string& content,
+      Idea::Type type = Idea::Type::GENERAL,
+      Idea::Permission perm = Idea::Permission::PRIVATE);
 
 
-  //Idea& UpdateIdea();
 
 
   bool IsAdmin(const std::string& session);
@@ -126,6 +126,9 @@ private:
   Sessions        sessions_;
   Lives           lives_;
   Invitations     invitations_;
+
+  Ideas           ideas_;
+  Contents        contents_;
   
 };
 
