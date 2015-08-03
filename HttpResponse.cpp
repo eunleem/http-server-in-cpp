@@ -208,6 +208,30 @@ bool HttpResponse::SetBody(const char* address, size_t size, http::ContentType c
   return true;
 }
 
+bool HttpResponse::SetBody(const rapidjson::Document& jsdoc) {
+
+  if (this->status != Status::IN_PROCESS) {
+    DEBUG_cerr << "WARNING: SetBody is meant to be called when the status is IN_PROCESS!" << endl; 
+    //return false;
+  } 
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+
+  jsdoc.Accept(writer);
+
+  size_t length = strlen(buffer.GetString());
+
+  this->body = new char[length];
+  strncpy(this->body, buffer.GetString(), length);
+  this->bodySize = length;
+  this->isTempBody = true;
+  this->contentType = http::ContentType::JSON;
+
+  this->status = Status::PROCESSED;
+  return true;
+}
+
 size_t HttpResponse::buildHeader() {
   if (this->responseCode == ResponseCode::UNDEF) {
     DEBUG_cerr << "Cannot build header. ResponseCode not set." << endl; 

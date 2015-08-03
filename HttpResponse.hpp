@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Mar 04, 2015
+    Jul 31, 2015
   
   History
     October 24, 2014
@@ -45,6 +45,10 @@
 #include <openssl/err.h>
 
 #include "liolib/http/Http.hpp"
+
+#include "include/rapidjson/document.h"
+#include "include/rapidjson/writer.h"
+#include "include/rapidjson/stringbuffer.h"
 
 #include "liolib/Util.hpp"
 //#include "liolib/DataBlock.hpp"
@@ -121,9 +125,14 @@ int KEEP_ALIVE_TIMEOUT;
   bool SetCookie(const string& name, const string& value,
       datetime exp = system_clock::now(),
       bool isSecure = false, bool isHttpOnly = false);
+
   bool SetBody(const char* address, size_t size, http::ContentType contentType,
-      bool isTempBody = false);
+               bool isTempBody = false);
+
   bool SetBody(string& body, http::ContentType type);
+
+  bool SetBody(const rapidjson::Document& jsondoc);
+
 
   Status Send(const int& fd, size_t& sentSize,
       bool isSecureConnection = false, SSL* ssl = nullptr);
