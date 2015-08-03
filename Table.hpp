@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 22, 2015
+    Jul 31, 2015
   
   History
     April 27, 2015
@@ -50,7 +50,21 @@ namespace lio {
 
 
 
-class Row : public Serializable { };
+class Row : public Serializable { 
+  public:
+    virtual
+    ssize_t SyncTo(std::fstream& file) {
+      // CONVERT THIS TO PURE VIRTUAL FUNCTION LATER.
+      DEBUG_cerr << "Must be overrided!" << endl;
+      return 0;
+    };
+
+    virtual
+    ssize_t SyncFrom(std::fstream& file) {
+      DEBUG_cerr << "Must be overrided!" << endl;
+      return 0;
+    };
+};
 
 class TableConfig {
 public:

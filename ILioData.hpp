@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 22, 2015
+    Jul 31, 2015
   
   History
     June 09, 2015
@@ -92,21 +92,25 @@ private:
 
   std::pair<const Life*, std::string> SignUp(std::string invitcode);
 
-  std::pair<std::string, Session&>    Login(std::string dna, std::string code);
+  std::pair<std::string, Session&> Login(std::string dna, std::string code);
 
-  lifeid_t                            GetLifeIdBySessionId(std::string session);
+  lifeid_t GetLifeIdBySessionId(std::string session);
 
-  Life&                               GetLifeById(lifeid_t id);
-
-
-  ideaid_t PostIdea(
-      lifeid_t lifeId,
-      std::string& content,
-      Idea::Type type = Idea::Type::GENERAL,
-      Idea::Permission perm = Idea::Permission::PRIVATE);
+  Life& GetLifeById(lifeid_t id);
 
 
+  ideaid_t PostIdea(lifeid_t lifeId, std::string& content,
+                    Idea::Type type = Idea::Type::GENERAL,
+                    Idea::Permission perm = Idea::Permission::PRIVATE);
 
+  bool UpdateIdea(ideaid_t ideaId, std::string& content,
+                  Idea::Type type = Idea::Type::GENERAL,
+                  Idea::Permission perm = Idea::Permission::PRIVATE);
+
+  std::vector<Idea*> GetIdeas(size_t count, size_t skip = 0);
+
+  const Idea* GetIdeaById(ideaid_t id);
+  const Content* GetContentById(contentid_t id);
 
   bool IsAdmin(const std::string& session);
 

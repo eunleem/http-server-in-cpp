@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 22, 2015
+    Jul 28, 2015
   
   History
     September 23, 2014
@@ -200,20 +200,17 @@ private:
   Contents(const std::string& dirPath,
            const std::string& dataFileName = "contents.data");
 
+  const Content* GetContentById(contentid_t contentId);
+  std::vector<const Content*> GetContents(std::vector<contentid_t>& contentIds);
 
+  contentid_t AddContent(Content& newContent);
+  contentid_t UpdateContent(contentid_t id, const std::string& content);
 
-
-  const Content*                GetContentById(contentid_t contentId);
-  std::vector<const Content*>   GetContents(std::vector<contentid_t>& contentIds);
-
-  contentid_t                   AddContent(Content& newContent);
-  contentid_t                   UpdateContent(contentid_t id, const std::string& content);
-  
   bool SyncContent(contentid_t id);
   bool SyncContents();
 
   ssize_t LoadAllFromStorage() override {
-    DEBUG_cout << "Not Used." << endl; 
+    DEBUG_cout << "Not Used." << endl;
     return 0;
   }
   ssize_t SaveAllToStorage() override {

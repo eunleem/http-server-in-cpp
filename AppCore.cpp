@@ -132,20 +132,25 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
 
 
     if (request->GetRequestMethod() == http::RequestMethod::GET) {
-      if (uri.substr(0, strlen("/login")) == "/login") {
-        return this->CreateFileResponse(connection, "./lifeino/login.html");
+      if (uri.substr(0, strlen("/main")) == "/main") {
+        return this->CreateFileResponse(connection, "./lifeino/main.html");
+      } 
+
+      if (uri.substr(0, strlen("/planner")) == "/planner") {
+        std::string sessionid = request->GetCookie("sessionid").ToString();
+        if (this->data.GetLifeIdBySessionId(sessionid) == 0) {
+          return this->CreateFileResponse(connection, "./lifeino/login.html");
+        }
+        return this->CreateFileResponse(connection, "./lifeino/planner.html");
       }
 
       if (uri.substr(0, strlen("/invitation")) == "/invitation") {
         return this->CreateFileResponse(connection, "./lifeino/invitation.html");
       }
 
-
-      if (uri.substr(0, strlen("/main")) == "/main") {
-        return this->CreateFileResponse(connection, "./lifeino/main.html");
-      } 
-
-
+      if (uri.substr(0, strlen("/login")) == "/login") {
+        return this->CreateFileResponse(connection, "./lifeino/login.html");
+      }
 
       if (uri.substr(0, strlen("/admin")) == "/admin") {
         std::string sessionid = request->GetCookie("sessionid").ToString();
@@ -157,13 +162,18 @@ bool AppCore::ProcessLocalhost(HttpConnection* connection) {
       }
 
     } else if (request->GetRequestMethod() == http::RequestMethod::POST) {
-      if (uri.substr(0, strlen("/login")) == "/login") {
-        LoginPage page;
+      if (uri.substr(0, strlen("/planner")) == "/planner") {
+        PlannerPage page;
         return page.Process(connection, &this->data);
       }
-      
+
       if (uri.substr(0, strlen("/invitation")) == "/invitation") {
         InvitationPage page;
+        return page.Process(connection, &this->data);
+      }
+
+      if (uri.substr(0, strlen("/login")) == "/login") {
+        LoginPage page;
         return page.Process(connection, &this->data);
       }
       

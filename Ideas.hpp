@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 23, 2015
+    Aug 03, 2015
   
   History
     September 23, 2014
@@ -58,6 +58,7 @@ typedef std::chrono::system_clock::time_point datetime;
 
 typedef uint32_t ideaid_t;
 
+
 class Idea : public Row {
 public:
   enum class Status : uint8_t {
@@ -69,7 +70,7 @@ public:
   enum class Type : uint8_t {
     GENERAL, // Unspecified
     JOURNAL,
-    PLAN, // plan vs goal...
+    PLAN,   // plan vs goal...
     ACTION, // ToDo or Task
     IDEA,
     INFO,
@@ -97,20 +98,32 @@ public:
       sizeof(Idea::type) +
       sizeof(Idea::perm) +
       sizeof(Idea::created) +
+      sizeof(Idea::modified) +
       sizeof(Idea::contentId) +
-      sizeof(Idea::title);
+      Idea::MAX_TITLE_LENGTH;
   }
+
   static
-  size_t GetTitleSize() {
-    return sizeof(Idea::title);
+  const size_t MAX_TITLE_LENGTH;
+
+  static
+  const size_t GetTitleSize() {
+    DEBUG_cerr << "GetTitleSize() is Deprecated. Use GetMaxTitleLength() instead." << endl;
+    return Idea::MAX_TITLE_LENGTH;
+  }
+
+  static
+  const size_t GetMaxTitleLength() {
+    return Idea::MAX_TITLE_LENGTH;
   }
 
   ideaid_t GetId() const;
   datetime GetCreatedTime() const;
+  datetime GetModifiedTime() const;
   Type GetType() const;
   Status GetStatus() const;
   Permission GetPermission() const;
-  std::string GetTitle() const;
+  const std::string& GetTitle() const;
   const char* GetTitleChar() const;
   uint32_t GetContentId() const;
 
@@ -126,15 +139,66 @@ public:
     DEBUG_cout << "type: " << (int) this->type << endl; 
     DEBUG_cout << "perm: " << (int) this->perm << endl; 
     DEBUG_cout << "created: " << Util::Time::TimeToString(this->created) << endl; 
-    DEBUG_cout << "title: " << this->title << endl; 
+    DEBUG_cout << "modified: " << Util::Time::TimeToString(this->modified) << endl; 
     DEBUG_cout << "contentId: " << this->contentId << endl; 
+    DEBUG_cout << "title: " << this->title << endl; 
     DEBUG_cout << "isSynced: " << std::boolalpha << this->isSynced << std::noboolalpha << endl; 
   }
 
 
-  bool Sync(std::fstream& file) { 
-    file << this;
-    return true;
+  virtual
+  ssize_t SyncTo(std::fstream& file) override { 
+    if (this->isSynced == true) {
+      DEBUG_cout << "Already Synced! good!" << endl; 
+      return 0;
+    }
+    if (this->pos == -1) {
+      DEBUG_cout << "POS is -1. Meaning it's a new Idea and needs to be added at the end." << endl; 
+      file.seekp(0, std::ios::end);
+      this->pos = file.tellp();
+    } else {
+      file.seekp(this->pos, std::ios::beg);
+    }
+    file.write((char*)&this->id, sizeof(this->id));
+    file.write((char*)&this->lifeId, sizeof(this->lifeId));
+    file.write((char*)&this->status, sizeof(this->status));
+    //file.write((char*)&this->relatedId, sizeof(this->relatedId));
+    file.write((char*)&this->type, sizeof(this->type));
+    file.write((char*)&this->perm, sizeof(this->perm));
+    file.write((char*)&this->created, sizeof(this->created));
+    file.write((char*)&this->modified, sizeof(this->modified));
+    file.write((char*)&this->contentId, sizeof(this->contentId));
+
+    const size_t orgTitleSize = this->title.length();
+    this->title.resize(Idea::MAX_TITLE_LENGTH);
+    file.write(this->title.c_str(), this->title.length());
+    this->title.resize(orgTitleSize);
+
+    this->isSynced = true;
+    return 0;
+  }
+
+  virtual
+  ssize_t SyncFrom(std::fstream& file) override { 
+    if (this->pos != -1) {
+      DEBUG_cerr << "WARN: SyncFrom file when it already has pos." << endl;
+    }
+    this->pos = file.tellg();
+    file.read((char*)&this->id, sizeof(this->id));
+    file.read((char*)&this->lifeId, sizeof(this->lifeId));
+    file.read((char*)&this->status, sizeof(this->status));
+    //file.read((char*)&this->relatedId, sizeof(this->relatedId));
+    file.read((char*)&this->type, sizeof(this->type));
+    file.read((char*)&this->perm, sizeof(this->perm));
+    file.read((char*)&this->created, sizeof(this->created));
+    file.read((char*)&this->modified, sizeof(this->modified));
+    file.read((char*)&this->contentId, sizeof(this->contentId));
+
+    this->title.resize(Idea::MAX_TITLE_LENGTH);
+    file.read((char*)this->title.c_str(), Idea::MAX_TITLE_LENGTH);
+    this->isSynced = true;
+
+    return 0;
   }
 
   void SetId(ideaid_t id);
@@ -142,46 +206,17 @@ public:
   void SetStatus(Status status);
   void SetPermission(Permission& permission);
   void SetType(Type type);
-  bool SetTitle(const string& title);
+  bool SetTitle(std::string& title);
   void SetContentId(uint32_t contentId);
 
 
   std::ostream& Serialize(std::ostream& os) const override {
-    if (this->isSynced == true) {
-      DEBUG_cout << "WARN: writing synced data..." << endl; 
-    } 
-    if (this->pos == -1) {
-      DEBUG_cout << "POS is -1. Meaning it's a new Idea and needs to be added at the end." << endl; 
-      os.seekp(0, std::ios::end);
-      this->pos = os.tellp();
-    } else {
-      os.seekp(this->pos, std::ios::beg);
-    }
-    os.write((char*)&this->id, sizeof(this->id));
-    os.write((char*)&this->lifeId, sizeof(this->lifeId));
-    os.write((char*)&this->status, sizeof(this->status));
-    //os.write((char*)&this->relatedId, sizeof(this->relatedId));
-    os.write((char*)&this->type, sizeof(this->type));
-    os.write((char*)&this->perm, sizeof(this->perm));
-    os.write((char*)&this->created, sizeof(this->created));
-    os.write((char*)&this->contentId, sizeof(this->contentId));
-    os.write((char*)this->title, sizeof(this->title));
-    this->isSynced = true;
+    static_assert(true, "DEPRECATED");
     return os;
   }
 
   std::istream& Deserialize(std::istream& is) override {
-    this->pos = is.tellg();
-    is.read((char*)&this->id, sizeof(this->id));
-    is.read((char*)&this->lifeId, sizeof(this->lifeId));
-    is.read((char*)&this->status, sizeof(this->status));
-    //is.read((char*)&this->relatedId, sizeof(this->relatedId));
-    is.read((char*)&this->type, sizeof(this->type));
-    is.read((char*)&this->perm, sizeof(this->perm));
-    is.read((char*)&this->created, sizeof(this->created));
-    is.read((char*)&this->contentId, sizeof(this->contentId));
-    is.read((char*)this->title, sizeof(this->title));
-    this->isSynced = true;
+    static_assert(true, "DEPRECATED");
     return is;
   }
 protected:
@@ -193,26 +228,14 @@ private:
   Type type;
   Permission perm;
   datetime created;
+  datetime modified;
   uint32_t contentId;
-  char title[256];
+  std::string title;
 
-  mutable std::streampos pos;
-  mutable bool isSynced;
+  std::streampos pos;
+  bool isSynced;
 
 };
-
-
-
-
-
-class IdeasSummary : public Summary<ideaid_t> {
-public:
-  IdeasSummary() :
-    Summary<ideaid_t>("ideas.summary", "./data/ideas/")
-  { }
-};
-
-
 
 
 class IdeasIndex {
@@ -250,10 +273,20 @@ public:
 
   ssize_t LoadAllFromStorage() {
 
+    std::string dataFilePath = this->dirPath_ + this->dataFileName_;
+    
+    bool isExisting = Util::File::IsFileExisting(dataFilePath, false); // Do not create file automatically
+    if (isExisting == false) {
+      DEBUG_cout << "File does not exist. Nothing to load." << endl;
+      return 0;
+    }
+
     std::fstream dataFile;
-    dataFile.open(this->dirPath_ + this->dataFileName_, std::ios::in | std::ios::binary);
+    dataFile.open(this->dirPath_ + this->dataFileName_,
+                  std::ios::in | std::ios::binary);
     if (dataFile.is_open() == false) {
-      DEBUG_cerr << "Could not open data file. Path: " << this->dirPath_ + this->dataFileName_ << endl; 
+      DEBUG_cerr << "Could not open data file. Path: "
+                 << this->dirPath_ + this->dataFileName_ << endl;
       return -1;
     } 
 
@@ -265,7 +298,7 @@ public:
     } 
 
     const size_t numRows = fileSize / rowSize;
-    DEBUG_cout << "numRows: " << numRows << endl; 
+    DEBUG_cout << "numRows: " << numRows << endl;
 
     dataFile.seekg(0, std::ios::beg);
     for (size_t i = 0; numRows > i; ++i) {
@@ -273,7 +306,7 @@ public:
       Idea loadedIdea;
 
       item.pos = dataFile.tellg();
-      dataFile >> loadedIdea;
+      loadedIdea.SyncFrom(dataFile);
       item.id = loadedIdea.GetId();
 
       DEBUG_cout << "ReadItem: " << item.id << " " << " " << item.pos << endl; 
@@ -285,7 +318,7 @@ public:
   }
 
   ssize_t SaveAllToStorage() {
-    DEBUG_cout << "Nothing" << endl; 
+    DEBUG_cout << "Nothing" << endl;
 
     return true;
   }
@@ -328,17 +361,17 @@ private:
   virtual
   ~Ideas();
 
+  size_t GetNumIdeas() const {
+    return this->index_.items.size();
+  }
+
   Idea* GetIdeaById(const ideaid_t ideaId);
-  std::vector<Idea*> GetIdeas(size_t from, size_t count);
-  std::vector<Idea*> GetLastIdeas(size_t count);
-  //vector<Idea*> GetIdeasByLifeId(lifeid_t lifeId, size_t from, size_t count);
-  ideaid_t AddIdea(
-      lifeid_t lifeId,
-      const std::string& title,
-      uint32_t contentId = 0,
-      Idea::Permission permission = Idea::Permission::PRIVATE,
-      Idea::Type type = Idea::Type::GENERAL
-    );
+  std::vector<Idea*> GetIdeas(size_t count, size_t skip = 0);
+
+  ideaid_t AddIdea(lifeid_t lifeId, std::string& title,
+                   uint32_t contentId = 0,
+                   Idea::Permission permission = Idea::Permission::PRIVATE,
+                   Idea::Type type = Idea::Type::GENERAL);
   // DON'T ADD UPDATE IDEA. Can be done by updating referenced Idea object.
   bool SyncIdea(const ideaid_t id);
   bool SyncIdeas();
@@ -351,6 +384,8 @@ protected:
 
   ssize_t LoadAllFromStorage() override;
   ssize_t SaveAllToStorage() override;
+
+  Idea* GetIdeaByIndexItem(const IndexItem<ideaid_t>& indexItem);
 
   
 private:

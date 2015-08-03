@@ -24,6 +24,8 @@ Ideas::Exception::type() const noexcept {
 }
 // ===== Exception Implementation End ===== 
 
+const size_t Idea::MAX_TITLE_LENGTH = 256;
+
 
 Ideas::Ideas(const std::string& dirPath,
              const std::string& dataFileName) :
@@ -38,12 +40,11 @@ Ideas::Ideas(const std::string& dirPath,
 
 Ideas::~Ideas() {
   DEBUG_FUNC_START;
-
+  this->SyncIdeas();
 }
 
 
 bool Ideas::open() {
-
   bool isLockFileExisting = this->isLockFileExisting(this->dirPath_);
   if (isLockFileExisting == true) {
     // Table was closed abnormaly or is still running.
@@ -52,8 +53,6 @@ bool Ideas::open() {
     DEBUG_cerr << "WHILE OPENING IDEA TABLE, LOCK FILE WAS DETECTED!" << endl; 
   } 
 
-
-  
   //this->summary_.Open();
   //this->index_.Open();
   this->index_.LoadAllFromStorage();
@@ -94,37 +93,16 @@ bool Ideas::close() {
 
 
 Idea* Ideas::GetIdeaById(const ideaid_t id) {
-  if (this->status_ != Status::OPEN) {
-    DEBUG_cerr << "Ideas table is not open!" << endl; 
-    throw Exception();
-  } 
 
   auto itr = this->ideas_.find(id);
   if (itr == this->ideas_.end()) {
     // not found
     try {
       IndexItem<ideaid_t>& item = this->index_.GetIndexItemById(id);
-      DEBUG_cout << "ItemPos: " << item.pos << endl; 
-      if (this->dataFile_.is_open() == false) {
-        DEBUG_cerr << "DataFile is Not Open!" << endl; 
-        return nullptr;
-      } 
-
-      this->dataFile_.seekg(item.pos, std::ios::beg);
-
-      Idea loadedIdea;
-      this->dataFile_ >> loadedIdea;
-      //loadedIdea.ReadIdeaFromFile(this->dataFile_);
-      const ideaid_t loadedid = loadedIdea.GetId();
-      if (id != loadedid) {
-        DEBUG_cerr << "READ WRONG ROW. SERIOUSLY WRONG. id: " << id << " loadedid: " << loadedid << endl; 
-        return nullptr;
-      } 
-      this->ideas_[loadedid] = std::move(loadedIdea);
-      return &this->ideas_[loadedid];
+      return this->GetIdeaByIndexItem(item);
 
     } catch (Ideas::Exception& ex) {
-      DEBUG_cerr << "Idea does not exist." << endl; 
+      DEBUG_cerr << "Idea does not exist. " << ex.what() << endl; 
       return nullptr;
     } 
   } 
@@ -132,67 +110,80 @@ Idea* Ideas::GetIdeaById(const ideaid_t id) {
   return &itr->second;
 }
 
-std::vector<Idea*> Ideas::GetIdeas(size_t from, size_t count) {
-  if (this->status_ != Status::OPEN) {
-    DEBUG_cerr << "Ideas table is not open!" << endl; 
-    throw Exception();
-  } 
+Idea* Ideas::GetIdeaByIndexItem(const IndexItem<ideaid_t>& indexItem) {
 
-  DEBUG_cout << "from: " << from << " count: " << count << endl; 
-  std::vector<Idea*> result;
-  if (count > 200) {
-    // number too big
-    DEBUG_cerr << "Count can't be too big. Returning empty vector." << endl; 
-    return result;
-  } 
-  result.reserve(count * sizeof(Idea*));
+  auto itr = this->ideas_.find(indexItem.id);
+  if (itr == this->ideas_.end()) {
+    // not found
+    try {
+      const IndexItem<ideaid_t>& item = indexItem;
+      DEBUG_cout << "ItemPos: " << item.pos << endl;
 
-  if (from == 0) {
-    result = this->GetLastIdeas(count);
-  } else {
-    auto indexRit = this->index_.items.find(from);
-    if (indexRit == this->index_.items.end()) {
-      DEBUG_cout << "Invalid from. from: " << from << endl; 
-      return result;
+      this->dataFile_.seekg(item.pos, std::ios::beg);
+
+      Idea loadedIdea;
+      loadedIdea.SyncFrom(this->dataFile_);
+      const ideaid_t loadedid = loadedIdea.GetId();
+      if (indexItem.id != loadedid) {
+        DEBUG_cerr << "READ WRONG ROW. SERIOUSLY WRONG. id: " << indexItem.id
+                   << " loadedid: " << loadedid << endl;
+        return nullptr;
+      } 
+      this->ideas_[loadedid] = std::move(loadedIdea);
+      return &this->ideas_[loadedid];
+
+    } catch (Ideas::Exception& ex) {
+      DEBUG_cerr << "Idea does not exist. " << ex.what() << endl; 
+      return nullptr;
     } 
-    for (uint32_t i = 0; count > i && this->index_.items.begin() != indexRit; i++, --indexRit) {
-      result.push_back(this->GetIdeaById(indexRit->first));
-    }
-  }
+  } 
 
-  DEBUG_cout << "Ideas are returned! n: " << result.size() << endl; 
-
-  return result;
+  return &itr->second;
 }
 
-std::vector<Idea*> Ideas::GetLastIdeas(size_t count) {
-  if (this->status_ != Status::OPEN) {
-    DEBUG_cerr << "Ideas table is not open!" << endl; 
-    throw Exception();
-  } 
+std::vector<Idea*> Ideas::GetIdeas(size_t count, size_t skip) {
+
   std::vector<Idea*> result;
+
+  if (count == 0) {
+    DEBUG_cerr << "Count can't be 0. Returning empty vector." << endl; 
+    return result;
+  }
+
   if (count > 200) {
     // number too big
     DEBUG_cerr << "Count can't be too big. Returning empty vector." << endl; 
     return result;
   } 
+
+  if (this->index_.items.size() <= skip) {
+    DEBUG_cerr << "Skip cannot be larger than numItems." << endl; 
+    return result;
+  }
+
+  if (this->index_.items.size() <= (count + skip)) {
+    count = this->index_.items.size() - skip; 
+  }
+
   result.reserve(count);
 
   auto indexRit = this->index_.items.crbegin();
-  for (uint32_t i = 0; count > i && this->index_.items.crend() != indexRit; i++, ++indexRit) {
-    result.push_back(this->GetIdeaById(indexRit->first));
+  for (size_t i = 0; i < skip; ++i) {
+    ++indexRit;
+  }
+  for (size_t i = 0; i < count; ++i) {
+    result.push_back(this->GetIdeaByIndexItem(indexRit->second));
+    ++indexRit;
   }
 
+
+  DEBUG_cout << "Ideas are returned! n: " << result.size() << endl; 
   return result;
 }
 
-
-ideaid_t Ideas::AddIdea(lifeid_t lifeId,
-                        const string& title, 
-                        uint32_t contentId,
-                        Idea::Permission permission,
-                        Idea::Type type)
-{
+ideaid_t Ideas::AddIdea(lifeid_t lifeId, std::string& title,
+                        uint32_t contentId, Idea::Permission permission,
+                        Idea::Type type) {
   if (this->status_ != Status::OPEN) {
     DEBUG_cerr << "Ideas table is not open!" << endl; 
     throw Exception();
@@ -212,7 +203,7 @@ ideaid_t Ideas::AddIdea(lifeid_t lifeId,
   newIdea.SetStatus(Idea::Status::ACTIVE);
   newIdea.SetContentId(contentId);
 
-  this->dataFile_ << newIdea;
+  newIdea.SyncTo(this->dataFile_);
   
   const std::streampos pos = newIdea.GetPos();
   
@@ -224,35 +215,28 @@ ideaid_t Ideas::AddIdea(lifeid_t lifeId,
 
 
 bool Ideas::SyncIdea(ideaid_t id) {
-  auto it = this->ideas_.find(id);
-  if (it == this->ideas_.end()) {
+  auto itr = this->ideas_.find(id);
+  if (itr == this->ideas_.end()) {
     // not found;
     DEBUG_cout << "Idea not found. Id: " << id << endl; 
     return false;
   } 
 
-  Idea& idea = it->second ;
-
-  if (idea.IsSynced() == true) {
-    DEBUG_cout << "Already synced! Good" << endl; 
-    return true;
-  } 
-
-  this->dataFile_ << idea;
-  DEBUG_cout << "Idea " << id << " has been synced." << endl; 
+  Idea& idea = itr->second ;
+  idea.SyncTo(this->dataFile_);
 
   return true;
 }
 
 bool Ideas::SyncIdeas() {
-
+  size_t count = 0;
   for (auto& idea : this->ideas_) {
     if (idea.second.IsSynced() == false) {
-      this->dataFile_ << idea.second;
-      DEBUG_cout << "Idea " << idea.second.GetId() << " has been synced." << endl; 
+      idea.second.SyncTo(this->dataFile_);
+      count += 1;
     } 
   } 
-
+  DEBUG_cout << "Synced " << count << " idea(s)." << endl;
   return true;
 }
 
@@ -279,12 +263,11 @@ Idea::Idea() :
   type(Type::GENERAL),
   perm(Permission::PRIVATE),
   created(std::chrono::system_clock::now()),
+  modified(std::chrono::system_clock::now()),
   contentId(0),
   pos(-1),
   isSynced(false)
-{ 
-  memset(this->title, 0, sizeof(this->title));
-}
+{ }
 
 Idea::~Idea() {
   if (this->isSynced == false) {
@@ -313,12 +296,15 @@ Idea::Status Idea::GetStatus() const {
   return this->status;
 }
 
-std::string Idea::GetTitle() const {
-  return std::string(this->title);
+const std::string& Idea::GetTitle() const {
+  return this->title;
 }
 
 const char* Idea::GetTitleChar() const {
-  return this->title;
+  DEBUG_cerr
+      << "GetTitleChar() is DEPRECATED. Use std::string GetTitle() instead."
+      << endl;
+  return this->title.c_str();
 }
 
 uint32_t Idea::GetContentId() const {
@@ -354,6 +340,7 @@ void Idea::SetLifeId(lifeid_t lifeid) {
 void Idea::SetStatus(Idea::Status status) {
   if (this->status != status) {
     this->status = status;
+    this->modified = std::chrono::system_clock::now();
     this->isSynced = false;
   } 
 }
@@ -361,6 +348,7 @@ void Idea::SetStatus(Idea::Status status) {
 void Idea::SetType(Idea::Type type) {
   if (this->type != type) {
     this->type = type;
+    this->modified = std::chrono::system_clock::now();
     this->isSynced = false;
   } 
 }
@@ -368,19 +356,26 @@ void Idea::SetType(Idea::Type type) {
 void Idea::SetPermission(Idea::Permission& perm) {
   if (this->perm != perm) {
     this->perm = perm;
+    this->modified = std::chrono::system_clock::now();
     this->isSynced = false;
   }
 }
 
-bool Idea::SetTitle(const std::string& title) {
-  size_t length = title.length();
-  if (length > 200) {
-    DEBUG_cerr << "Title length is too long. Trimming it and continue." << endl; 
-    length = 200;
+bool Idea::SetTitle(std::string& title) {
+  if (title.length() > Idea::MAX_TITLE_LENGTH) {
+    DEBUG_cerr << "Title is too long. Trimmed and cont..." << endl;
+    title.resize(Idea::MAX_TITLE_LENGTH);
   } 
-  memset(this->title, 0, sizeof(this->title));
-  title.copy(this->title, length);
-  //memcpy(this->title, title.c_str(), length);
+
+  auto trimmedBytes = Util::String::TrimIncompleteUTF8(title);
+  if (trimmedBytes > 0) {
+    DEBUG_cout << "Trimmed " << trimmedBytes << " bytes from title." << endl;
+  }
+
+  //this->title = std::move(title);
+  this->title = title;
+
+  this->modified = std::chrono::system_clock::now();
   this->isSynced = false;
   return true;
 }
@@ -388,6 +383,7 @@ bool Idea::SetTitle(const std::string& title) {
 void Idea::SetContentId(uint32_t contentId) {
   if (this->contentId != contentId) {
     this->contentId = contentId;
+    this->modified = std::chrono::system_clock::now();
     this->isSynced = false;
   }
 }
@@ -409,7 +405,7 @@ using namespace lio;
 
 TEST(IdeasTest, OpenAndClose) {
   ASSERT_NO_THROW({
-    Ideas table("ideas.data", "./testdata/ideas/");
+    Ideas table("./testdata/ideas/");
     ASSERT_TRUE(table.Open());
     ASSERT_TRUE(table.Close());
   });
@@ -419,7 +415,7 @@ TEST(IdeasTest, OpenAndClose) {
 
 ideaid_t firstId = 0;
 TEST(IdeasTest, AddIdea) {
-  Ideas table("ideas.data", "./testdata/ideas/");
+  Ideas table("./testdata/ideas/");
   EXPECT_TRUE(table.Open());
 
   std::string content = "Hello First Idea";
@@ -440,7 +436,7 @@ TEST(IdeasTest, AddIdea) {
 
 
 TEST(IdeasTest, GetAddedIdea) {
-  Ideas table("ideas.data", "./testdata/ideas/");
+  Ideas table("./testdata/ideas/");
   EXPECT_TRUE(table.Open());
 
   std::string content = "Hello First Idea";
@@ -449,7 +445,6 @@ TEST(IdeasTest, GetAddedIdea) {
     Idea* idea = table.GetIdeaById(firstId);
     ASSERT_FALSE(idea == nullptr);
     EXPECT_EQ(firstId, idea->GetId());
-    EXPECT_STREQ(content.c_str(), idea->GetTitleChar());
     EXPECT_STREQ(content.c_str(), idea->GetTitle().c_str());
     EXPECT_TRUE(idea->IsSynced() == true);
     EXPECT_EQ(0, idea->GetContentId());
@@ -458,19 +453,26 @@ TEST(IdeasTest, GetAddedIdea) {
   EXPECT_TRUE(table.Close());
 }
 
+size_t numRowsToAdd = 20;
 TEST(IdeasTest, AddIdeas) {
-  Ideas table("ideas.data", "./testdata/ideas/");
+  Ideas table("./testdata/ideas/");
   srand(time(NULL));
 
   EXPECT_TRUE(table.Open());
 
-  for (int i = 0; 200 > i; ++i) {
-    size_t randomLength = rand() % (200 + 100);
+  for (size_t i = 0; numRowsToAdd > i; ++i) {
+    size_t randomLength = rand() % (Idea::MAX_TITLE_LENGTH + 100);
     uint32_t randomLifeId = rand() % 2000;
 
     std::string randomContent = Util::String::RandomString(randomLength);
 
     ASSERT_NO_THROW({
+      std::string trimmed((randomContent.length() > Idea::MAX_TITLE_LENGTH)
+                              ? randomContent.substr(0, Idea::MAX_TITLE_LENGTH)
+                              : randomContent);
+
+      Util::String::TrimIncompleteUTF8(trimmed);
+
       ideaid_t newId = table.AddIdea(randomLifeId, randomContent);
       EXPECT_GT(newId, 0);
       DEBUG_cout << "newId: " << newId << endl; 
@@ -480,13 +482,9 @@ TEST(IdeasTest, AddIdeas) {
       EXPECT_EQ(newId, idea->GetId());
       //EXPECT_EQ(randomLifeId, idea->Get());
 
-      EXPECT_LT(idea->GetTitle().length(), 201);
-      std::string trimmed(
-        (randomContent.length() > 200) ? randomContent.substr(0, 200) : std::move(randomContent)
-      );
+      EXPECT_LT(idea->GetTitle().length(), Idea::MAX_TITLE_LENGTH + 1);
 
       EXPECT_STREQ(trimmed.c_str(), idea->GetTitle().c_str());
-      EXPECT_STREQ(trimmed.c_str(), idea->GetTitleChar());
       EXPECT_TRUE(idea->IsSynced() == true);
       EXPECT_EQ(0, idea->GetContentId());
       idea->Print();
@@ -497,13 +495,116 @@ TEST(IdeasTest, AddIdeas) {
 }
 
 TEST(IdeasTest, OpenAfterAdding) {
-  Ideas table("ideas.data", "./testdata/ideas/");
+  Ideas table("./testdata/ideas/");
   EXPECT_TRUE(table.Open());
   //table.GetIdea();
   EXPECT_TRUE(table.Close());
 }
 
-TEST(IdeasTest, UpdateIdea) {
+
+TEST(IdeasTest, GetAddedIdeaa) {
+  Ideas table("./testdata/ideas/");
+  EXPECT_TRUE(table.Open());
+
+  for (size_t i = 0; numRowsToAdd > i; ++i) {
+    const ideaid_t randomId = rand() % numRowsToAdd + 1; 
+
+    ASSERT_NO_THROW({
+      const Idea* item = table.GetIdeaById(randomId);
+      ASSERT_FALSE(item == nullptr);
+      EXPECT_TRUE(item->IsSynced() == true);
+      item->Print();
+    });
+  } 
+
+  EXPECT_TRUE(table.Close());
+}
+
+TEST(IdeasTest, GetIdeasA) {
+  Ideas table("./testdata/ideas/");
+  EXPECT_TRUE(table.Open());
+
+  // THIS USES MANY LARGE COUNT AND SKIP TO TEST UNACCEPTABLE INPUT
+  const size_t numItems = table.GetNumIdeas();
+  for (int i = 0; i < 20; ++i) {
+    const size_t randomCount = rand() % (numItems * 2); 
+    const size_t randomSkip = rand() % (numItems * 2); 
+
+    ASSERT_NO_THROW({
+      DEBUG_cout << "GetIdeas. TotalItemsInIdeas: " << numItems << endl;
+      DEBUG_cout << "GetIdeas. count: " << randomCount << " skip: " << randomSkip << endl;
+      auto items = table.GetIdeas(randomCount, randomSkip);
+      DEBUG_cout << "ReturnedCount: " << items.size() << endl;
+      if (randomCount == 0 ||
+          randomCount > 200)
+      {
+        EXPECT_EQ(0, items.size());
+        continue;
+      }
+
+      if (numItems <= randomSkip) {
+        EXPECT_EQ(0, items.size());
+        continue;
+      }
+
+      if (numItems <= (randomCount + randomSkip)) {
+        if (numItems < randomSkip) {
+          EXPECT_EQ(0, items.size());
+          continue;
+        }
+        EXPECT_EQ(numItems - randomSkip, items.size());
+      }
+
+      if (numItems >= (randomCount + randomSkip)) {
+        EXPECT_EQ(randomCount, items.size());
+      }
+    });
+  }
+
+  EXPECT_TRUE(table.Close());
+}
+
+TEST(IdeasTest, GetIdeasB) {
+  Ideas table("./testdata/ideas/");
+  EXPECT_TRUE(table.Open());
+
+  const size_t numItems = table.GetNumIdeas();
+  for (int i = 0; i < 200; ++i) {
+    const size_t randomCount = rand() % (50); 
+    const size_t randomSkip = rand() % (numItems); 
+
+    ASSERT_NO_THROW({
+      DEBUG_cout << "GetIdeas. TotalItemsInIdeas: " << numItems << endl;
+      DEBUG_cout << "GetIdeas. count: " << randomCount << " skip: " << randomSkip << endl;
+      auto items = table.GetIdeas(randomCount, randomSkip);
+      DEBUG_cout << "ReturnedCount: " << items.size() << endl;
+      if (randomCount == 0 ||
+          randomCount > 200)
+      {
+        EXPECT_EQ(0, items.size());
+        continue;
+      }
+
+      if (numItems <= randomSkip) {
+        EXPECT_EQ(0, items.size());
+        continue;
+      }
+
+      if (numItems <= (randomCount + randomSkip)) {
+        if (numItems < randomSkip) {
+          EXPECT_EQ(0, items.size());
+          continue;
+        }
+        EXPECT_EQ(numItems - randomSkip, items.size());
+      }
+
+      if (numItems >= (randomCount + randomSkip)) {
+        EXPECT_EQ(randomCount, items.size());
+      }
+    });
+  }
+
+  EXPECT_TRUE(table.Close());
 }
 
 //TEST(IdeasTest, ) {

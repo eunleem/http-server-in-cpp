@@ -1,0 +1,172 @@
+.panel {
+  position: relative;
+  font-size: 1.2em;
+  transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  -webkit-transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  min-height: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+.panel > .wrap {
+  text-align: center;
+  position: relative;
+  top: 0%;
+  width: 96%;
+  margin-left: 2%;
+  margin-right: 2%;
+  padding: 30px 0;
+}
+
+#sect-header {
+  min-height: 100px;
+
+  transition: height 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86); 
+  /*border-bottom: 3px solid #DDD;*/
+}
+
+#sect-header > div{
+}
+
+#sect-header #lblTodayDate {
+  font-size: 2.3em;
+  font-weight: bold;
+  color: #777;
+}
+
+#sect-journal {
+  /*
+  background-color: #EECD86;
+  color: #3D3242;
+  background-color: #DED29E;;
+  background-color: #DCCCAA;
+  background-color: #F4F0CB;
+  overflow-x: auto;
+  */
+  background-color: #FFF;
+  color: #000;
+  min-height: 100%;
+  overflow: auto;
+  transition: background-color 1000ms linear;
+}
+
+#sect-journal .wrap > h1 {
+  /*
+  font-family: Lobster;
+  font-weight: normal;
+  text-transform: uppercase;
+  */
+  margin: 0;
+  padding: 0;
+  font-size: 3em;
+  color: #444;
+}
+
+#sect-journal #boxJournal > #boxJournalWriteTime {
+  text-align: left;
+  font-size: 3em;
+  color: #999;
+  font-family: Lobster;
+}
+
+#sect-journal #boxJournal > #boxJournalWriteMode {
+  position: relative;
+  z-index: 100;
+  top: -40px;
+
+}
+
+#sect-journal #boxJournal > #boxJournalWriteMode > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+#sect-journal #boxJournal > #boxJournalWriteMode > ul > li {
+  display: inline-block;
+  margin: 0px 20px 0px 20px;
+  font-size: 2em;
+}
+
+#sect-journal #boxJournal > #txtJournalWrite {
+  /*
+
+  background: transparent;
+  background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
+  background-size: 100% 80px;
+  font-family: 'Nanum Pen Script', serif;
+  line-height: 80px;
+  min-height: 900px;
+   */
+  background: transparent;
+  font-size: 2em;
+  line-height: 1.3em;
+  color: #333;
+  margin-top: 20px;
+  padding: 0 30px 10px 30px;
+  min-width: 500px;
+  width: 90%;
+  border-bottom: 4px solid #999;
+  resize: vertical;
+}
+
+#sect-journal #boxJournal > .boxControls {
+}
+#sect-journal #boxJournal > .boxControls button {
+  height: 40px;
+  font-weight: bold;
+  background: transparent;
+}
+
+
+
+#sect-journal #boxJournal > .boxUnderWrite {
+  text-align: left;
+}
+
+#sect-journal #boxJournal input[type="text"] {
+  /*
+  background: transparent;
+  background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
+  background-size: 100% 80px;
+  font-family: 'Nanum Pen Script', serif;
+  line-height: 80px;
+   */
+  font-size: 200px;
+  color: #333;
+  padding: 10px 30px;
+  min-width: 600px;
+  width: 90%;
+  display:none;
+}
+
+
+#sect-journal #boxJournal > .boxUnderWrite #boxJournalPosted {
+  position: relative;
+  z-index: 1000;
+  top: -20px;
+  padding-top: 40px;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li {
+  display: block;
+  margin: 30px auto;
+  min-width: 600px;
+  width: 90%;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li > .journal-entry-time {
+  font-size: 1.5em;
+  color: #666;
+}
+
+#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li > .journal-entry-content {
+  margin-left: 20px;
+  font-size: 2em;
+}

@@ -615,7 +615,6 @@ TEST(ContentsTest, GetAddedContents) {
   for (int i = 0; numRowsToAdd > i; ++i) {
     const contentid_t randomId = rand() % numRowsToAdd + 1; 
 
-
     ASSERT_NO_THROW({
       const Content* item = table.GetContentById(randomId);
       ASSERT_FALSE(item == nullptr);

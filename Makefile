@@ -94,7 +94,7 @@ HttpServer: Logger.o $(ROOT_DIR)/liolib/AsyncIo.o $(ROOT_DIR)/liolib/Inotify.o $
 	rm -f HttpServer-*.exe
 	@$(call COMPILE,$@,$^,HttpServer)
 
-Worker: AdminPage.o LoginPage.o InvitationPage.o Page.o ILioData.o Invitations.o Lives.o Sessions.o HttpPostData.o HttpRequest.o HttpResponse.o HttpRequestPool.o HttpResponsePool.o HttpConnection.o AppCore.o $(ROOT_DIR)/liolib/Gzip.o $(ROOT_DIR)/liolib/MemoryPool.o $(ROOT_DIR)/liolib/AsyncIo.o $(ROOT_DIR)/liolib/Inotify.o $(ROOT_DIR)/liolib/Util.o $(ROOT_DIR)/liolib/Logger.o $(ROOT_DIR)/liolib/AsyncSocket.o $(ROOT_DIR)/liolib/Socket.o $(ROOT_DIR)/liolib/http/Http.o
+Worker: PlannerPage.o AdminPage.o LoginPage.o InvitationPage.o Page.o ILioData.o Ideas.o Contents.o Invitations.o Lives.o Sessions.o HttpPostData.o HttpRequest.o HttpResponse.o HttpRequestPool.o HttpResponsePool.o HttpConnection.o AppCore.o $(ROOT_DIR)/liolib/Gzip.o $(ROOT_DIR)/liolib/MemoryPool.o $(ROOT_DIR)/liolib/AsyncIo.o $(ROOT_DIR)/liolib/Inotify.o $(ROOT_DIR)/liolib/Util.o $(ROOT_DIR)/liolib/Logger.o $(ROOT_DIR)/liolib/AsyncSocket.o $(ROOT_DIR)/liolib/Socket.o $(ROOT_DIR)/liolib/http/Http.o
 	@$(call COMPILE,$@,$^,Worker)
 	mv Worker-*.exe ./workers/HttpWorker.exe
 

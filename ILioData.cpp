@@ -148,6 +148,8 @@ ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
     return 0;
   }
 
+  //Util::String::UriDecodeFly((char*)content.c_str(), content.length());
+
   bool isSafeUserInput = Util::String::IsUserInputSafe(content);
   if (isSafeUserInput == false) {
     DEBUG_cerr << "Content is not safe." << endl;
@@ -155,7 +157,6 @@ ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
   }
 
   // Check content for unsafe or invalid chars for json/html
-  //std::string encoded = Util::String::JsonEncode(content);
   bool isSafeJson = Util::String::IsSafeForJson(content);
   if (isSafeJson == false) {
     DEBUG_cerr << "NOT SAFE FOR JSON!" << endl;
@@ -166,8 +167,8 @@ ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
 
   std::string ideatitle;
 
-  if (content.length() > Idea::GetTitleSize()) {
-    ideatitle = content.substr(0, Idea::GetTitleSize());
+  if (content.length() > Idea::MAX_TITLE_LENGTH) {
+    ideatitle = content.substr(0, Idea::MAX_TITLE_LENGTH);
     auto numBytesTrimmed = Util::String::TrimIncompleteUTF8(ideatitle);
     DEBUG_cout << "Trimmed " << numBytesTrimmed << " bytes for UTF-8 string!"<< endl;
 
@@ -181,6 +182,9 @@ ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
     ideatitle = content;
   }
 
+  DEBUG_cout << "ProcessedTitle: " << ideatitle << "END len: " << ideatitle.length() << endl;
+  DEBUG_cout << "ProcessedContent: " << content << "END len:" << content.length() << endl;
+
   ideaid_t newIdeaId = this->ideas_.AddIdea(lifeId, ideatitle, contentId);
 
   if (newIdeaId == 0) {
@@ -188,6 +192,23 @@ ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
   }
 
   return newIdeaId;
+}
+
+bool ILioData::UpdateIdea(ideaid_t ideaId, std::string& content,
+    Idea::Type type, Idea::Permission perm) {
+  return true;
+}
+
+std::vector<Idea*> ILioData::GetIdeas(size_t count, size_t skip) {
+  return this->ideas_.GetIdeas(count, skip);
+}
+
+const Idea* ILioData::GetIdeaById(ideaid_t id) {
+  return this->ideas_.GetIdeaById(id);
+}
+
+const Content* ILioData::GetContentById(contentid_t id) {
+  return this->contents_.GetContentById(id);
 }
 
 //ILioData::

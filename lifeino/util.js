@@ -26,7 +26,7 @@ var IDEASTATUS = {
 };
 
 
-var gCachedObjs = new Object();
+var gCachedObjs = {};
 
 function jGet(selector) {
   // #DEVEL
@@ -34,21 +34,21 @@ function jGet(selector) {
     console.log("function jGet cannot be used before jQuery is Loaded!");
     alert("function jGet cannot be used before jQuery is Loaded!");
     return;
-  } 
+  }
   if (typeof selector !== "string") {
     console.log("function jGet only take string param.");
     return;
-  } 
+  }
   // #DEVLE_END
 
   if (typeof gCachedObjs[selector] === "undefined") {
-    if ($(selector).length == 0) {
+    if ($(selector).length === 0) {
       console.log("Could not get " + selector);
       return null;
     }
 
     gCachedObjs[selector] = $(selector);
-  } 
+  }
 
   return gCachedObjs[selector];
 }
@@ -62,16 +62,16 @@ Number.prototype.toStringPad = function (digits) {
   var s = this.toString();
   for (var i = 0; c > i; i++) {
     leadingZeros += "0";
-  } 
+  }
   return leadingZeros + s;
-}
+};
 
 
 
 Date.prototype.getMonthStr = function(format) {
   if (typeof format == "undefined") {
     return gMonthNames[this.getMonth()];
-  } 
+  }
   return gMonthNames[this.getMonth()].substr(0, format);
 };
 
@@ -85,6 +85,13 @@ Date.prototype.getDatePad = function() {
   return s.substr(s.length - 2);
 };
 
+Date.prototype.getMonthStrAndDate = function(format) {
+  if (typeof format == "undefined") {
+    return gMonthNames[this.getMonth()] + " " + this.getDate().toString();
+  }
+  return gMonthNames[this.getMonth()].substr(0, format) + " " + this.getDate().toString();
+};
+
 
 Date.prototype.getWeekNumber = function() {
   var onejan = new Date(this.getFullYear(), 0, 1);
@@ -94,16 +101,16 @@ Date.prototype.getWeekNumber = function() {
 Date.prototype.getWeekday = function(format) {
   var dayIdx = this.getDay();
   //console.log(dayIdx);
-  if (isNaN(dayIdx) == true ||
+  if (isNaN(dayIdx) === true ||
       dayIdx === undefined) {
     return "";
-  } 
-
-  if (format !== undefined) {
-    return gWeekDayNames[dayIdx].substr(0, format); 
   }
 
-  return gWeekDayNames[dayIdx]; 
+  if (format !== undefined) {
+    return gWeekDayNames[dayIdx].substr(0, format);
+  }
+
+  return gWeekDayNames[dayIdx];
 };
 
 Date.prototype.getHoursPad = function() {
@@ -135,38 +142,38 @@ Date.prototype.getTimeStr = function(config) {
 
   var hours = this.getHours();
   var minutes = this.getMinutes();
-  if (config.paddedMinutes == true) {
+  if (config.paddedMinutes === true) {
     minutes = minutes.toStringPad(2);
   }
 
   var result = "";
   var ending = "";
-  if (config.twelveHrs == true) {
+  if (config.twelveHrs === true) {
     var ampm = "am";
     if (hours >= 12) {
       hours -= 12;
       ampm = "pm";
-    } 
-    if (hours == 0) {
+    }
+    if (hours === 0) {
       // No Zero hours.
       hours = 12;
-    } 
-    if (config.uppercaseAmPm == true) {
+    }
+    if (config.uppercaseAmPm === true) {
       ampm = ampm.toUpperCase();
-    } 
+    }
     ending = " " + ampm;
   }
 
-  if (config.paddedHours == true) {
+  if (config.paddedHours === true) {
     hours = hours.toStringPad(2);
-  } 
+  }
   result = hours + ":" + minutes + ending;
   return result;
 };
 
 Date.prototype.getDateTime = function() {
   return this.getMonthStr() + " " + this.getDatePad() + ", " + this.getFullYear() + " " + this.getTimeStr();
-}
+};
 
 String.prototype.htmltrim = function() {
   return this.replace(/^\s+|\s+$/g, "")
@@ -193,7 +200,7 @@ String.prototype.firstline = function(maxlength) {
   }
   if (firstlineEnd > 0) {
     return this.substr(0, firstlineEnd);
-  } 
+  }
   return "";
 };
 
@@ -206,10 +213,61 @@ String.prototype.truncatebyte = function(size) {
   var result = this.substr(0, size);
   while (result.bytelength() > size) {
     result = this.substr(0, --i);
-  } 
+  }
   return result;
 };
 
+String.prototype.toSafeHtml = function() {
+  return this
+        .replace(/>/g, "&gt;")
+        .replace(/</g, "&lt;");
+};
+
+String.prototype.toPrettyHtml = function() {
+  return this
+        .replace(/&/g, "&amp;")
+        .replace(/  /g, "&nbsp;&nbsp;")
+        .replace(/\n/g, "<br>");
+};
+
+String.prototype.fromJsonStringToPrettyHtml = function() {
+  return this
+        .replace(/&gt;/g, ">")
+        .replace(/&lt;/g, "<")
+        .replace(/&/g, "&amp;")
+        .toSafeHtml()
+        .replace(/  /g, "&nbsp;&nbsp;")
+        //.replace(/\\/g, "\\")
+        //.replace(/\"/g, "\"")
+        .replace(/\\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
+        .replace(/\\r/g, "<br>")
+        .replace(/\\n/g, "<br>");
+};
+
+String.prototype.toJsonString = function() {
+  return this
+        .replace(/\\/g, "\\\\")
+        .replace(/\"/g, "\\\"")
+        .replace(/\t/g, "\\t")
+        .replace(/\r/g, "\\r")
+        .replace(/\n/g, "\\n")
+        .replace(/\u2028/g, "")
+        .replace(/\u2029/g, "")
+        .replace(/\b/g, "")
+        .replace(/\f/g, "")
+        .toSafeHtml();
+};
+
+String.prototype.toEditable = function() {
+  return this
+        .replace(/&nbsp;&nbsp;&nbsp;&nbsp;/g, "\t")
+        .replace(/&nbsp;/g, " ")
+        .replace(/<br>/g, "\n")
+        .replace(/&gt;/g, ">")
+        .replace(/&lt;/g, "<")
+        .replace(/&amp;/g, "&");
+
+};
 
 function getUrlVars() {
   var vars = [], hash;
@@ -237,7 +295,7 @@ function setCookieValue(cname, cvalue, expInDays) {
   d.setTime(d.getTime() + (expInDays * 24 * 60 * 60 * 1000));
   var expires = "expires=" + d.toGMTString();
   document.cookie = cname + "=" + cvalue + "; " + expires;
-} 
+}
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -268,13 +326,13 @@ function disableText(target) {
 function enableButton(target) {
   if (target.is(":disabled")) {
     target.removeAttr("disabled");
-    if (target.data("orgtext") != "") {
+    if (target.data("orgtext") !== "") {
       if (target.is("button")) {
         target.text(target.data("orgtext"));
       } else if (target.is("input")) {
         target.val(target.data("orgtext"));
       }
-    } 
+    }
     return true;
 
   } else {
