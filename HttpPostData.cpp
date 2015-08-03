@@ -47,7 +47,7 @@ HttpPostData::~HttpPostData() {
 
 }
 
-DataBlock<char*> HttpPostData::GetData(const string& fieldName) {
+DataBlock<char*> HttpPostData::GetData(const std::string& fieldName) {
   if (this->content_.IsNull() == true) {
     return DataBlock<char*>();
   } 
@@ -82,9 +82,9 @@ DataBlock<char*> HttpPostData::GetData(const string& fieldName) {
     ptr++;
   } 
 
-  //ssize_t size = Util::String::UriDecodeFly((char*)this->content_.GetObject() + dataPos, length);
+  ssize_t decodedLength = Util::String::UriDecodeFly((char*)this->content_.GetObject() + dataPos, length);
 
-  this->cached_[fieldName] = DataBlock<char*>((char*)this->content_.GetObject() + dataPos, 0, length);
+  this->cached_[fieldName] = DataBlock<char*>((char*)this->content_.GetObject() + dataPos, 0, decodedLength);
 
   return this->cached_[fieldName];
 }

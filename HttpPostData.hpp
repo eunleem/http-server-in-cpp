@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jan 01, 2015
+    Jul 29, 2015
   
   History
     January 01, 2015
@@ -35,7 +35,7 @@
 
 #include "liolib/Debug.hpp"
 
-#include <map>
+#include <unordered_map>
 
 #include "liolib/DataBlock.hpp"
 #include "liolib/Util.hpp"
@@ -71,12 +71,12 @@ private:
   HttpPostData(char* data, size_t length);
   ~HttpPostData();
 
-  DataBlock<char*> GetData(const string& fieldName);
+  DataBlock<char*> GetData(const std::string& fieldName);
 protected:
   
 private:
   DataBlock<char*> content_;
-  std::map<string, DataBlock<char*>> cached_;
+  std::unordered_map<std::string, DataBlock<char*>> cached_;
   
 };
 
