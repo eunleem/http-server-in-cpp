@@ -18,9 +18,9 @@ LIBRARY_DIR=-L$(ROOT_DIR)/libs
 LIBRARIES=-lz -lcrypto -lssl
 
 PROFILING_FLAGS=-pg 
-OBJECT_FLAGS=-c -Wall -std=c++14 -O3 -ggdb
-EXECUTABLE_FLAGS=-Wall -std=c++14 -O3 -ggdb -pthread
-TEST_EXE_FLAGS=-Wall -std=c++14 -O3 -ggdb -pthread
+OBJECT_FLAGS=-c -Wall -std=c++11 -O3 -ggdb
+EXECUTABLE_FLAGS=-Wall -std=c++11 -O3 -ggdb -pthread
+TEST_EXE_FLAGS=-Wall -std=c++11 -O3 -ggdb -pthread
 
 SOURCES=NarshaMain.cpp HttpServer.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
