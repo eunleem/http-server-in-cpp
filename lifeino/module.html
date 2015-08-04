@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  <link href='//fonts.googleapis.com/earlyaccess/nanumgothic.css' rel='stylesheet' type='text/css'>
+  <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="util.js" type="text/javascript"></script>
+  <script src="manager.js" type="text/javascript"></script>
+  <title></title>
+</head>
+<body>
+
+  <section id="sect-header" class="panel">
+    <div class="wrap">
+      <div>
+        <time id="lblTodayDate">Today's date!</time>
+      </div>
+      <button id="btnSendMsgToJournal">Send Message to Journal Module</button>
+      <button id="btnSendMsgToUndefined">Send Message to Undefined Module</button>
+    </div>
+  </section>
+
+  <section id="sect-journal">
+    <h2>Journal</h2>
+    <div id="boxReceivedMessage"></div>
+    <button id="btnPush">PUSH</button>
+  </section>
+
+  <section id="sect-planner">
+    <h2>Planner</h2>
+  </section>
+
+<script type="text/javascript">
+
+(function (window, $) {
+  var HeaderModule = function (name, sectionId) {
+    console.log("HeaderModule constructor called.");
+    Module.call(this, name, sectionId);
+
+    this.elems.set("#lblTodayDate", this.section.find("#lblTodayDate"));
+  };
+
+  HeaderModule.prototype = Object.create(Module.prototype);
+  HeaderModule.prototype.constructor = HeaderModule;
+
+  HeaderModule.prototype.onEveryMinute = function(time) {
+    this.elems.get("#lblTodayDate").text(
+      time.getMonthStr() + " " + time.getDate() + " " + time.getWeekday() + " " + time.getTimeStr());
+  };
+
+
+  HeaderModule.prototype.Run = function() {
+    console.log("HeaderModule.Run() has been called.");
+
+    addEventHandler(this);
+  };
+
+  function addEventHandler(that) {
+    that.section.on("click", "#btnSendMsgToJournal", function() {
+      that.SendMessage(that.name, "Journal", "TYPE", "MS");
+    });
+
+    that.section.on("click", "#btnSendMsgToUndefined", function() {
+      that.SendMessage(that.name, "UNDEFINED", "TYPE", "MS");
+    });
+  }
+
+  window.HeaderModule = HeaderModule;
+
+})(window, $);
+
+(function (window, $) {
+  var JournalModule = function (name, sectionId) {
+    console.log("JournalModule constructor called.");
+    Module.call(this, name, sectionId);
+
+    this.elems.set("#boxReceivedMessage", this.section.find("#boxReceivedMessage"));
+
+  };
+
+  JournalModule.prototype = Object.create(Module.prototype);
+  JournalModule.prototype.constructor = JournalModule;
+
+  JournalModule.prototype.onReceiveMessage = function(from, type, msg) {
+    this.elems.get("#boxReceivedMessage").html(
+        "Received a message from " + from + "<br>" +
+        "type: " + type + "<br>" +
+        "msg: " + msg + "<br>");
+    
+  };
+
+  JournalModule.prototype.Run = function() {
+    console.log("JournalModule.Run() has been called.");
+
+    addEventHandler(this);
+
+  };
+
+  function addEventHandler(that) {
+    that.section.on("click", "#btnPush", function() {
+      that.SendMessage(that.name, "Planner", "TYPE", "MS");
+    });
+  }
+
+  //Module.fn = Module.prototype;
+  window.JournalModule = JournalModule;
+
+})(window, $);
+
+
+
+
+  $(function() {
+    var mg = new Manager();
+    mg.Register(new HeaderModule("Header", "#sect-header"));
+    mg.Register(new JournalModule("Journal", "#sect-journal"));
+
+    mg.Run();
+  });
+
+</script>
+  
+</body>
+</html>

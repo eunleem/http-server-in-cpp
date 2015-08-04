@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JOURNAL</title>
+
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans|Lobster|Roboto|Lato|Droid+Sans|Roboto+Condensed|Droid+Serif' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/earlyaccess/nanumgothic.css' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/earlyaccess/nanumpenscript.css' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/earlyaccess/nanumbrushscript.css' rel='stylesheet' type='text/css'>
+  <script src="jquery.js" type="text/javascript"></script>
+  <script src="jquery-plugins.js" type="text/javascript"></script>
+  <script src="journal.js" type="text/javascript"></script>
+  <script src="workitem.js" type="text/javascript"></script>
+  <script src="util.js" type="text/javascript"></script>
+  <link href="style.css" rel="stylesheet">
+  <link href="proto.css" rel="stylesheet">
+</head>
+<body>
+<script type="text/javascript">
+  var gNow = new Date();
+
+  function LioTagToHtml(content) {
+    content = content.trim()
+      .replace(/  /g, "&nbsp;&nbsp;")
+      .replace(/\s>\s/g, "&gt;")
+      .replace(/\s<\s/g, "&lt;")
+      .replace(/\s?Title: (.*?)\n/g, "<h2>$1</h2>")
+      .replace(/\s?Subtitle: (.*?)\n/g, "<h3>$1</h3>")
+      .replace(/\s?Subsubtitle: (.*?)\n/g, "<h4>$1</h4>")
+      .replace(/Center:/g, "<div style='text-align: center;'>")
+      .replace(/:Center/g, "</div>")
+      .replace(/Indent:/g, "<div class='indent15'>")
+      .replace(/:Indent/g, "</div>")
+      .replace(/Code:/g, "<code>")
+      .replace(/:Code/g, "</code>")
+      .replace(/(\s*)PG:/g, "$1<p>")
+      .replace(/:PG(\s*)/g, "</p>$1")
+      .replace(/BQ:/g, "<blockquote>")
+      .replace(/:BQ/g, "</blockquote>")
+      .replace(/(\s?)ST:/g, "$1<strong>")
+      .replace(/:ST(\s?)/g, "</strong>$1")
+      .replace(/(\s+)Cite:/g, "$1<cite>")
+      .replace(/:Cite(\s+)/g, "</cite>$1")
+      .replace(/(\s?)DEL:/g, "$1<del datetime='" + gNow.toISOString() + "'>")
+      .replace(/:DEL(\s?)/g, "</del>$1")
+      .replace(/(\s?)INS:/g, "$1<ins datetime='" + gNow.toISOString() + "'>")
+      .replace(/:INS(\s?)/g, "</ins>$1")
+      .replace(/(\s?)EM:/g, "$1<em>")
+      .replace(/:EM(\s?)/g, "</em>$1")
+      .replace(/(\s+)DFN:/g, "$1<dfn>")
+      .replace(/:DFN(\s+)/g, "</dfn>$1")
+      .replace(/(\s+)IT:/g, "$1<i>")
+      .replace(/:IT(\s+)/g, "</i>$1")
+      .replace(/RED:/g, "<span class='color-red'>")
+      .replace(/:RED/g, "</span>")
+      .replace(/ORG:/g, "<span class='color-orange'>")
+      .replace(/:ORG/g, "</span>")
+      .replace(/LOG:/g, "<div class='log-entry'>:TS:<div class='indent15'>")
+      .replace(/:LOG/g, "</div></div>")
+      .replace(/:TS:/g, "<time datetime='" + gNow.toISOString() + "'>" + gNow.toDateString() + " " + gNow.getTimeStr() + "</time>")
+      .replace(/(\s?)li:\s?/g, "$1<li>")
+      .replace(/\s?:li(\s?)/g, "</li>$1")
+      .replace(/ol:\s?/g, "<ol>")
+      .replace(/\s?:ol/g, "</ol>")
+      .replace(/ul:\s?/g, "<ul>")
+      .replace(/\s?:ul/g, "</ul>")
+      .replace(/[\s]*<(h|div|blockquote|p|ol|ul|li|code)(.*?)>\s*/g, "<$1$2>")
+      .replace(/[\s]*<\/(h|div|blockquote|p|ol|ul|li|code)>\s*/g, "</$1>");
+    return content;
+  }
+
+function safeDisplay(content) {
+  content = content
+    .replace(/<\s*(\/?)script/ig, "&lt;$1script")
+    .replace(/script\s*>/ig, "script&gt;");
+  return content;
+}
+
+  function HtmlToLioTag(content) {
+    if (typeof content === "undefined") {
+      return "";
+    } 
+
+    content = content
+      .replace(/<\s*script(.*?)>/ig, "")
+      .replace(/  /g, "&nbsp;&nbsp;")
+      .replace(/<br><br>/ig,"\n \n")
+      .replace(/<br>/ig,"\n")
+      .replace(/<h2>(.*?)<\/h2>/ig, "\nTitle: $1\n")
+      .replace(/<h3>(.*?)<\/h3>/ig, "\nSubtitle: $1\n")
+      .replace(/<h4>(.*?)<\/h4>/ig, "\nSubsubtitle: $1\n")
+      //.replace(/<strong>/g, "ST:")
+      //.replace(/<\/strong>/g, ":ST")
+      //.replace(/<i>/g, "IT:")
+      //.replace(/<\/i>/g, ":IT")
+      //.replace(/<span class=\"color-red\">/g, "RED:")
+      //.replace(/<\/span>/g, ":RED")
+      //.replace(/<blockquote>/g, "BQ:")
+      //.replace(/<\/blockquote>/g, ":BQ")
+      .replace(/<div(.*?)>/ig, "\n<div$1>\n")
+      .replace(/<\/div>/ig, "\n</div>\n")
+      .replace(/<p(.*?)>/ig, "\n<p$1>\n")
+      .replace(/<\/p>/ig, "\n</p>\n")
+      //.replace(/<p>/g, "PG:")
+      //.replace(/<\/p>/g, ":PG")
+      .replace(/<blockquote(.*?)>/ig, "\n<blockquote$1>\n")
+      .replace(/<\/blockquote>/ig, "\n</blockquote>\n")
+      .replace(/<li>/ig, "\nli:")
+      .replace(/<\/li>/ig, ":li\n")
+      .replace(/<ol>/ig, "\nol:\n")
+      .replace(/<\/ol>/ig, "\n:ol\n")
+      .replace(/<ul>/ig, "\nul:\n")
+      .replace(/<\/ul>/ig, "\n:ul\n")
+      .replace(/&gt;/ig, ">")
+      .replace(/&lt;/ig, "<")
+      .replace(/\n\n/g, "\n");
+    return content.trim();
+  }
+
+$(function() {
+
+  updateEveryMinute();
+  setInterval(updateEveryMinute, 60 * 1000);
+
+  //$("body > section").hide();
+  //$("#sect-header, #sect-daystart").show();
+
+
+
+  $("#boxDayStartMessages div").click(function() {
+    var prev = $(this).prev();
+    if (prev.length == 0 || prev.hasClass("line-through")) {
+      $(this).toggleClass("line-through");
+      if ($(this).next().length == 0) {
+        //$("#sect-daystart").css("min-height", "0");
+        //$("#sect-header").height(0);
+        //$("#sect-warning").show();
+        $("#sect-daystart").height(0);
+      } 
+    } else {
+      if (prev.hasClass("line-through") == false) {
+        // Warn... if I want to.
+      } 
+    }
+
+  });
+  getMonthlyGoal(gNow.getFullYear(), gNow.getMonth() + 1);
+  getWeeklyGoal(gNow.getFullYear(), gNow.getWeekNumber());
+
+  $("#lblStartWorking").click(function() {
+    //$("#sect-header").height("100px");
+    $("#sect-warning").hide();
+    $("#sect-daystart").hide();
+    $(document).scrollTop(0);
+  });
+
+
+  $("body").lioInputMask();
+
+  $("#btnSetNewMonthlyGoal").click(function() {
+    postMonthlyGoal(gNow.getFullYear(), gNow.getMonth() + 1);
+  });
+
+  $("#btnSetNewWeeklyGoal").click(function() {
+    postWeeklyGoal(gNow.getFullYear(), gNow.getWeekNumber());
+  });
+
+
+function postWeeklyGoal(year, weekno) {
+  var yearweek = year % 2000 * 100 + weekno;
+  var goal = $("#txtNewWeeklyGoal").val();
+  var detail = "<div id=\"txtWeeklyGoalContent\">" + $("#txtNewWeeklyGoalContent").val() + "</div>";
+  detail += "<h3>Why is it needed this week?</h3>";
+  detail += "<div id=\"txtWeeklyGoalQuestionA\">" + $("#txtNewWeeklyGoalQuestionA").val() + "</div>\n";
+  detail += "<h3>Is it feasible goal for this week?</h3>";
+  detail += "<div id=\"txtWeeklyGoalQuestionB\">" + $("#txtNewWeeklyGoalQuestionB").val() + "</div>\n";
+
+  detail = LioTagToHtml(detail);
+
+  $.ajax({
+    type: "POST",
+    url: "/goal/postweek",
+    data: {
+      "yearweek": yearweek,
+      "goal": goal,
+      "detail": detail
+    }
+  }).fail(function() {
+    alert("failed to post weekly goal.");
+    
+  }).done(function(result) {
+    console.log(result);
+    if (result["code"] == 0) {
+
+      $("#popboxWeeklyGoalSet").parents(".popup-box").hide();
+
+      goal = goal.replace(/\n/g, "<br>");
+      detail = detail.replace(/\n/g, "<br>");
+
+      $("#lblWeeklyGoal").html(goal);
+      $("#boxWeeklyGoalContent").html(detail);
+    } else {
+    }
+  });
+
+}
+  
+function getWeeklyGoal(year, weekno) {
+  $.ajax({
+    type: "POST",
+    url: "/goal/weekget",
+    data: {
+      "year": year,
+      "weekno": weekno
+    }
+  }).fail(function() {
+    alert("failed to get weekly goal.");
+    
+  }).done(function(result) {
+    console.log(result);
+    if (result["code"] == 0) {
+      var goal = result["goal"];
+      var detail = result["detail"];
+
+      goal = goal.replace(/\n/g, "<br>");
+      detail = detail.replace(/\n/g, "<br>");
+
+      $("#lblWeeklyGoal").html(goal);
+      $("#boxWeeklyGoalContent").html(detail);
+    } else {
+      $("#lblWeeklyGoal").html("NOT SET");
+      $("#boxWeeklyGoalContent").html("");
+    }
+  });
+}
+
+function postMonthlyGoal(year, month) {
+  var goal = $("#txtNewMonthlyGoal").val();
+  var detail = $("#txtNewMonthlyGoalContent").val();
+
+  detail = LioTagToHtml(detail);
+
+  $.ajax({
+    type: "POST",
+    url: "/goal/postmonth",
+    data: {
+      "year": year,
+      "month": month,
+      "goal": goal,
+      "detail": detail
+    }
+  }).fail(function() {
+    alert("failed to post monthly goal.");
+    
+  }).done(function(result) {
+    console.log(result);
+    if (result["code"] == 0) {
+      $("#popboxMonthlyGoalSet").parents(".popup-box").hide();
+
+      goal = goal.replace(/\n/g, "<br>");
+      detail = detail.replace(/\n/g, "<br>");
+
+      $("#lblMonthlyGoal").html(goal);
+      $("#boxMonthlyGoalContent").html(detail);
+    } else {
+    }
+  });
+
+}
+
+function getMonthlyGoal(year, month) {
+
+  $.ajax({
+    type: "POST",
+    url: "/goal/getmonth",
+    data: {
+      "year": year,
+      "month": month
+    }
+  }).fail(function() {
+    alert("failed to get monthly goal.");
+    
+  }).done(function(result) {
+    console.log(result);
+    if (result["code"] == 0) {
+      var goal = result["goal"];
+      var detail = result["detail"];
+
+      goal = goal.replace(/\n/g, "<br>");
+      detail = detail.replace(/\n/g, "<br>");
+
+      $("#lblMonthlyGoal").html(goal);
+      $("#boxMonthlyGoalContent").html(detail);
+    } else {
+      //$("#lblMonthlyGoal").html("NOT SET");
+      //$("#boxMonthlyGoalContent").html("");
+    }
+  });
+}
+
+function updateTodayDateAndDaysLeft() {
+  var now = new Date();
+  var lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  console.log("LastDayOfMonth");
+  console.log(lastDayOfMonth);
+  var remainingDays = lastDayOfMonth.getDate() - now.getDate();
+  var remainingDaysStr = remainingDays.toString();
+  if (remainingDays > 1) {
+    remainingDaysStr += " days left...";
+  } else if (remainingDays == 1) {
+    remainingDaysStr += " day left...";
+  } else if (remainingDays == 0) {
+    remainingDaysStr = "LAST DAY";
+  }
+
+  $("#lblTodayDate").text(now.getMonthStr() + " " + now.getDate() + " " + now.getWeekday());
+  $("#lblThisMonth").text(now.getMonthStr() + " " + now.getFullYear());
+  $("#lblDaysLeftMonth").text(remainingDaysStr);
+}
+
+function updateEveryMinute() {
+  gNow = new Date();
+
+  updateTodayDateAndDaysLeft();
+  $("#boxJournalWriteTime time").text(gNow.getTimeStr());
+}
+
+
+  $("#btnMonthlyGoalSet").click(function() {
+    $("body").css("overflow", "hidden");
+    $("#popboxMonthlyGoalSet").show();
+    $("#popboxMonthlyGoalSet .popup-title").val("Set Monthly Goal");
+
+    var goal = $("#lblMonthlyGoal").html();
+    goal = goal.trim();
+    $("#txtNewMonthlyGoal").val(goal);
+    
+    var detail = $("#boxMonthlyGoalContent").html();
+    detail = detail.trim();
+    //detail = detail.replace(/&nbsp;/g, " ");
+    detail = HtmlToLioTag(detail);
+
+    //detail = detail.replace(/<br>/g, "\n").trim();
+
+    $("#txtNewMonthlyGoalContent").val(detail);
+
+    $("#popboxMonthlyGoalSet textarea")
+      .keyup()  // To Resize Textarea automatically;
+      .change(); // For lioInputMask plugin.
+  });
+
+  $("#btnMonthlyGoalSetNext").click(function() {
+    $("body").css("overflow", "hidden");
+    $("#popboxMonthlyGoalSet").show();
+    $("#popboxMonthlyGoalSet .popup-title").val("Set Next Month's Goal");
+
+    //var goal = $("#lblMonthlyGoal").html();
+    //goal = goal.trim();
+    $("#txtNewMonthlyGoal").val("Next Month Goal");
+    
+    //var detail = $("#boxMonthlyGoalContent").html();
+    //detail = detail.trim();
+    //detail = detail.replace(/&nbsp;/g, " ");
+    //detail = HtmlToLioTag(detail);
+
+    //detail = detail.replace(/<br>/g, "\n").trim();
+
+    $("#txtNewMonthlyGoalContent").val("");
+
+    $("#popboxMonthlyGoalSet textarea")
+      .keyup()  // To Resize Textarea automatically;
+      .change(); // For lioInputMask plugin.
+  });
+
+  $("#btnWeeklyGoalSet").click(function() {
+    $("#popboxWeeklyGoalSet").show();
+
+    $("body").css("overflow", "hidden");
+    $("#popboxWeeklyGoalSet").show();
+
+    var goal = $("#lblWeeklyGoal").html();
+    goal = goal.trim();
+    goal = HtmlToLioTag(goal);
+    $("#txtNewWeeklyGoal").val(goal);
+    
+    var detail = $("#boxWeeklyGoalContent #txtWeeklyGoalContent").html();
+    console.log("Set Weekly Goal");
+    console.log(detail);
+    detail = HtmlToLioTag(detail);
+    console.log(detail);
+    //detail = detail.replace(/<br>/g, "\n").trim();
+    $("#txtNewWeeklyGoalContent").val(detail);
+
+    var qa = $("#boxWeeklyGoalContent #txtWeeklyGoalQuestionA").html();
+    qa = HtmlToLioTag(qa);
+    $("#txtNewWeeklyGoalQuestionA").val(qa);
+    var qb = $("#boxWeeklyGoalContent #txtWeeklyGoalQuestionB").html();
+    qb = HtmlToLioTag(qb);
+    $("#txtNewWeeklyGoalQuestionB").val(qb);
+
+    $("#popboxWeeklyGoalSet textarea")
+      .keyup()  // To Resize Textarea automatically;
+      .change(); // For lioInputMask plugin.
+  });
+
+  $(".popup-box .popup-close").click(function(e) {
+    $(this).parent().hide();
+    $("body").css("overflow", "auto");
+  });
+
+
+  $("#boxMonthlyGoalComments").find("h2").click(function() {
+    if ($("#boxMonthlyGoalCommentList").height() == 0) {
+      var height = $("#boxMonthlyGoalCommentList").find("#lstMonthlyGoalCommentList").height() + 30;
+      $("#boxMonthlyGoalCommentList").height(height);
+    } else {
+      $("#boxMonthlyGoalCommentList").height("0px");
+    }
+
+  });
+
+  $("#boxWeeklyGoalComments").find("h2").click(function() {
+    if ($("#boxWeeklyGoalCommentList").height() == 0) {
+      var height = $("#lstWeeklyGoalCommentList").height() + 30;
+      $("#boxWeeklyGoalCommentList").height(height);
+
+      var parheight = $("#boxWeeklyGoalContent").height() + height + 30;
+      $("#boxWeeklyGoal").height(parheight);
+    } else {
+      var height = $("#boxWeeklyGoalCommentList").height();
+      $("#boxWeeklyGoalCommentList").height("0px");
+
+      var parheight = $("#boxWeeklyGoalContent").height() + 30 - height;
+      $("#boxWeeklyGoal").height(parheight);
+    }
+  });
+
+  $("#sect-goal-week h3").click(function() {
+    $(this).next("div").toggle();
+    //$("#sect-goal-week .weekly-day div").toggle();
+  });
+
+
+
+  $("#sect-today").on("click", "#btnAddTask", function() {
+    var task = createTask();
+    $("#sect-today #boxTasks").append(task);
+    task.children(".txtTaskTitle").focus();
+  });
+
+  getTasks();
+  function postTask(task) {
+    var dataToPost = {
+      "ideaid": task.data("ideaid"),
+      "title": task.find(".txtTaskTitle").val(),
+      "completed": task.data("iscompleted"),
+      "archived": task.data("archived"),
+      "start": task.data("start"),
+      "due": task.data("due"),
+    };
+
+    $.ajax({
+      type: "POST",
+      url: "/task/post",
+      data: dataToPost
+    }).fail(function() {
+      alert("Failed to post content.");
+
+    }).done(function(result) {
+      console.log(result);
+      if (result["code"] == 0) {
+        var id = result["ideaid"];
+        task.data("ideaid", id)
+      } else {
+        alert("failed to post task.")
+      }
+    });
+  }
+
+  function getTasks() {
+    var now = new Date();
+    var dataToPost = {
+      "start": now.getFullYear() + now.getMonthPad() + now.getDatePad()
+    };
+
+    $.ajax({
+      type: "POST",
+      url: "/task/get",
+      data: dataToPost
+    }).fail(function() {
+      alert("Failed to get tasks.");
+
+    }).done(function(result) {
+      console.log(result);
+      if (result["code"] == 0) {
+
+        var i = 0;
+        for (i = 0; i < result["tasks"].length; ++i) {
+          var task = result["tasks"][i];
+          var id = task["id"];
+          var st = task["status"];
+          var title = task["title"];
+          var start = new Date (task["start"]);
+          var due = new Date(task["due"]);
+          var completedtime = new Date (task["completed"]);
+          console.log(due);
+
+          start = start.getFullYear() + start.getMonthPad() + start.getDatePad();
+          due = due.getFullYear() + due.getMonthPad() + due.getDatePad();
+          console.log(due);
+          completedtime = completedtime.getFullYear() + completedtime.getMonthPad() + completedtime.getDatePad();
+
+          var iscompleted = false;
+          if (st == 0) { // ACTIVE
+            iscompleted = false;
+          } else if (st == 1) { // COMPLETED
+            iscompleted = true;
+          } else if (st == 2) { // Archived
+            iscompleted = true;
+          }
+          var elemTask = createTask(id, title, iscompleted, start, due, completedtime);
+          $("#sect-today #boxTasks").append(elemTask);
+          elemTask.find(".btnTaskDoneEdit").click();
+          if (iscompleted == true) {
+            elemTask.find(".btnTaskFinished").click();
+          } 
+        } 
+      } else {
+      }
+    });
+
+  }
+
+function createTask(ideaid, title, iscompleted, start, due, completedtime) {
+  //var newTask = $("<li class='task'><h1 class='lblTaskTitle'>new task</h1><div></div></li>");
+
+  var now = new Date();
+
+  var newTaskDefaultMessage = "assign a task here!";
+  var taskTitle = "";
+  var newTask = $("<li>", {
+    "class": "task"
+  });
+
+  if (typeof ideaid == "undefined") {
+    ideaid = 0;
+  } 
+  if (typeof title == "undefined") {
+    title = newTaskDefaultMessage;
+  } 
+  if (typeof iscompleted == "undefined") {
+    iscompleted = false;
+  } 
+  if (typeof start == "undefined") {
+    start = now.getFullYear() + now.getMonthPad() + now.getDatePad();
+  } 
+  if (typeof due == "undefined") {
+    due = "20000101";
+  } 
+  if (typeof completedtime == "undefined") {
+    completedtime = "20000101";
+  } 
+
+  console.log(start);
+  console.log(due);
+  console.log(completedtime);
+
+  newTask.data("ideaid", ideaid);
+  newTask.data("iscompleted", iscompleted);
+  newTask.data("archived", false);
+  newTask.data("start", start);
+  newTask.data("due", due);
+  newTask.data("completed", completedtime);
+
+  var lbltasktitle = $("<h1>", {
+    "class": "lblTaskTitle",
+    "text": title
+  }).css("display", "none");
+
+  lbltasktitle.click(function() {
+    var task = $(this).closest(".task");
+    // Close all other task details
+    task.siblings().children(".task-detail").hide();
+
+    var detailBox = task.children(".task-detail");
+    if (detailBox.css("display") == "none") {
+      detailBox.css("display", "block");
+    } else {
+      detailBox.css("display", "none");
+    }
+  });
+
+  var txttasktitle = $("<input>", {
+    "type": "text",
+    "class": "txtTaskTitle",
+    "maxlength": "200",
+    "value": title
+  });
+
+
+  function exitTaskTitleEditMode(me) {
+    var task = $(me).closest(".task");
+    var lbl = task.children(".lblTaskTitle");
+    var txt = task.children(".txtTaskTitle");
+    if (txt.val() == newTaskDefaultMessage) {
+      txt.addClass("error");
+      return;
+
+    } else {
+      // Task Edited.
+      txt.removeClass("error");
+      lbl.text(txt.val());
+      lbl.show();
+      txt.hide();
+
+      var taskoptions = task.children(".task-options");
+      taskoptions.children(".editoptions").hide();
+      taskoptions.children(".viewoptions").show();
+      taskoptions.css("opacity", 1);
+
+      postTask(task);
+
+    }
+  }
+
+  function enterTaskTitleEditMode(me) {
+    var task = $(me).closest(".task");
+    var lbl = task.children(".lblTaskTitle");
+    var txt = task.children(".txtTaskTitle");
+    txt.val(lbl.text());
+    lbl.hide();
+    txt.show();
+    txt.focus();
+
+    var taskoptions = task.children(".task-options");
+    taskoptions.children(".editoptions").show();
+    taskoptions.children(".viewoptions").hide();
+    //taskoptions.css("opacity", 1);
+  }
+
+  txttasktitle.keyup(function(e) {
+    //console.log(e.keyCode);
+    if (e.keyCode == 13) {
+      exitTaskTitleEditMode(this);
+    } 
+  });
+
+  newTask.append(lbltasktitle);
+  newTask.append(txttasktitle);
+
+  var taskOptions = $("<section>", {
+    "class": "task-options"
+  });
+
+  var list = $("<ul>", {"class": "viewoptions"}).css("display", "none");
+  var btnpomodoro = $("<li><a class='btnTaskAddPomodoro'>+1</a></li>");
+  var btnengage = $("<li><a class='btnTaskEngage'>engage</a></li>");
+  var btnedit = $("<li><a class='btnTaskEdit'>edit</a></li>");
+  btnengage.children("a").click(function() {
+    $("#sect-engage").css("display", "block");
+  });
+  btnedit.children("a").click(function() {
+    enterTaskTitleEditMode(this);
+  });
+
+  var btnadddescription = $("<li><a class='btnTaskAddDescription'>add description</a></li>");
+  btnadddescription.click(function() {
+
+  });
+
+  var btnfinished = $("<li><a class='btnTaskFinished'>finished</a></li>");
+  btnfinished.children(".btnTaskFinished").click(function() {
+    var task = $(this).closest(".task");
+    var lbl = task.children(".lblTaskTitle");
+    var txt = task.children(".txtTaskTitle");
+    txt.disabled = true;
+    lbl.addClass("line-through");
+
+    var taskoptions = task.children(".task-options");
+    taskoptions.children(".viewoptions").hide();
+    taskoptions.children(".finishedoptions").show();
+    var taskdetail = task.children(".task-detail");
+    taskdetail.hide();
+    task.data("iscompleted", true);
+    postTask(task);
+  });
+
+
+  //list.append(btnpomodoro);
+  list.append(btnengage);
+  list.append(btnedit);
+  //list.append(btnadddescription);
+  list.append(btnfinished);
+
+  var finishedlist = $("<ul>", {"class": "finishedoptions"}).css("display", "none");
+  var btndelete = $("<li><a class='btnTaskDelete'>archive</a></li>");
+  btndelete.children(".btnTaskDelete").click(function() {
+    var task = $(this).closest(".task");
+    task.animate({
+      "opacity": 0
+    }, 800).animate({
+      "height": 0
+    }, 500, function() {
+      $(this).hide();
+    });
+    task.data("iscompleted", true);
+    task.data("archived", true);
+    postTask(task);
+  });
+
+
+  var btnunfinish = $("<li><a class='btnTaskUnfinish'>not done</a></li>");
+  btnunfinish.children(".btnTaskUnfinish").click(function() {
+    var task = $(this).closest(".task");
+    var lbl = task.children(".lblTaskTitle");
+    var txt = task.children(".txtTaskTitle");
+    txt.disabled = false;
+    lbl.removeClass("line-through");
+
+    var taskoptions = task.children(".task-options");
+    taskoptions.children(".viewoptions").show();
+    taskoptions.children(".finishedoptions").hide();
+
+    task.data("iscompleted", false);
+    task.data("archived", false);
+    postTask(task);
+  });
+
+  finishedlist.append(btndelete);
+  finishedlist.append(btnunfinish);
+
+
+  var editlist = $("<ul>", {"class": "editoptions"});
+  var btnexitedit = $("<li><a class='btnTaskDoneEdit'>done editing</a></li>");
+  btnexitedit.children(".btnTaskDoneEdit").click(function() {
+    exitTaskTitleEditMode(this);
+
+  });
+
+  editlist.append(btnexitedit);
+
+  taskOptions.append(list);
+  taskOptions.append(finishedlist);
+  taskOptions.append(editlist);
+
+  newTask.append(taskOptions);
+
+  var descriptionBox = $("<section>", {
+    "class": "description"
+  });
+
+  descriptionBox.mouseover(function() {
+    $(this).children(".description-options").css("opacity", 1);
+  }).mouseout(function() {
+    $(this).children(".description-options").css("opacity", 0);
+  });
+
+  var newTaskDescriptionDefaultMessage = "no description has been added!";
+
+  var descriptionHeader = $("<h2>", { "text": "Description" });
+
+  var lblDescription = $("<div>", {
+    "class": "lblTaskDescription",
+    "html": newTaskDescriptionDefaultMessage
+  });
+
+  lblDescription.click(function() {
+    //$(this).hide();
+    //$(this).siblings(".txtTaskDescription").show();
+  });
+
+  function enterTaskDescriptionEditMode(target) {
+    var description = $(target).closest(".description");
+    var lbl = description.children(".lblTaskDescription");
+    var txt = description.children(".txtTaskDescription");
+
+    txt.val(lbl.text());
+    lbl.hide();
+    txt.show();
+    txt.focus();
+
+    var options = description.children(".description-options");
+    options.children(".editoptions").show();
+    options.children(".viewoptions").hide();
+    options.css("opacity", 1);
+  }
+
+  function exitTaskDescriptionEditMode(target) {
+    var description = $(target).closest(".description");
+    var lbl = description.children(".lblTaskDescription");
+    var txt = description.children(".txtTaskDescription");
+
+    // Task Edited.
+    lbl.text(txt.val());
+    lbl.show();
+    txt.hide();
+
+    var options = description.children(".description-options");
+    options.children(".editoptions").hide();
+    options.children(".viewoptions").show();
+    options.css("opacity", 1);
+
+    if (txt.val() != newTaskDescriptionDefaultMessage) {
+      // UPDATE. Send request to server
+      return;
+
+    }
+  }
+
+
+  var txtDescription = $("<textarea>", {
+    "class": "txtTaskDescription",
+    "rows": "1",
+    "text": "no summary has been added."
+  });
+  txtDescription.css("display", "none");
+
+
+  var descriptionOptions = $("<div>", {
+    "class": "description-options"
+  });
+
+
+  var descriptionOptionsViewList = $("<ul class='viewoptions'>");
+  var descriptionOptionEdit = $("<li><a class='btnDescriptionEdit'>edit</a></li>");
+  descriptionOptionEdit.click(function() {
+    enterTaskDescriptionEditMode(this);
+  });
+
+  descriptionOptionsViewList.append(descriptionOptionEdit);
+
+  var descriptionOptionsEditList = $("<ul class='editoptions' style='display: none;'>");
+  var descriptionOptionDoneEdit = $("<li><a class='btnDescriptionDoneEdit'>done edit</a></li>");
+  descriptionOptionDoneEdit.click(function() {
+    exitTaskDescriptionEditMode(this);
+  });
+
+  descriptionOptionsEditList.append(descriptionOptionDoneEdit);
+
+  descriptionOptions.append(descriptionOptionsViewList);
+  descriptionOptions.append(descriptionOptionsEditList);
+
+
+  descriptionBox.append(descriptionHeader);
+  descriptionBox.append(lblDescription);
+  descriptionBox.append(txtDescription);
+  descriptionBox.append(descriptionOptions);
+
+  var goals = $("<section>", {
+    "class": "goals"
+  }).append($("<h2>", { "text": "Goals" }));
+
+  var goallist = $("<ol>")
+    .append($("<li>").append($("<input>",{"type": "text"})));
+
+  goals.append(goallist);
+
+
+  var logs = $("<section>", {
+    "class": "logs"
+  }).append($("<h2>", { "text": "Logs" }));
+
+
+  var taskDetail = $("<section>", {
+    "class": "task-detail"
+  });
+
+  taskDetail.append(descriptionBox);
+  //taskDetail.append(goals);
+  //taskDetail.append(logs);
+
+  newTask.append(taskDetail);
+
+  newTask.mouseover(function() {
+    var optionBox = $(this).children(".task-options");
+    optionBox.css("opacity", 1);
+
+  }) .mouseout(function() {
+    var optionBox = $(this).children(".task-options");
+    optionBox.css("opacity", 0);
+
+  });
+
+  newTask.children(".lblTaskTitle").click(function() {
+
+  });
+  
+  return newTask;
+}
+});
+
+</script>
+<section id="sect-nav">
+  <ul>
+    <li>
+      <a>Monthly Goal</a>
+    </li>
+    <li>
+      <a>Weekly Goal</a>
+    </li>
+    <li>
+      <a>Today</a>
+    </li>
+  </ul>
+</section>
+
+<section id="sect-header" class="panel">
+  <div class="panel-inner-wrap">
+    <div>
+      <time id="lblTodayDate">January 1, 2014</time>
+    </div>
+  </div>
+</section>
+<section id="sect-daystart" class="panel">
+  <div class="panel-inner-wrap">
+    <div>
+    </div>
+    <div id="boxDayStartMessages">
+      <div>
+        Drink a cup of water.
+      </div>
+      <div>
+        Meditate for a few minutes!
+      </div>
+      <div>
+        Get a cup of tea or coffee!
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sect-warning" class="panel">
+  <div class="panel-inner-wrap">
+    <div id="lblStop">
+      STOP
+    </div>
+    <div id="lblWarningMessage">
+      NOW<br>
+      LEAVE THE COMPUTER!<br>
+      <br>
+      ENJOY YOUR CUP OF COFFEE<br>
+      WHILE<br>
+      CAREFULLY PLANNING YOUR DAY.
+    </div>
+    <div id="lblStartWorking">
+      DONE PLANNING!
+    </div>
+  </div>
+</section>
+
+<section class="panel" id="sect-green">
+  <div class="panel-inner-wrap">
+    <div style="height: 10%;">&nbsp;</div>
+    <h1>자신에 대한<br> 무한 신뢰<br> 무한 사랑</h1>
+  </div>
+</section>
+
+<section class="panel" id="sect-trust">
+  <div class="panel-inner-wrap">
+    <br><br>
+    <h1>It's OK.</h1>
+    <br><br> 
+    <h1>Try again!</h1>
+    <br><br> 
+    <h1>Take small steps!</h1>
+    <br><br> 
+  </div>
+</section>
+
+<section class="panel" id="sect-color">
+  <div class="panel-inner-wrap">
+    <br><br>
+    <h1>The World<br>I am Dreaming</h1>
+    <br><br> 
+    <h1>WILL COME TO ME.</h1>
+  </div>
+</section>
+
+<section class="panel" id="sect-believe">
+  <div class="panel-inner-wrap">
+    <h1>BELIeVE</h1>
+  </div>
+</section>
+
+<section class="panel" id="sect-prayer">
+  <div class="panel-inner-wrap">
+    <p>
+      언제나 용기와 희망을 잃지 않는 힘을 주소서.<br>
+      불안이 가득한 어두운 절망, 좌절속에서<br>
+      앞을 환희 비추어 주는 지혜를 허락하옵시고.<br>
+      궁핍하며 부족한 때와 같이<br>
+      늘 작은 것에 기뻐하고 감사하게 하소서.<br>
+      방심하게 되는 순간에 굳건하게 하사 이길 수 있게 하시고,<br>
+      작은 싸움에서 매번 승리하게 하소서.<br>
+      최악의 상황에서도 주변의 이웃들을 살필 수 있는<br>
+      마음의 사치와 부를 허락하소서.<br>
+      이 기도를 진실로 간구하게 하소서.<br>
+    </p>
+  </div>
+</section>
+
+<section class="panel" id="sect-lost">
+  <div class="panel-inner-wrap">
+    <br><br>
+    <h1>그토록 원하고 바라고 꿈꾸고</h1>
+    <br><br> 
+    <h1>좋아하고 사랑하는</h1>
+    <br><br> 
+    <h1>그 무엇인가를</h1>
+    <br><br> 
+    <h1>한발짝도 움직이지 않고</h1>
+    <br><br> 
+    <h1>가만히 한 곳에 서있다</h1>
+    <br><br> 
+    <h1>놓쳐버렸다.</h1>
+    <br><br> 
+  </div>
+</section>
+
+<div id="popboxMonthlyGoalSet" class="popup-box">
+  <div class="popup-title">
+    Set Monthly Goal
+  </div>
+  <div class="popup-close">
+    CLOSE
+  </div>
+  <div class="popup-content">
+    <label for="txtNewMonthlyGoal">monthly goal...</label>
+    <textarea id="txtNewMonthlyGoal" maxlength="200"></textarea>
+    <label for="txtNewMonthlyGoalContent">details...</label>
+    <textarea id="txtNewMonthlyGoalContent"></textarea>
+    <br>
+    <button id="btnSetNewMonthlyGoal">set monthly goal</button>
+  </div>
+</div>
+<section id="sect-goal-month" class="panel" style="">
+  <div class="panel-inner-wrap">
+    <div>
+      <time id="lblThisMonth">MONTH</time><br>
+      <span id="lblDaysLeftMonth" class="color-red">0 days left...</span>
+    </div>
+    <div id="boxMonthlyGoal">
+      <h1 id="lblMonthlyGoal">Monthly Goal Not Loaded...</h1>
+      <div id="boxMonthlyGoalContent">
+        Monthly Goal Content Not Loaded...
+      </div>
+      <div id="boxMonthlyGoalOptions">
+        <a id="btnMonthlyGoalViewPrev">View Previous Goal</a>
+        <a id="btnMonthlyGoalSet">Edit Monthly Goal</a>
+        <a id="btnMonthlyGoalSetNext">Set Next Monthly Goal</a>
+      </div>
+      <div id="boxMonthlyGoalComments">
+        <h2>
+          comments
+          <span id="lblMonthlyGoalCommentCount">(0)</span>
+        </h2>
+        <div id="boxMonthlyGoalCommentList">
+          <ul id="lstMonthlyGoalCommentList">
+            <li>
+              <div class="box-timestamp">
+                <time> October 3 11:00 am</time>
+              </div>
+              <div class="box-comment">comment comes here...</div>
+            </li>
+          </ul>
+        </div>
+        <div id="boxMonthlyGoalCommentWrite">
+          <label for="txtMonthlyGoalComment">add comment</label>
+          <input type="text" id="txtMonthlyGoalComment" class="text" value="" name=""><br>
+          <button id="btnMonthlyGoalCommentPost">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="sect-ripple-phrases" class="panel">
+  <div class="panel-inner-wrap" >
+    <h1>TRAVEL</h1>
+  </div>
+</section>
+<section id="sect-image" class="panel" style="background-image: url('/beach.jpg');">
+</section>
+
+<div id="popboxWeeklyGoalSet" class="popup-box">
+  <div class="popup-title">
+    Set New Weekly Goal
+  </div>
+  <div class="popup-close">
+    CLOSE
+  </div>
+  <div class="popup-content">
+    <label for="txtNewWeeklyGoal" maxlength="200">new weekly goal...</label>
+    <textarea id="txtNewWeeklyGoal" ></textarea>
+    <label for="txtNewWeeklyGoalContent">details...</label>
+    <textarea id="txtNewWeeklyGoalContent"></textarea>
+    <h3>Why is it needed this week?</h3>
+    <textarea id="txtNewWeeklyGoalQuestionA"></textarea>
+    <h3>Is it feasible goal for this week?</h3>
+    <textarea id="txtNewWeeklyGoalQuestionB"></textarea>
+    <br>
+    <button id="btnSetNewWeeklyGoal">set new weekly goal</button>
+  </div>
+</div>
+
+<section id="sect-goal-week" class="panel">
+  <div class="panel-inner-wrap">
+    <h1>This Week...</h1>
+    <h2 id="lblWeeklyGoal">Make the planner look fancy and usable.</h2>
+    <div id="boxWeeklyGoal">
+      <div id="boxWeeklyGoalContent">
+        <p>
+          Create a list of hypothesis that need to be tested.<br>
+          All of my ideas are based on core assumptions and
+          I need to test those in order to refine and
+          be confident about the ideas that I have developed.<br>
+          Nothing needs to be fancy.
+        </p>
+        <h3>Why is it needed this week?</h3>
+        <p>Don't try to overkill.</p>
+        <h3>Is it feasible goal for this week?</h3>
+        <p>Don't try to overkill.</p>
+      </div>
+    </div>
+    <div id="boxWeeklyGoalOptions">
+      <a id="btnWeeklyGoalSet">Set Weekly Goal</a>
+    </div>
+    <!--<div id="boxWeeklyActions">
+      <ul>
+        <li>hi</li>
+        <li>actionsa</li>
+        <li>act</li>
+      </ul>
+    </div>
+    <div id="boxWeeklyProgress">
+      <span id="lblWeeklyFinishedWork">10</span>
+      /
+      <span id="lblWeeklyTotalWork">40</span>
+    </div>
+    <div id="boxDayWrap">
+      <h3>SUNDAY</h3>
+      <div class="weekly-day">
+        <div id="">
+          HELL
+        </div>
+      </div>
+      <h3>Monday</h3>
+      <div class="weekly-day">
+        <div id="">
+          Sunday
+          <br>
+          hello content here
+        </div>
+      </div>
+    </div>
+    -->
+  </div>
+</section>
+<section id="sect-ripple-phrases-second" class="panel ripple-phrases" style="color: #D22042; background-color: white;">
+  <div class="panel-inner-wrap" >
+    <h1>COMMITMENT</h1>
+  </div>
+</section>
+<section id="sect-today" class="panel">
+  <div class="panel-inner-wrap">
+    <h1>today</h1>
+    <ul id="boxTasks">
+    </ul>
+    <div id="boxAddTask">
+      <a id="btnAddTask">add new task</a>
+    </div>
+  </div>
+</section>
+
+<section class="popup-box" id="sect-engage">
+  <div class="popup-title">
+    ENGAGE MODE
+  </div>
+  <div class="popup-close">
+    CLOSE
+  </div>
+  <div class="popup-content">
+    ENGAGE
+  </div>
+</section>
+
+<section class="panel" id="sect-journal">
+<script type="text/javascript">
+$(function() {
+  $("#sect-journal").on("keyup", "#txtJournalWrite", function() {
+    var content = LioTagToHtml($(this).val());
+    var len = byteLength(content);
+    if (len > 200) {
+      $(".boxCharCounter").css("color", "red");
+    } else {
+      $(".boxCharCounter").css("color", "#AAA");
+    }
+    $(this).siblings(".textareaUnderline").find(".lblCharCount").text(len);
+
+  });
+
+  $("#sect-journal").on("click", "#btnJournalSubmit", function() {
+    postJournal();
+  });
+
+  $("#sect-journal").on("click", "#btnJournalModeReg", function() {
+    var list = $("#sect-journal #boxJournalPosted #listJournalEntriesRecent");
+    list.css("font-family", "");
+    $("#sect-journal").css("background-color", "#FFF");
+    $("#sect-journal").css("color", "#000");
+    $("#sect-journal textarea").css("font-family", "");
+    $("#sect-journal textarea").css("font-size", "4em");
+    $("#sect-journal .textareaUnderline").css("top", "-220px");
+    $("#sect-journal .boxUnderWrite").css("top", "-200px");
+    $("#sect-journal textarea").keyup();
+  });
+
+  $("#sect-journal").on("click", "#btnJournalModeSenti", function() {
+    var list = $("#sect-journal #boxJournalPosted #listJournalEntriesRecent");
+    list.css("font-family", "Nanum Pen Script");
+    $("#sect-journal").css("background-color", "#F8F3D6");
+    $("#sect-journal").css("color", "#685642");
+    $("#sect-journal textarea").css("font-family", "Nanum Pen Script");
+    $("#sect-journal textarea").css("font-size", "4em");
+    $("#sect-journal .textareaUnderline").css("top", "-220px");
+    $("#sect-journal .boxUnderWrite").css("top", "-200px");
+    $("#sect-journal textarea").keyup();
+  });
+
+  $("#sect-journal").on("click", "#btnJournalModeInfo", function() {
+    var list = $("#sect-journal #boxJournalPosted #listJournalEntriesRecent");
+    list.css("font-family", "");
+    $("#sect-journal").css("background-color", "#FFF");
+    $("#sect-journal").css("color", "#000");
+    $("#sect-journal textarea").css("font-family", "");
+    $("#sect-journal textarea").css("font-size", "2em");
+    $("#sect-journal .textareaUnderline").css("top", "-160px");
+    $("#sect-journal .boxUnderWrite").css("top", "-140px");
+    $("#sect-journal textarea").keyup();
+  });
+
+  getEntries(0, 10);
+
+  function getTags(content) {
+    var re = /#([^\s]+)[,;]?\s/g;
+    //var result = new Array();
+    var result = "";
+    content += "\n";
+    while ((matched = re.exec(content)) !== null) {
+      result += matched[1] + ",";
+
+    } 
+    console.log("TAGS");
+    console.log(result);
+    return result.substr(0, result.length - 1);
+  }
+
+  function getEntries(from, count) {
+    $.ajax({
+      type: "POST",
+      url: "/idea/get",
+      data: { "from": from.toString(), "count": count.toString() }
+    }).fail(function() {
+      alert("Failed to get content.");
+
+    }).done(function(result) {
+      if (result["code"] == 0) {
+
+        var box = $("#sect-journal #boxJournalPosted");
+        var list = $("#sect-journal #boxJournalPosted #listJournalEntriesRecent");
+
+        for (var i in result["ideas"]) {
+          var id = result["ideas"][i]["id"];
+          var type = new Number(result["ideas"][i]["type"]);
+          var title = result["ideas"][i]["title"];
+          var content = "";
+          if (typeof result["ideas"][i]["content"] != "undefined") {
+            content = result["ideas"][i]["content"];
+          } 
+          var time = new Date(Number(result["ideas"][i]["date"]));
+
+          var contentWhole = title;
+          if (content.length > 0) {
+            contentWhole = content;
+          } 
+          contentWhole = safeDisplay(contentWhole);
+          if (type == 1) {
+            var item = createJournalEntry(contentWhole.replace(/\n/g, "<br>"), time, id);
+            list.append(item);
+          } 
+        } 
+
+      } else {
+        alert("return code other than 0");
+      }
+      //$(".entry").last().css("color", "red");
+    });
+  }
+
+
+
+  
+  function postJournal() {
+    var txt = $("#sect-journal #txtJournalWrite");
+    var contentWhole = LioTagToHtml(txt.val());
+    var tags = getTags(contentWhole);
+    var title = "";
+    var content = "";
+
+    title = contentWhole.truncatebyte(200);
+    if (contentWhole.bytelength() >= 200) {
+      content = contentWhole;
+    }
+
+    var dataToPost = new Object();
+    dataToPost["title"] = title;
+    dataToPost["type"] = "journal";
+    if (content.length > 0) {
+      dataToPost["content"] = content;
+    } 
+    if (tags.length > 0) {
+      dataToPost["tagsadd"] = tags;
+
+    } 
+    console.log(dataToPost);
+
+    $.ajax({
+      type: "POST",
+      url: "/idea/post",
+      data: dataToPost
+
+    }).fail(function() {
+      alert("failed to post journal.");
+      
+    }).done(function(result) {
+      console.log(result);
+      if (result["code"] == 0) {
+        var ideaid = new Number(result["ideaid"]);
+
+        var box = $("#sect-journal #boxJournalPosted");
+        var list = $("#sect-journal #boxJournalPosted #listJournalEntriesRecent");
+        if (list.children("li").size() > 10) {
+          list.children("li").last().remove();
+        } 
+        contentWhole = safeDisplay(contentWhole);
+
+        var now = new Date();
+        var item = createJournalEntry(contentWhole.replace(/\n/g, "<br>"), now, ideaid);
+        item.data("id", ideaid);
+        list.prepend(item);
+        
+        txt.val("");
+        txt.focus();
+        txt.keyup();
+
+      } else {
+      }
+    });
+
+  }
+
+  function createJournalEntry(content, time, id) {
+    if (typeof time == "undefined") {
+      time = gNow;
+    } 
+
+    if (typeof id === "undefined") {
+      id = 0;
+    } 
+
+    var entry = $("<li>", {
+      "id": "entries-" + id.toString()
+    });
+
+    var boxId = $("<div class='journal-entry-id'>" + id.toString() + "</div>");
+    var boxTime = $("<div class='journal-entry-time'><time>" + time.getMonthStr() + " " + time.getDatePad() + " " + time.getTimeStr() + "</time></div>");
+    var boxContent = $("<div class='journal-entry-content'>" + content + "</div>");
+    entry.append(boxId);
+    entry.append(boxTime);
+    entry.append(boxContent);
+
+    return entry;
+  }
+
+  $("#btnJournalConfigApply").click(function(){
+    var from = $("#txtJournalConfigFrom").val();
+    var count = $("#txtJournalConfigCount").val();
+
+    if (from == "") {
+      from = 0;
+    } 
+    if (count == "") {
+      count = 10;
+    } 
+    $("#listJournalEntriesRecent").html("");
+
+    getEntries(from, count);
+  });
+});
+</script>
+  <div class="panel-inner-wrap">
+    <h1>Journal</h1>
+    <div id="boxJournalConfig">
+      from: <input type="text" value="0" style="width: 100px;" id="txtJournalConfigFrom">&nbsp;&nbsp;
+      count: <input type="text" value="10" style="width: 100px;" id="txtJournalConfigCount">
+      <button id="btnJournalConfigApply">apply</button>
+    </div>
+    <div id="boxJournal">
+      <div id="boxJournalWriteTime">
+        <time>4:09 pm</time>
+      </div>
+      <div id="boxJournalWriteMode">
+        <ul>
+          <li><a id="btnJournalModeReg">regular</a></li>
+          <li><a id="btnJournalModeSenti">senti.</a></li>
+          <li><a id="btnJournalModeInfo">info</a></li>
+        </ul>
+      </div>
+      <label for="txtJournalWrite">write here...</label>
+      <textarea id="txtJournalWrite"></textarea>
+      <div class="textareaUnderline">
+        <div class="boxCharCounter">
+          <span class="lblCharCount">0</span>
+        </div>
+        <button id="btnJournalSubmit">+</button>
+      </div>
+      <div class="boxUnderWrite">
+        <div id="boxJournalPosted">
+          <ul id="listJournalEntriesRecent">
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="panel" id="sect-writing">
+  <div class="panel-inner-wrap">
+    <h1>글쓰기</h1>
+    <div id="boxWriting">
+      <p class="penscript">
+        Oct 15 1:50 pm <br>
+        그대와 문자를 주고 받은것만으로도.<br>
+        그대가 어딘가에 있다는 것을 다시 깨닫는 것만으로도.<br>
+        다디단 낮잠에 빠져들었다 깬 듯.<br>
+        잔잔하고도 풀잎같은 생기가 나를 감쌉니다.<br>
+      </p>
+      <textarea name=""> Secretly I write you a letter. Without you knowing.
+You are right beside me writing a list of things we need.
+까꿍. ㅋㅋㅋㅋㅋ </textarea>
+    </div>
+  </div>
+</section>
+<section id="sect-flow" class="panel">
+  <div class="panel-inner-wrap">
+    <h1>READY FOR FLOW...?</h1>
+    <div id="boxFlowWrap">
+      <h2>What do I MUST to do?</h2>
+      <div class="flow-answer">
+        LIST MENU from TODAY's ToDo List
+      </div>
+      <h2>Is it something CRUCIAL for the goal?</h2>
+      <div class="flow-answer">
+        hello
+      </div>
+      <h2>Do I need to do it RIGHT now?</h2>
+      <div class="flow-answer">
+        hello
+      </div>
+      <h2>How can I do it FAST and EFFICIENTLY?</h2>
+      <div class="flow-answer">
+        hello
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sect-dayend" class="panel">
+  <div class="panel-inner-wrap">
+    <div class="dayend-messages">
+      Hope you had a good day.
+    </div>
+  </div>
+</section>
+
+<section id="sect-footer" class="panel">
+  <div class="panel-inner-wrap">
+    Good night!
+  </div>
+</section>
+  
+<script type="text/javascript">
+$(function() {
+  $("textarea").attr("rows", "1");
+
+  $("body").on("keyup", "textarea", function() {
+    $(this).css("height", "auto");
+    $(this).height(this.scrollHeight);
+  });
+
+  $("textarea").each(function(i) {
+    //$(this).focus();
+    $(this).keyup();
+    //$("body").scrollTop(0);
+  });
+
+});
+</script>
+</body>
+</html>

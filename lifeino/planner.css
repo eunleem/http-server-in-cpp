@@ -3,9 +3,10 @@
   font-size: 1.2em;
   transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
   -webkit-transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
-  min-height: 50%;
+  min-height: 20%;
   background-size: cover;
   background-position: center;
+  font-family: Open Sans, "Nanum Gothic";
 }
 
 .panel > .wrap {
@@ -21,7 +22,7 @@
 #sect-header {
   min-height: 100px;
 
-  transition: height 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86); 
+  transition: height 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
   /*border-bottom: 3px solid #DDD;*/
 }
 
@@ -32,6 +33,14 @@
   font-size: 2.3em;
   font-weight: bold;
   color: #777;
+}
+
+#sect-steps {
+  background-color: #62C2CC;
+  line-height: 200%;
+  font-size: 4em;
+  font-weight: bold;
+  color: white;
 }
 
 #sect-journal {
@@ -148,25 +157,30 @@
   padding-top: 40px;
 }
 
-#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent {
+#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent {
   margin: 0;
   padding: 0;
   list-style: none;
+  text-align: left;
 }
 
-#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li {
+#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li{
   display: block;
   margin: 30px auto;
   min-width: 600px;
   width: 90%;
 }
 
-#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li > .journal-entry-time {
+#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li > .journal-entry-time {
   font-size: 1.5em;
   color: #666;
 }
 
-#sect-journal #boxJournal > .boxUnderWrite #listJournalEntriesRecent > li > .journal-entry-content {
+#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li > .journal-entry-content {
   margin-left: 20px;
   font-size: 2em;
+}
+
+#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li > .journal-entry-controls {
+  text-align: center;
 }
