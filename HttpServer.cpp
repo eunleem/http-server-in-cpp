@@ -223,6 +223,7 @@ void HttpServer::OnFdEvent(const AsyncSockets::FdEventArgs& event) {
               if (fileName == "HttpWorker.exe") {
                 Worker& oldWorker = this->workers_.front();
                 this->killWorker(&oldWorker);
+                sleep(5);
                 bool result = this->runNewWorker();
                 if (result == true) {
                   DEBUG_cout << "Running New Worker!" << endl; 
@@ -376,11 +377,11 @@ bool HttpServer::CheckEnvironment() {
 int HttpServer::killWorker(Worker* worker) {
   DEBUG_cout << "KLLING WORKER!" << endl; 
   write(worker->sockFd, "DIE", 3);
-  char buf[3];
-  auto readCount = read(worker->sockFd, buf, 3);
-  if (readCount == -1) {
-    DEBUG_cerr << "Failed to get response from worker." << endl; 
-  } 
+  //char buf[3];
+  //auto readCount = read(worker->sockFd, buf, 3);
+  //if (readCount == -1) {
+    //DEBUG_cerr << "Failed to get response from worker." << endl; 
+  //} 
   close(worker->sockFd);
   delete worker->socket;
   worker->status = ProcStatus::KILLING;

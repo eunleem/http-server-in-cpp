@@ -61,6 +61,9 @@ bool Worker::Run() {
 
   this->initSSL();
 
+  this->app_.Open();
+  this->status = Status::RUNNING;
+
   string socketKeyPath = this->config_.keyDirPath + this->config_.serverSocketKeyName;
   this->fileNoti_.AddToWatch("./lifeino", IN_MOVE | IN_MODIFY | IN_DELETE);
   this->status = Status::RUNNING;
@@ -69,9 +72,17 @@ bool Worker::Run() {
 }
 
 bool Worker::Stop() {
+  if (this->status == Status::STOPPED) {
+    DEBUG_cout << "Already Stopped." << endl;
+    return true;
+  }
+  DEBUG_FUNC_START;
   if (this->ssl_ctx != nullptr) {
     SSL_CTX_free(this->ssl_ctx);
+    this->ssl_ctx = nullptr;
   } 
+
+  this->app_.Close();
   this->status = Status::STOPPED;
 
   return true;
@@ -122,7 +133,7 @@ void Worker::OnFdEvent(const AsyncSocket::FdEventArgs& event) {
   if (event.fd == this->serverAcceptFd_) {
     // REGULAR REQUESTS
     DEBUG_cout << "     ServerAcceptEvent\n";
-    this->OnReceiveFdEvent (event.fd);
+    this->OnReceiveFdEvent(event.fd);
 
   } else if (event.fd == serverSocketFd) {
     DEBUG_cout << "  App: SocketEvent\n";
@@ -137,17 +148,17 @@ void Worker::OnFdEvent(const AsyncSocket::FdEventArgs& event) {
       DEBUG_cout << "IN" << endl; 
       HttpConnection* connection = this->HandleFdInEvent(event.fd);
       if (connection == nullptr) {
-        auto it = this->connections_.find(event.fd);
-        if (it != this->connections_.end()) {
-          this->connections_.erase(it);
+        auto itr = this->connections_.find(event.fd);
+        if (itr != this->connections_.end()) {
+          this->connections_.erase(itr);
         } 
       } else if (
           connection->GetStatus() == HttpConnection::Status::CLOSED ||
           connection->GetStatus() == HttpConnection::Status::ERROR)
       {
-        auto it = this->connections_.find(event.fd);
-        if (it != this->connections_.end()) {
-          this->connections_.erase(it);
+        auto itr = this->connections_.find(event.fd);
+        if (itr != this->connections_.end()) {
+          this->connections_.erase(itr);
         } 
       } 
     } else if (event.type == FdEventArgs::EventType::EPOLLOUT) {
@@ -592,10 +603,6 @@ void sighandler(int signum) {
       break;
     case SIGHUP:
       DEBUG_cout << "SIGHUP Received!" << endl; 
-      if (worker != nullptr) {
-        delete worker;
-        worker = nullptr;
-      } 
       break;
     case SIGINT:
       DEBUG_cout << "SIGINT Received!" << endl; 
@@ -632,9 +639,7 @@ int main(int argc, char** argv) {
     worker->Run();
 
   } catch (...) {
-    delete worker;
-    worker = nullptr;
-
+    DEBUG_cerr << "Unhandled exception is caught!" << endl;
   } 
 
   if (worker != nullptr) {

@@ -7,22 +7,22 @@
 
   Last Modified Date
     July 24, 2015
-  
+
   History
     July 24, 2015
       Created
 
   ToDos
-    
+
 
 
   Milestones
     1.0
-      
+
 
   Learning Resources
     http://
-  
+
   Copyright (c) All rights reserved to LIFEINO.
 */
 
@@ -185,6 +185,3 @@
   window.Module = Module;
 
 })(window, $);
-
-
-

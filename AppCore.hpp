@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 23, 2015
+    Aug 04, 2015
   
   History
     November 18, 2014
@@ -59,15 +59,15 @@
 
 #include "PlannerPage.hpp"
 
+#include "liolib/Openable.hpp"
 
 #include "liolib/JsonString.hpp"
 #include "liolib/DataBlock.hpp"
 
 namespace lio {
 
-using std::vector;
 
-class AppCore {
+class AppCore : public Openable {
 public:
 
 // ******** Exception Declaration *********
@@ -98,6 +98,9 @@ private:
   bool RemoveCache(const string& cacheName);
 
 protected:
+  bool open() override;
+  bool close() override;
+
   bool ProcessLocalhost(HttpConnection*);
 
 
