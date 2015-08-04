@@ -188,7 +188,7 @@ bool AdminPage::Process(HttpConnection* connection, ILioData* data) {
   } 
 
 
-  return true;
+  return false;
   
 }
 

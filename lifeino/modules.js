@@ -15,11 +15,7 @@
   TemplateModule.prototype.Run = function() {
     console.log("TemplateModule.Run() has been called.");
 
-    addEventHandler(this);
   };
-
-  function addEventHandler(that) {
-  }
 
   window.TemplateModule = TemplateModule;
 })(window, $);
@@ -45,11 +41,7 @@
   HeaderModule.prototype.Run = function() {
     console.log("HeaderModule.Run() has been called.");
 
-    addEventHandler(this);
   };
-
-  function addEventHandler(that) {
-  }
 
   window.HeaderModule = HeaderModule;
 
