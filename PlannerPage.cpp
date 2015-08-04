@@ -134,6 +134,7 @@ bool PlannerPage::Process(HttpConnection* connection, ILioData* data) {
     if (action == "getideas") {
       std::string grouptype = posted.GetData("type").ToString();
       if (grouptype == "") {
+        DEBUG_cout << "getideas.type is not set. Set it to 'latest'." << endl;
         grouptype = "latest";
       }
 
@@ -215,29 +216,28 @@ bool PlannerPage::Process(HttpConnection* connection, ILioData* data) {
     if (action == "editidea") {
       std::string ideaidStr = posted.GetData("ideaid").ToString();
       if (ideaidStr == "") {
+        DEBUG_cerr << "ideaid is required!" << endl;
         response.SetBody(this->invalid, strlen(this->invalid), http::ContentType::JSON);
         return true;
       }
-      ideaid_t ideaid = Util::String::To<ideaid_t>(ideaidStr);
 
+      ideaid_t ideaid = Util::String::To<ideaid_t>(ideaidStr);
 
       std::string content = posted.GetData("content").ToString();
       DEBUG_cout << "content: " << content << endl;
-
-      Idea* idea = const_cast<Idea*>(data->GetIdeaById(ideaid));
-      idea->SetTitle(content);
-      ideaid_t newIdeaId = data->PostIdea(lifeid, content);
-      if (newIdeaId == 0) {
-        DEBUG_cerr << "newIdeaId is 0" << endl;
+      if (content == "") {
+        DEBUG_cerr << "content is required!" << endl;
         response.SetBody(this->invalid, strlen(this->invalid), http::ContentType::JSON);
         return true;
       }
 
-      std::string responseStr;
-      responseStr =
-          "{\"code\": 0, \"ideaid\": " + std::to_string(newIdeaId) + "}";
+      bool isUpdated = data->UpdateIdea(ideaid, content);
+      if (isUpdated == false) {
+        response.SetBody(this->invalid, strlen(this->invalid), http::ContentType::JSON);
+        return true;
+      }
 
-      response.SetBody(responseStr, http::ContentType::JSON);
+      response.SetBody(this->successful, strlen(this->successful), http::ContentType::JSON);
       return true;
     }
 

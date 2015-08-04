@@ -134,9 +134,8 @@ Life& ILioData::GetLifeById(lifeid_t lifeid) {
   return const_cast<Life&>(*life);
 }
 
-
 ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
-    Idea::Type type, Idea::Permission perm) {
+                            Idea::Type type, Idea::Permission perm) {
 
   // Check if lifeId is non-zero
   if (lifeId == 0) {
@@ -186,7 +185,6 @@ ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
   DEBUG_cout << "ProcessedContent: " << content << "END len:" << content.length() << endl;
 
   ideaid_t newIdeaId = this->ideas_.AddIdea(lifeId, ideatitle, contentId);
-
   if (newIdeaId == 0) {
     DEBUG_cerr << "Could not Add Idea!" << endl;
   }
@@ -195,7 +193,83 @@ ideaid_t ILioData::PostIdea(lifeid_t lifeId, std::string& content,
 }
 
 bool ILioData::UpdateIdea(ideaid_t ideaId, std::string& content,
-    Idea::Type type, Idea::Permission perm) {
+                          Idea::Type type, Idea::Permission perm) {
+
+  // Check if lifeId is non-zero
+  if (ideaId == 0) {
+    DEBUG_cerr << "ideaId is 0!!!" << endl;
+    return false;
+  }
+
+  if (content.length() > 50000) {
+    DEBUG_cerr << "Content is TOO long." << endl;
+    return false;
+  }
+
+  bool isSafeUserInput = Util::String::IsUserInputSafe(content);
+  if (isSafeUserInput == false) {
+    DEBUG_cerr << "Content is not safe." << endl;
+    return false;
+  }
+
+  // Check content for unsafe or invalid chars for json/html
+  bool isSafeJson = Util::String::IsSafeForJson(content);
+  if (isSafeJson == false) {
+    DEBUG_cerr << "NOT SAFE FOR JSON!" << endl;
+    return false;
+  }
+
+  Idea* idea = this->ideas_.GetIdeaById(ideaId);
+  if (idea == nullptr) {
+    DEBUG_cerr << "Idea does not exist. id: " << ideaId << endl;
+    return false;
+  }
+
+  std::string ideatitle;
+
+  if (content.length() > Idea::MAX_TITLE_LENGTH) {
+    ideatitle = content.substr(0, Idea::MAX_TITLE_LENGTH);
+    auto numBytesTrimmed = Util::String::TrimIncompleteUTF8(ideatitle);
+    DEBUG_cout << "Trimmed " << numBytesTrimmed << " bytes for UTF-8 string!"<< endl;
+  } else {
+    ideatitle = content;
+  }
+
+  idea->SetTitle(ideatitle);
+
+
+  contentid_t contentId = idea->GetContentId();
+  Content newContent;
+  if (contentId == 0) {
+    if (content.length() > Idea::MAX_TITLE_LENGTH) {
+      newContent.SetType(Content::Type::GENERAL);
+      newContent.SetPrevId(0);
+      newContent.SetContent(content);
+      contentId = this->contents_.AddContent(newContent);
+    }
+  } else {
+    const Content* ideaContent = this->contents_.GetContentById(contentId);
+    if (ideaContent == nullptr) {
+      DEBUG_cerr << "Content does not exist! id: " << contentId << endl;
+      return false;
+    }
+    newContent.SetType(ideaContent->GetType());
+    newContent.SetPrevId(ideaContent->GetId());
+    newContent.SetContent(content);
+    contentId = this->contents_.AddContent(newContent);
+  }
+  idea->SetContentId(contentId);
+
+
+  DEBUG_cout << "ProcessedTitle: " << ideatitle << "END len: " << ideatitle.length() << endl;
+  DEBUG_cout << "ProcessedContent: " << content << "END len:" << content.length() << endl;
+
+  bool isSynced = this->ideas_.SyncIdea(ideaId);
+  if (isSynced == false) {
+    DEBUG_cerr << "Could not sync idea. ideaid:" << ideaId << endl;
+    return false;
+  }
+
   return true;
 }
 
