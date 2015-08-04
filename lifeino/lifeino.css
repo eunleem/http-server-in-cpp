@@ -72,6 +72,27 @@ input[type="text"].error, textarea.error
   border-bottom-color: #D22042;
 }
 
+
+.panel {
+  font-size: 1.2em;
+  transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  -webkit-transition : height 700ms cubic-bezier(0.645, 0.045, 0.355, 1);
+  min-height: 20%;
+  background-size: cover;
+  background-position: center;
+  font-family: Open Sans, "Nanum Gothic";
+}
+
+.panel > .wrap {
+  text-align: center;
+  position: relative;
+  top: 0%;
+  width: 96%;
+  margin-left: 2%;
+  margin-right: 2%;
+  padding: 30px 0;
+}
+
 .indent15 {
   margin-left: 15px;
 }
