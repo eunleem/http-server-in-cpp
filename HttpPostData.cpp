@@ -50,43 +50,41 @@ HttpPostData::~HttpPostData() {
 DataBlock<char*> HttpPostData::GetData(const std::string& fieldName) {
   if (this->content_.IsNull() == true) {
     return DataBlock<char*>();
-  } 
+  }
 
-  auto it = this->cached_.find(fieldName);
-  if (it != this->cached_.end()) {
-    return this->cached_[fieldName];
-  } 
-
-  ssize_t dataPos = Util::String::Find(fieldName + "=",
-      (char*)this->content_.GetObject(),
-      this->content_.GetLength());
+  ssize_t dataPos =
+      Util::String::Find(fieldName + "=", (char*)this->content_.GetObject(),
+                         this->content_.GetLength());
 
   if (dataPos == -1) {
-    DEBUG_cout << "Not Found." << endl; 
+    DEBUG_cout << "Not Found. fieldName: " << fieldName << endl;
     return DataBlock<char*>();
   } 
 
   dataPos += fieldName.length() + strlen("=");
 
-  char* ptr = (char*)this->content_.GetObject() + dataPos;
-  size_t maxLength = this->content_.GetLength() - dataPos;
+  const size_t maxLength = this->content_.GetLength() - dataPos;
   size_t length = 0;
+  
+  char* ptr = (char*)this->content_.GetObject() + dataPos;
 
-  for (length = 0; maxLength > length; length++) {
-    if (*ptr == '\n'||
-        *ptr == '\r' ||
-        *ptr == '&')
-    {
+  for (length = 0; length < maxLength; ++length) {
+    if (*ptr == '\n' || *ptr == '\r' || *ptr == '&') {
       break;
-    } 
-    ptr++;
-  } 
+    }
+    ++ptr;
+  }
 
-  ssize_t decodedLength = Util::String::UriDecodeFly((char*)this->content_.GetObject() + dataPos, length);
+  ssize_t decodedLength = Util::String::UriDecodeFly(
+      (char*)this->content_.GetObject() + dataPos, length);
+  if (decodedLength > length) {
+    DEBUG_clog << "DecodedLength exceeded original length. "
+               << "Possible overwrite of data! "
+               << "orglenth: " << length << " "
+               << "decodedLength: " << decodedLength << endl;
+  }
 
-  this->cached_[fieldName] = DataBlock<char*>((char*)this->content_.GetObject() + dataPos, 0, decodedLength);
-
-  return this->cached_[fieldName];
+  return DataBlock<char*>((char*)this->content_.GetObject() + dataPos, 0, decodedLength); 
 }
 
 //HttpPostData::

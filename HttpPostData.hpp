@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 29, 2015
+    Aug 04, 2015
   
   History
     January 01, 2015
@@ -75,9 +75,8 @@ private:
 protected:
   
 private:
-  DataBlock<char*> content_;
-  std::unordered_map<std::string, DataBlock<char*>> cached_;
-  
+  const DataBlock<char*> content_;
+  //std::unordered_map<std::string, DataBlock<char*>> cached_;
 };
 
 }
