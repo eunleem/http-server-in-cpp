@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>First Step | Your Life In O</title>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans|Lobster' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/earlyaccess/nanumgothic.css' rel='stylesheet' type='text/css'>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="util.js"></script>
+  <link href="lifeino.css" rel="stylesheet">
+</head>
+<body>
+<style media="screen">
+body {
+  font-family: 'Open Sans', 'Nanum Gothic';
+}
+#sect-today {
+  font-size: 2.3em;
+  font-weight: bold;
+  color: #777;
+  text-align: center;
+  min-height: 120px;
+  height: 120px;
+  border-bottom: 0px solid #CCC;
+}
+</style>
+<script type="text/javascript">
+$(function(){
+  var now = new Date();
+  $("#sect-today .wrap").text(now.getMonthStrAndDate() + ", " + now.getFullYear());
+});
+
+</script>
+  <section id="sect-today" class="panel">
+    <div class="wrap">
+      August 14, 2015
+    </div>
+  </section>
+
+<style media="screen">
+#sect-lifeino {
+  background-color: #62C2CC;
+  color: #FFF;
+  font-weight: bold;
+  text-align: center;
+  min-height: 120px;
+  border-bottom: 0px solid #CCC;
+}
+
+#sect-lifeino h2 {
+  font-size: 4em;
+  margin: 20px;
+  padding: 0;
+}
+
+#sect-lifeino .body {
+  font-size: 1.3em;
+  line-height: 2em;
+}
+
+#sect-lifeino #btnAbout {
+  background: transparent;
+  color: #FFF;
+  font-size: 0.8em;
+  padding: 5px 20px;
+  border: 3px solid #FFF;
+  border-radius: 0px;
+  margin: 20px 0 10px 0;
+}
+
+#sect-lifeino #btnAbout:hover {
+  background-color: #7accd5;
+}
+
+#sect-lifeino #boxAbout {
+  display: none;
+}
+</style>
+<script type="text/javascript">
+$(function(){
+  $("#btnAbout").click(function() {
+    var display = $("#sect-lifeino #boxAbout").css("display");
+    if (display === "none") {
+      $(this).text("close");
+      $("#sect-lifeino #boxAbout").show();
+    } else {
+      $(this).text("learn more...");
+      $("#sect-lifeino #boxAbout").hide();
+    }
+  });
+});
+
+</script>
+  <section id="sect-lifeino" class="panel">
+    <div class="wrap">
+      <h2>LIFE IN O</h2>
+      <div class="body">
+        라이프 인 오,<br>
+        작은 변화의 시작<br>
+        <div id="boxAbout">
+          <p>
+            LIFE IN O는 삶을 변화시키기 위한 서비스입니다.<br>
+            삶의 변화라는게 거창한 것처럼 들리기도 하지만<br>
+            삶의 변화는 작은 것에서부터 시작된다고 믿습니다.<br><br>
+
+            소규모의 사람들로 이뤄진 작은 동그라미 O 안에서<br>
+            삶의 변화를 위한 나의 노력을 공유하며<br>
+            실패할 땐 독려 받으며<br>
+            작은 성공이라도 같이 기쁨을 나누며<br>
+            조금씩 삶의 변화를 함께 만들어 가는 것.<br><br>
+
+            같이 만들어가는 작은 삶의 변화에 집착한 서비스<br>
+            LIFE IN O가 해보려 합니다.<br>
+          </p>
+        </div>
+        <button id="btnAbout">learn more...</button>
+      </div>
+    </div>
+  </section>
+
+<style media="screen">
+#sect-first {
+  /*background-color: #8ED2C9;*/
+  /*background-color: #FCF4D9;*/
+  /*background-color: #00AAA0;*/
+
+  background-color: #F4F1E0;
+  color: #666;
+  min-height: 60%;
+  padding: 30px 5%;
+  border-bottom: 0px solid #CCC;
+}
+
+.number {
+  margin-left: -20px;
+  font-size: 1.3em;
+  font-weight: bold;
+  font-style: italic;
+}
+
+
+#sect-first .title {
+  text-align: center;
+  font-size: 2.4em;
+  font-weight: bold;
+  color: #F14C38;
+}
+
+
+#sect-first .body {
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 400px;
+  max-width: 600px;
+  width: 80%;
+  text-align: left;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+#sect-first .body p {
+  text-indent: 20px;
+  line-height: 1.5em;
+}
+
+#sect-first h2.progress {
+  margin-top: 60px;
+  text-align: center;
+  color: #000;
+}
+
+#sect-first div.progress {
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 300px;
+  max-width: 600px;
+  width: 50%;
+}
+
+</style>
+  <section id="sect-first">
+    <div class="wrap">
+      <div class="number">
+        first project
+      </div>
+      <h2 class="title">같이 일기 쓸래요?</h2>
+      <div class="body">
+        <p>
+          아이구야.<br>
+          일기쓰기가 그렇게 좋다고 해서<br>
+          매일 일기쓰기를 해보려고 했거든요.<br>
+          근데 꾸준히 지속적으로 쓰기가 쉽지가 않더라구요.<br>
+          그래서 같이 일기를 쓰면 좀 더 재미있지 않을까<br>
+          하는 마음에 시작해 본 프로젝트입니다.<br>
+          <br>
+          무려 LIFE IN O의 첫번째 프로젝트.
+        </p>
+      </div>
+      <h2 class="progress">진행상황</h2>
+      <div class="progress">
+        <ul>
+          <li>혼자 쓰는 일기의 기능 테스트 및 개선</li>
+          <li>서버에 올린 후 Alpha Test</li>
+          <li>같이 쓰는 일기의 테스트</li>
+          <li>More Alpha Test</li>
+          <li>Closed Beta Test</li>
+          <li>Open Beta Test</li>
+          <li>일기 같이 쓰기 1기 모집</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+<style media="screen">
+#sect-second {
+  display: none;
+  /*background-color: #8ED2C9;*/
+  /*background-color: #FCF4D9;*/
+  background-color: #fff4aa;
+  color: #666;
+  height: 60%;
+  padding: 30px 5%;
+  border-bottom: 0px solid #CCC;
+}
+
+#sect-second .title {
+  text-align: center;
+  font-size: 2.0em;
+  font-weight: bold;
+  color: #F14C38;
+}
+</style>
+  <section id="sect-second">
+    <div class="wrap">
+      <div class="number">
+        second project
+      </div>
+      <div class="title">
+        <h2>to be determined...</h2>
+      </div>
+    </div>
+  </section>
+
+<style media="screen">
+  #sect-footer {
+    background-color: #473E3F;
+    color: #FFF;
+    text-align: center;
+    padding: 30px;
+  }
+</style>
+
+  <footer id="sect-footer">
+    <div class="wrap">
+      Footer
+
+    </div>
+  </footer>
+
+</body>
+</html>

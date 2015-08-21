@@ -11,7 +11,7 @@
     One Master One Worker architecture Http Server
 
   Last Modified Date
-    Apr 27, 2015
+    Aug 20, 2015
   
   History
     October 22, 2014
@@ -55,10 +55,15 @@
 #include <unistd.h> // fcntl(), read(), execl(), sleep();
 #include <signal.h> // kill(), SIGUSR1
 #include <wait.h> // waitpid()
+#include <fcntl.h>
+#include <errno.h>
+#include <syslog.h>
 
 #include <sys/prctl.h> // prctl
+#include <sys/types.h> //getaddrinfo()
+#include <sys/stat.h> //
+#include <sys/file.h>
 //#include <sys/socket.h> // getaddrinfo() getnameinfo()
-//#include <sys/types.h> //getaddrinfo()
 //#include <netdb.h> // getaddrinfo() getnameinfo()
 //#include <sys/epoll.h>
 

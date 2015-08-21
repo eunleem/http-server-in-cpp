@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 31, 2015
+    Aug 10, 2015
   
   History
     June 09, 2015
@@ -111,6 +111,8 @@ private:
 
   const Idea* GetIdeaById(ideaid_t id);
   const Content* GetContentById(contentid_t id);
+
+  std::vector<contentid_t> GetAllPrevContents(const contentid_t contentId);
 
   bool IsAdmin(const std::string& session);
 

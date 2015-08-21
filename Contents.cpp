@@ -413,6 +413,24 @@ std::vector<const Content*> Contents::GetContents(std::vector<contentid_t>& cont
   return result;
 }
 
+std::vector<contentid_t> Contents::GetAllPrevContents(contentid_t contentId) {
+  std::vector<contentid_t> result;
+
+  Content* content = const_cast<Content*>(this->GetContentById(contentId));
+
+  while (content != nullptr && content->GetId() != 0) {
+    result.push_back(content->GetId());
+    if (content->GetPrevId() == 0) {
+      break;
+    }
+    content = const_cast<Content*>(this->GetContentById(content->GetPrevId()));
+  }
+
+  DEBUG_cout << "Got " << result.size() << " histories." << endl;
+
+  return result;
+}
+
 contentid_t Contents::AddContent(Content& newContent) {
   DEBUG_FUNC_START;
 

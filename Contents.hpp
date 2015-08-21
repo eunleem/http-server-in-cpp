@@ -8,7 +8,7 @@
     [ETL] Eun T. Leem (eunleem@gmail.com)
 
   Last Modified Date
-    Jul 28, 2015
+    Aug 10, 2015
   
   History
     September 23, 2014
@@ -202,6 +202,8 @@ private:
 
   const Content* GetContentById(contentid_t contentId);
   std::vector<const Content*> GetContents(std::vector<contentid_t>& contentIds);
+
+  std::vector<contentid_t> GetAllPrevContents(contentid_t contentId);
 
   contentid_t AddContent(Content& newContent);
   contentid_t UpdateContent(contentid_t id, const std::string& content);

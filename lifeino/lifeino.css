@@ -22,29 +22,16 @@ a:hover {
   text-decoration: underline;
 }
 
-button
-{
+button {
   cursor: pointer;
-  margin-top: 20px;
   border: 0;
-  font-size: 1em;
-  font-family: 'Open Sans', 'Nanum Gothic', Sans-Serif;
+  border-radius: 5px;
+  margin-top: 10px;
 }
 
-input[type="text"]
-{
+input[type="text"] {
   font-size: 1.1em;
-}
-
-input[type="text"], textarea
-{
-  border: 0px;
-  border-bottom: 2px solid #999;
   padding: 5px 5px 3px 5px;
-  //transition: height 10ms ease-out;
-  transition: border-color 300ms ease-out;
-  -webkit-transition: border-color 300ms ease-out;
-  font-family: Open Sans, 'Nanum Gothic', Sans-Serif;
 }
 
 textarea {
@@ -53,23 +40,46 @@ textarea {
   line-height: 1.3em;
 }
 
+
+input[type="text"], textarea {
+  border: 0px;
+  border-bottom: 2px solid #999;
+  transition: border-color 300ms ease-out;
+  font-family: 'Open Sans', 'Nanum Gothic', Sans-Serif;
+}
+
 input[type="text"]:hover, textarea:hover
 {
   transition: border-color 300ms ease-out;
-  -webkit-transition: border-color 300ms ease-out;
   border-bottom-color:  #000;
 }
 
-input[type="text"]:disabled , textarea:disabled
-{
-  opacity: 0.5;
-  border-bottom-color:  #666;
-  background-color: #EEEEEE;
+button:disabled {
+  opacity: 0.4 !important;
+  color: #EEE !important;
+  background-color: #333 !important;
 }
 
-input[type="text"].error, textarea.error
+input[type="text"]:disabled,
+textarea:disabled {
+  opacity: 0.4 !important;
+  background-color: #CCC !important;
+}
+
+input[type="text"].error,
+textarea.error
 {
-  border-bottom-color: #D22042;
+  border-bottom-color: #D22042 !important;
+}
+
+::-webkit-input-placeholder {
+  font-style: italic;
+}
+::-moz-placeholder {
+  font-style: italic;
+}
+:-ms-input-placeholder {
+  font-style: italic;
 }
 
 
@@ -80,7 +90,7 @@ input[type="text"].error, textarea.error
   min-height: 20%;
   background-size: cover;
   background-position: center;
-  font-family: Open Sans, "Nanum Gothic";
+  font-family: "Open Sans", "Nanum Gothic";
 }
 
 .panel > .wrap {
@@ -142,6 +152,10 @@ input[type="text"].error, textarea.error
 .color-green {
   color: #A4B808;
 }
+
+.color-green-b {
+  color: #59ac06;
+}
 .bgcolor-white {
   background-color: #FFF;
 }
@@ -200,11 +214,11 @@ input[type="text"].error, textarea.error
 }
 
 .errorMessage {
-  color: #D22042;
+  color: #D22042 !important;
 }
 
 .successMessage {
-  color: #1C73BA;
+  color: #48830c !important;
 }
 
 .rotating {
@@ -237,4 +251,17 @@ input[type="text"].error, textarea.error
     transform: rotate(360deg);
     -webkit-transform: rotate(360deg);
   }
+}
+
+.blink-flash {
+  animation-name: blinker;
+  animation-duration: 400ms;
+  animation-timing-function: ease-in;
+  animation-iteration-count: 2;
+}
+
+@keyframes blinker {
+    0% { opacity: 1.0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1.0; }
 }

@@ -167,6 +167,7 @@ std::vector<Idea*> Ideas::GetIdeas(size_t count, size_t skip) {
 
   result.reserve(count);
 
+
   auto indexRit = this->index_.items.crbegin();
   for (size_t i = 0; i < skip; ++i) {
     ++indexRit;

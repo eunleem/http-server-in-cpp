@@ -1,7 +1,176 @@
+button {
+  border-radius: 0px;
+  color: white;
+  padding: 0px;
+  font-size: 1em;
+  opacity: 0.8;
+  transition: opacity 200ms ease-in-out;
+}
+
+button:hover {
+  opacity: 1;
+}
+button:focus {
+  opacity: 1;
+}
+
+button.ok {
+  background-color: #06BCC2;
+}
+
+button.cancel {
+  background-color: #E66665;
+  margin-left: 30px;
+}
+
+
+#sect-notification {
+  position: fixed;
+  top: 50px;
+  left: 30px;
+  padding: 10px;
+  height: 50px;
+  width: 30px;
+  overflow: visible;
+  z-index: 1000;
+  /*
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 3px solid #CCC;
+  border-radius: 0 10px 10px 0;
+  */
+}
+
+#sect-notification #boxIcon {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 40px;
+  width: 40px;
+  cursor: pointer;
+  text-align: center;
+  line-height: 30px;
+  transition: opacity 500ms ease-in-out;
+  opacity: 0.8;
+}
+
+#sect-notification #boxIcon #imgAlertRedSmall {
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%) scale(.8);
+  transition: opacity 500ms ease-in-out;
+}
+
+#sect-notification #boxIcon #imgAlertRedSmall.active {
+  opacity: 1;
+}
+
+#sect-notification #boxIcon svg {
+  height: 40px;
+  width: 40px;
+}
+
+#sect-notification #boxIcon:hover {
+}
+
+#sect-notification #boxIcon #imgLogo {
+  stroke: #999;
+  transition: all 300ms ease-in-out;
+}
+
+#sect-notification #boxIcon #imgLogo.bad {
+  stroke: #D22042;
+}
+
+#sect-notification #boxIcon #imgLogo.good {
+  stroke: #84d220 !important;
+}
+
+#sect-notification #boxIcon #imgLogo:hover {
+  stroke: #333;
+}
+
+
+#sect-notification #boxNotification {
+  position: absolute;
+  top: 0px;
+  left: 60px;
+  height: 40px;
+  width: 0px;
+  overflow-x: hidden;
+  overflow-y: visible;
+  background-color: white;
+  box-shadow: 2px 2px 5px #888888;
+
+  transition: all 300ms ease-in-out;
+}
+
+#sect-notification #boxNotification.open {
+  width: 500px;
+}
+
+
+#sect-notification #boxMessage .wrapMessage {
+  width: 500px;
+  padding: 10px;
+  margin-left: 20px;
+}
+
+#sect-notification #boxMessage .wrapMessage > ul {
+  margin: 0;
+  padding: 0;
+}
+
+#sect-notification #boxMessage .wrapMessage > ul > li.nomessage {
+  font-size: 0.9em;
+  font-style: italic;
+  color: #999;
+}
+
+#sect-notification #boxMessage .wrapMessage > ul > li {
+  height: 40px;
+  line-height: 120%;
+  font-size: 1.0em;
+  color: #333;
+  list-style: none;
+}
+
+#sect-notification #boxMessage .wrapMessage > ul > li time {
+  margin-left: 10px;
+  color: #999 !important;
+  font-size: 0.9em;
+}
+
+#sect-notification #boxNotification .btnClose {
+  position: absolute;
+  top: 0;
+  left: auto;
+  right: 0;
+  height: 100%;
+  width: 25px;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+#sect-notification #boxNotification .btnClose > img {
+  position: relative;
+  top: 50%;
+  left: auto;
+  right: 5px;
+  margin-top: -20px;
+  height: 40px;
+  width: 20px;
+  margin-left: 5px;
+}
+
+#sect-notification .btnClose:hover {
+  opacity: 1;
+  background-color: #EEE;
+}
 
 #sect-header {
   min-height: 100px;
-
   transition: height 500ms cubic-bezier(0.785, 0.135, 0.15, 0.86);
   /*border-bottom: 3px solid #DDD;*/
 }
@@ -51,35 +220,23 @@
   color: #444;
 }
 
+#sect-journal #boxJournal {
+  min-width: 500px;
+  width: 96%;
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
 #sect-journal #boxJournal > #boxJournalWriteTime {
   text-align: left;
-  font-size: 3em;
+  margin: 0 0px;
+  font-size: 2.3em;
   color: #999;
   font-family: Lobster;
 }
 
-#sect-journal #boxJournal > #boxJournalWriteMode {
-  position: relative;
-  z-index: 100;
-  top: -40px;
-
-}
-
-#sect-journal #boxJournal > #boxJournalWriteMode > ul {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-}
-
-#sect-journal #boxJournal > #boxJournalWriteMode > ul > li {
-  display: inline-block;
-  margin: 0px 20px 0px 20px;
-  font-size: 2em;
-}
-
 #sect-journal #boxJournal > #txtJournalWrite {
   /*
-
   background: transparent;
   background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
   background-size: 100% 80px;
@@ -88,79 +245,144 @@
   min-height: 900px;
    */
   background: transparent;
-  font-size: 2em;
-  line-height: 1.3em;
+  font-size: 1.3em;
+  line-height: 150%;
+  width: 96%;
   color: #333;
-  margin-top: 20px;
-  padding: 0 30px 10px 30px;
-  min-width: 500px;
-  width: 90%;
+  padding: 10px 2%;
   border-bottom: 4px solid #999;
-  resize: vertical;
+  resize: none;
 }
+
+/*
+#sect-journal #boxJournal > #txtJournalWrite:disabled {
+  cursor: progress;
+  background-color: #EEE;
+  color: #999;
+}
+*/
 
 #sect-journal #boxJournal > .boxControls {
-}
-#sect-journal #boxJournal > .boxControls button {
-  height: 40px;
-  font-weight: bold;
-  background: transparent;
+  text-align: right;
 }
 
-
-
-#sect-journal #boxJournal > .boxUnderWrite {
-  text-align: left;
+#sect-journal #boxJournal > .boxControls > button {
+  line-height: 2.0em;
 }
 
-#sect-journal #boxJournal input[type="text"] {
-  /*
-  background: transparent;
-  background: -moz-linear-gradient(top, #FEFEFE 0%, transparent 3%) 0 0px;
-  background-size: 100% 80px;
-  font-family: 'Nanum Pen Script', serif;
-  line-height: 80px;
-   */
-  font-size: 200px;
-  color: #333;
-  padding: 10px 30px;
-  min-width: 600px;
-  width: 90%;
-  display:none;
+#sect-journal #boxJournal > .boxControls > #btnJournalPost {
+  width: 120px;
+  background-color: #049DBF;
+  color: white;
 }
 
-
-#sect-journal #boxJournal > .boxUnderWrite #boxJournalPosted {
-  position: relative;
-  z-index: 1000;
-  top: -20px;
-  padding-top: 40px;
-}
-
-#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent {
+#sect-journal #lstJournalEntriesRecent {
   margin: 0;
   padding: 0;
   list-style: none;
   text-align: left;
 }
 
-#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li{
+#sect-journal #lstJournalEntriesRecent > li {
   display: block;
-  margin: 30px auto;
+  margin: 0px auto;
   min-width: 600px;
-  width: 90%;
+  width: 98%;
 }
 
-#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li > .journal-entry-time {
-  font-size: 1.5em;
+#sect-journal #lstJournalEntriesRecent > li:hover .journal-entry-content {
+  border-left: 3px solid rgba(230, 102, 101, 1);
+}
+
+#sect-journal #lstJournalEntriesRecent > li:hover .journal-entry-controls {
+  opacity: 1;
+}
+
+#sect-journal #lstJournalEntriesRecent > li > .journal-entry-id {
+  display: none;
+}
+
+#sect-journal #lstJournalEntriesRecent > li > .journal-entry-time {
+  font-size: 1.3em;
   color: #666;
+  margin-bottom: 10px;
 }
 
-#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li > .journal-entry-content {
-  margin-left: 20px;
-  font-size: 2em;
+#sect-journal #lstJournalEntriesRecent > li > .journal-entry-content {
+  padding: 0 15px;
+  margin: 0px 0px;
+  font-size: 1.1em;
+  max-height: 500px;
+  overflow: auto;
+  border-left: 3px solid rgba(230, 102, 101, 0.1);
+  resize: vertical;
+  transition: border 200ms ease-in;
 }
 
-#sect-journal #boxJournal #boxJournalEntries #lstJournalEntriesRecent > li > .journal-entry-controls {
+#sect-journal #lstJournalEntriesRecent > li > .journal-entry-content:hover {
+}
+
+
+#sect-journal #lstJournalEntriesRecent > li > .journal-entry-controls {
+  opacity: 0;
+  margin: 0px 30px;
   text-align: center;
+  transition: opacity 300ms;
+}
+
+#sect-journal #lstJournalEntriesRecent .journal-entry-controls > button {
+  background: transparent;
+  color: #E66665;
+  margin: 0px 0px;
+  line-height: 1.5em;
+}
+
+#sect-journal #lstJournalEntriesRecent .journal-entry-controls > button:hover {
+  text-decoration: underline;
+}
+
+#sect-journal #boxJournal #boxJournalEntries textarea {
+  background-color: #F6F6F6 !important;
+  font-size: 1.1em;
+  line-height: 130%;
+  color: #333;
+  margin-top: 0px;
+  padding: 10px 2%;
+  min-width: 500px;
+  width: 96%;
+  border-bottom: 4px solid #999;
+}
+
+#sect-journal #boxJournalEntries .journal-entry-edit .editcontrols {
+  text-align: center;
+}
+#sect-journal #boxJournalEntries .journal-entry-edit button {
+  line-height: 2em;
+  width: 120px;
+  margin: 10px 20px;
+}
+
+#sect-journal #boxPageNav {
+  position: fixed;
+  top: auto;
+  bottom: 20px;
+  left: auto;
+  right: 20px;
+}
+#sect-journal #boxPageNav button {
+  height: 50px;
+}
+
+#sect-journal #boxPageNav #btnPageFirst {
+  width: 30px;
+  background-color: #A4B808;
+  margin-right: 10px;
+}
+#sect-journal #boxPageNav #btnPagePrev {
+  width: 80px;
+  background-color: #E66665;
+}
+#sect-journal #boxPageNav #btnPageNext {
+  width: 80px;
+  background-color: #049DBF;
 }

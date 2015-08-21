@@ -8,19 +8,41 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="jquery-plugins.js" type="text/javascript"></script>
   <script src="util.js" type="text/javascript"></script>
+  <script src="Autolinker.min.js" type="text/javascript"></script>
   <link href="lifeino.css" rel="stylesheet">
   <link href="planner.css" rel="stylesheet">
 </head>
 <body>
-  <header id="sect-header" class="panel">
+
+  <header id="sect-notification" class="pinned">
+    <div id="boxIcon">
+      <img id="imgAlertRedSmall" src="alert-red-small.png" />
+      <svg>
+        <circle id="imgLogo" cx="20" cy="20" r="17" stroke-width="5" fill="transparent" />
+        Sorry, your browser does not support inline SVG.
+      </svg>
+    </div>
+    <div id="boxNotification">
+      <div id="boxMessage">
+        <div class="wrapMessage">
+          <ul>
+            <li class="nomessage">You have no notification! :)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="btnClose"><img src="close-arrow.png" alt="" /></div>
+    </div>
+  </header>
+
+  <section id="sect-header" class="panel">
     <div class="wrap">
       <div>
         <time id="lblTodayDate">Today's date!</time>
       </div>
     </div>
-  </header>
+  </section>
 
-  <section class="panel" id="sect-steps">
+  <section id="sect-steps" class="panel">
     <div class="wrap">
       It's Ok.<br>
       Try Again!<br>
@@ -33,31 +55,17 @@
       <h1>Journal</h1>
       <div id="boxJournal">
         <div id="boxJournalWriteTime"><time>7:17 am</time></div>
-        <label for="txtJournalWrite">write here...</label>
-        <textarea id="txtJournalWrite" class="expandable"></textarea>
+        <textarea id="txtJournalWrite" class="expandable" placeholder="Write anything here!"></textarea>
         <div id="boxJouralWriteControls" class="boxControls">
-          <div style="display: none;">
-            <button id="btnJournalWriteFontLarger" style="font-size: 1.5em;">A</button>
-            <button id="btnJournalWriteFontRegular" style="font-size: 1em;">A</button>
-            <button id="btnJournalWriteFontSmaller" style="font-size: 0.6em;">A</button>
-          </div>
           <button id="btnJournalPost">Post</button>
         </div>
-        <div id="boxJournalWritePreview" style="text-align: left;"></div>
-        <div class="boxUnderWrite">
-          <div id="boxJournalPosted">
-          </div>
-          <div id="boxJournalPostedTemp">
-          </div>
-        </div>
         <div id="boxJournalEntries"></div>
+        <div id="boxPageNav">
+          <button type="button" id="btnPageFirst" name="button">&lt;</button>
+          <button type="button" id="btnPagePrev" name="button">Prev</button>
+          <button type="button" id="btnPageNext" name="button">Next</button>
+        </div>
       </div>
-    </div>
-  </section>
-
-  <section class="panel" id="sect-story">
-    <div class="wrap">
-      hello
     </div>
   </section>
 
@@ -69,15 +77,21 @@
     $(function() {
 
       var mg = new Manager();
+      mg.Register(new NotificationModule("Notification", "#sect-notification"));
       mg.Register(new HeaderModule("Header", "#sect-header"));
       mg.Register(new JournalModule("Journal", "#sect-journal"));
 
       mg.Run();
 
-      $("body").lioInputLabel();
+      $("button").each(function(){
+        $(this).data("orgtext", $(this).text());
+      });
+
+      //$("body").lioInputLabel();
       $('textarea.expandable').attr("rows", "1");
 
       autosize($('textarea.expandable'));
+
     });
 
   </script>

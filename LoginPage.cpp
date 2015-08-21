@@ -51,7 +51,7 @@ bool LoginPage::Process(HttpConnection* connection, ILioData* data) {
     std::pair<std::string, Session&> session = data->Login(dna, pwd);
     std::string& sessionCode = session.first;
     response.SetCookie("sessionid", sessionCode,
-        std::chrono::system_clock::now() + std::chrono::minutes(120));
+        std::chrono::system_clock::now() + std::chrono::hours(24 * 15));
     response.SetBody(this->successful_login, strlen(this->successful_login), http::ContentType::JSON);
     return true;
 

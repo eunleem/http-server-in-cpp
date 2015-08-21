@@ -104,7 +104,7 @@ std::pair<std::string, Session&> ILioData::Login(std::string dna, std::string co
     throw Exception(ExceptionType::LOGIN);
   } 
 
-  Session session(life->id, std::chrono::minutes(120));
+  Session session(life->id, std::chrono::hours(48));
   std::string sessionId = this->sessions_.AddSession(session);
 
   return std::pair<std::string, Session&>(sessionId, session);
@@ -118,6 +118,7 @@ lifeid_t ILioData::GetLifeIdBySessionId(std::string sid) {
 
   try {
     Session& session = this->sessions_.GetSession(sid);
+    session.expiration = std::chrono::steady_clock::now() + std::chrono::hours(2);
     return session.lifeid;
 
   } catch (Sessions::Exception& ex) {
@@ -239,6 +240,7 @@ bool ILioData::UpdateIdea(ideaid_t ideaId, std::string& content,
 
 
   contentid_t contentId = idea->GetContentId();
+  DEBUG_cout << "contentId:" << contentId << endl;
   Content newContent;
   if (contentId == 0) {
     if (content.length() > Idea::MAX_TITLE_LENGTH) {
@@ -258,15 +260,18 @@ bool ILioData::UpdateIdea(ideaid_t ideaId, std::string& content,
     newContent.SetContent(content);
     contentId = this->contents_.AddContent(newContent);
   }
+  DEBUG_cout << "prevContentId:" << newContent.GetPrevId() << endl;
+  DEBUG_cout << "oldContentId: " << idea->GetContentId() << endl;
   idea->SetContentId(contentId);
+  DEBUG_cout << "newContentId: " << idea->GetContentId() << endl;
 
 
-  DEBUG_cout << "ProcessedTitle: " << ideatitle << "END len: " << ideatitle.length() << endl;
-  DEBUG_cout << "ProcessedContent: " << content << "END len:" << content.length() << endl;
+  //DEBUG_cout << "ProcessedTitle: " << ideatitle << "END len: " << ideatitle.length() << endl;
+  //DEBUG_cout << "ProcessedContent: " << content << "END len:" << content.length() << endl;
 
-  bool isSynced = this->ideas_.SyncIdea(ideaId);
+  bool isSynced = this->ideas_.SyncIdea(idea->GetId());
   if (isSynced == false) {
-    DEBUG_cerr << "Could not sync idea. ideaid:" << ideaId << endl;
+    DEBUG_cerr << "Could not sync idea. ideaid:" << idea->GetId() << endl;
     return false;
   }
 
@@ -283,6 +288,10 @@ const Idea* ILioData::GetIdeaById(ideaid_t id) {
 
 const Content* ILioData::GetContentById(contentid_t id) {
   return this->contents_.GetContentById(id);
+}
+
+std::vector<contentid_t> ILioData::GetAllPrevContents(contentid_t id) {
+  return this->contents_.GetAllPrevContents(id);
 }
 
 //ILioData::

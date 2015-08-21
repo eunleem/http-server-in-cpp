@@ -474,7 +474,67 @@ void sighandler(int signum) {
 }
 
 
-int main() {
+int main(int argc, char* argv[]) {
+  
+
+#if 0
+  /* Our process ID and Session ID */
+  pid_t pid, sid;
+
+  /* Fork off the parent process */
+  pid = fork();
+  if (pid < 0) {
+    DEBUG_cout << "Failed to fork." << endl;
+    exit(EXIT_FAILURE);
+  }
+  /* If we got a good PID, then
+     we can exit the parent process. */
+  if (pid > 0) {
+    exit(EXIT_SUCCESS);
+  }
+
+
+  /* Change the file mode mask */
+  umask(0);
+          
+  /* Open any logs here */        
+  std::string date = Util::Time::Timestamp("%F");
+
+  std::ofstream cout("./log/Server-cout-" + date + ".log");
+  std::cout.rdbuf(cout.rdbuf());
+  std::cerr.rdbuf(cout.rdbuf());
+  std::clog.rdbuf(cout.rdbuf());
+
+  DEBUG_cout << "Log redirected." << endl;
+          
+  /* Create a new SID for the child process */
+  sid = setsid();
+  if (sid < 0) {
+    DEBUG_cout << "Failed to setsid." << endl;
+    exit(EXIT_FAILURE);
+  }
+
+  /* Change the current working directory */
+  if ((chdir("./")) < 0) {
+    DEBUG_cout << "Failed to set working dir.." << endl;
+    exit(EXIT_FAILURE);
+  }
+
+  /* Close out the standard file descriptors */
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
+#endif
+  std::string date = Util::Time::Timestamp("%F");
+
+  std::ofstream cout("./log/Server-cout-" + date + ".log");
+  std::cout.rdbuf(cout.rdbuf());
+  std::cerr.rdbuf(cout.rdbuf());
+  std::clog.rdbuf(cout.rdbuf());
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
+
   
   //http://stackoverflow.com/a/284443
   prctl(PR_SET_PDEATHSIG, SIGHUP);
@@ -489,8 +549,13 @@ int main() {
   signal(SIGUSR1, sighandler);
 
   lio::HttpServer::Config config;
-  config.portNumber = 8080;
-  config.portNumberSecure = 8088;
+  if (argc > 1) {
+    if (strncmp(argv[1], "dev", strlen("dev")) == 0) {
+      config.portNumber = 8080;
+      config.portNumberSecure = 8088;
+    }
+  }
+
 
   DEBUG_cout << "Port: " << config.portNumber << ", " << config.portNumberSecure << endl; 
 

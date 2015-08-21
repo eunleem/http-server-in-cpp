@@ -630,6 +630,16 @@ int main(int argc, char** argv) {
   signal(SIGHUP, sighandler);
   signal(SIGUSR1, sighandler);
 
+  std::string date = Util::Time::Timestamp("%F");
+  std::ofstream cout("./log/Worker-cout-" + date + ".log");
+  std::cout.rdbuf(cout.rdbuf());
+  std::cerr.rdbuf(cout.rdbuf());
+  std::clog.rdbuf(cout.rdbuf());
+
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
+
 
   string socketFileName(argv[1]);
   DEBUG_cout << "socketFileName argv1: " << argv[1] << endl; 

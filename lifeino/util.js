@@ -128,22 +128,26 @@ Date.prototype.getSecondsPad = function() {
   return s.substr(s.length - 2);
 };
 
+
 Date.prototype.getTimeStr = function(config) {
   var defConfig = {
     "twelveHrs": true,
     "uppercaseAmPm": false,
     "paddedHours": false,
-    "paddedMinutes": true
+    "paddedMinutes": true,
+    "showSeconds": false
   };
 
-  if (typeof config == "undefined") {
+  if (typeof config === "undefined") {
     config = defConfig;
+  } else {
+    config = extend(defConfig, config);
   }
 
   var hours = this.getHours();
   var minutes = this.getMinutes();
   if (config.paddedMinutes === true) {
-    minutes = minutes.toStringPad(2);
+    minutes = this.getMinutesPad();
   }
 
   var result = "";
@@ -167,7 +171,11 @@ Date.prototype.getTimeStr = function(config) {
   if (config.paddedHours === true) {
     hours = hours.toStringPad(2);
   }
-  result = hours + ":" + minutes + ending;
+  result = hours + ":" + minutes;
+  if (config.showSeconds === true) {
+    result += ":" + this.getSecondsPad();
+  }
+  result += " "+ ending;
   return result;
 };
 
@@ -227,7 +235,8 @@ String.prototype.toPrettyHtml = function() {
   return this
         .replace(/&/g, "&amp;")
         .replace(/  /g, "&nbsp;&nbsp;")
-        .replace(/\n/g, "<br>");
+        .replace(/\n/g, "<br>")
+        .replace(/\\\\/g, "\\");
 };
 
 String.prototype.fromJsonStringToPrettyHtml = function() {
@@ -241,7 +250,8 @@ String.prototype.fromJsonStringToPrettyHtml = function() {
         //.replace(/\"/g, "\"")
         .replace(/\\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
         .replace(/\\r/g, "<br>")
-        .replace(/\\n/g, "<br>");
+        .replace(/\\n/g, "<br>")
+        .replace(/\\\\/g, "\\");
 };
 
 String.prototype.toJsonString = function() {
@@ -267,6 +277,14 @@ String.prototype.toEditable = function() {
         .replace(/&lt;/g, "<")
         .replace(/&amp;/g, "&");
 
+};
+
+function extend (target, source) {
+  var result = Object.create(target);
+  Object.keys(source).map(function (prop) {
+      prop in result && (result[prop] = source[prop]);
+  });
+  return result;
 };
 
 function getUrlVars() {

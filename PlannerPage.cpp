@@ -51,7 +51,7 @@ bool PlannerPage::Process(HttpConnection* connection, ILioData* data) {
     return false; // returns 404 NOT FOUNT
   }
 
-  lifeid_t lifeid = data->GetLifeIdBySessionId(sessionid);
+  lifeid_t lifeid = data->GetLifeIdBySessionId(sessionid); // This extends session expiration by 2 hours
   if (lifeid == 0) {
     response.SetBody(this->notloggedin, strlen(this->notloggedin), http::ContentType::JSON);
     return true;
@@ -238,6 +238,58 @@ bool PlannerPage::Process(HttpConnection* connection, ILioData* data) {
       }
 
       response.SetBody(this->successful, strlen(this->successful), http::ContentType::JSON);
+      return true;
+    }
+
+    if (action == "gethistory") {
+      std::string ideaidStr = posted.GetData("ideaid").ToString();
+      if (ideaidStr == "") {
+        DEBUG_cerr << "ideaid is required!" << endl;
+        response.SetBody(this->invalid, strlen(this->invalid), http::ContentType::JSON);
+        return true;
+      }
+
+      ideaid_t ideaid = Util::String::To<ideaid_t>(ideaidStr);
+      if (ideaid == 0) {
+        DEBUG_cerr << "ideaid cannot be zero!" << endl;
+        response.SetBody(this->invalid, strlen(this->invalid), http::ContentType::JSON);
+        return true;
+      }
+
+      const Idea* idea = data->GetIdeaById(ideaid);
+      if (idea == nullptr) {
+        DEBUG_cerr << "idea cannot be found!" << endl;
+        response.SetBody(this->invalid, strlen(this->invalid), http::ContentType::JSON);
+        return true;
+      }
+      
+      const contentid_t contentId = idea->GetContentId();
+      DEBUG_cout << "contentId: " << contentId << endl;
+      std::vector<contentid_t> prevContentIds = data->GetAllPrevContents(contentId);
+      DEBUG_cout << "prevContentIds.size: " << prevContentIds.size() << endl;
+
+      rapidjson::Document jsDoc;
+      jsDoc.SetObject();
+
+      rapidjson::Document::AllocatorType& jsAlloc = jsDoc.GetAllocator();
+
+      rapidjson::Value jsvCode;
+      jsvCode.SetInt(0);
+
+      jsDoc.AddMember("code", jsvCode, jsAlloc);
+
+      rapidjson::Value jsvIds(rapidjson::kArrayType);
+
+      for (const auto id : prevContentIds) {
+        rapidjson::Value jsvId;
+        jsvId.SetUint(id);
+
+        jsvIds.PushBack(jsvId, jsAlloc);
+      }
+
+      jsDoc.AddMember("ids", jsvIds, jsAlloc);
+
+      response.SetBody(jsDoc);
       return true;
     }
 

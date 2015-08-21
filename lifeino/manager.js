@@ -36,6 +36,8 @@
     this.timer = new Date();
     this.timerOnEveryMinute = null;
 
+    this.autolinker = new Autolinker();
+
     this.engagingModule = "";
 
 
@@ -44,7 +46,7 @@
     this.DeliverMessage = function(from, to, type, message) {
       console.log("Manager is delivering message!");
       if (typeof that.modules.get(to) !== "object") {
-        console.log("Could not find receiving module named " + to);
+        console.error("Could not find receiving module named " + to);
         return false;
       }
       that.modules.get(to).onReceiveMessage(from, type, message);
@@ -57,25 +59,28 @@
     console.log("Register() has been called.");
     console.log("Is Mod instance of Module? " + (module instanceof Module).toString());
     if (module instanceof Module === false) {
-      console.log("ERR: Registering object that is not instanceof Module");
+      console.error("Registering object that is not instanceof Module");
       return;
     }
 
     if (typeof this.modules[module.name] !== "undefined") {
-      console.log("ERR: Registering object that has same name!");
+      console.error("Registering object that has same name!");
       return;
     }
 
+    module.state = "registered";
+    //module.autolinker = this.autolinker;
+
     this.modules.set(module.name, module);
 
-    module.SendMessage = this.DeliverMessage;
+    module.sendMessage = this.DeliverMessage;
   };
 
 
   Manager.prototype.Run = function(mode) {
 
     if (this.modules.length === 0) {
-      console.log("Have no modules registered.");
+      console.error("Have no modules to register.");
       return;
     }
 
@@ -88,18 +93,27 @@
       }, 60 * 1000);
     }, (60 - that.timer.getSeconds()) * 1000);
 
+    console.time("Run Modules");
     this.modules.forEach(function(module, name) {
-      console.log("Running Module! Module Name: " + name.toString());
+      console.log("Running " + name.toString() + " Module!");
+      console.time("Run Module " + name.toString());
       var okToRun = (module.checkRequiredElements() === 0);
       if (okToRun === true) {
         module.Run();
       }
+      console.timeEnd("Run Module " + name.toString());
     });
+    console.timeEnd("Run Modules");
   };
 
   Manager.prototype.Stop = function() {
     console.log("Manager.Stop() has been called.");
     clearInterval(this.timerOnEveryMinute);
+
+    this.modules.forEach(function(module, name) {
+      console.log("Stopping " + name.toString() + " Module!");
+      module.Stop();
+    });
   };
 
   Manager.prototype.onEveryMinute = function() {
@@ -108,8 +122,8 @@
     this.timer = new Date();
 
     var that = this;
-    this.modules.forEach(function(mod) {
-      mod.onEveryMinute(that.timer);
+    this.modules.forEach(function(module) {
+      module.onEveryMinute(that.timer);
     });
 
   };
@@ -134,8 +148,9 @@
       return;
     }
 
-    //this.status = "Uninitialized";
+    //this.state = "Uninitialized";
     this.name = name;
+    this.state = "starting";
 
     if (sectionId.charAt(0) != '#') { sectionId = "#" + sectionId; }
     this.section = $(sectionId);
@@ -151,16 +166,6 @@
 
   Module.prototype.onReceiveMessage = function(from, type, message) {
     console.log(this.name + " has received message from " + from + ". type:" + type + " msg: " + message);
-  };
-
-
-  //Module.prototype.SendMessage = function() {
-    //console.log("ERR: SendMessage() must be replaced by Manager's by registering.");
-  //};
-
-
-  Module.prototype.Run = function() {
-    console.log("Module.Run() has been called.");
   };
 
   Module.prototype.checkRequiredElements = function() {
@@ -180,6 +185,20 @@
 
     return 0;
   };
+
+  Module.prototype.SendMessage = function(to, type, message) {
+    console.log(this.name + " is sending message to " + to + ". type:" + type + " msg: " + message);
+    this.sendMessage(this.name, to, type, message);
+  };
+
+  Module.prototype.Run = function() {
+    console.log("Module.Run() has been called.");
+  };
+
+  Module.prototype.Stop = function() {
+    console.log("Module.Stop() has been called.");
+  };
+
 
   //Module.fn = Module.prototype;
   window.Module = Module;

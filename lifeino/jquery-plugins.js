@@ -6,9 +6,9 @@
       var id = $(this).attr("for");
       var input = $(this).siblings("#" + id);
       //alert();
-      if (input.attr("type") == "text" || 
+      if (input.attr("type") == "text" ||
           input.attr("type") == "password" ||
-          input.get(0).nodeName == "TEXTAREA") 
+          input.get(0).nodeName == "TEXTAREA")
       {
         var labelTxt = jQuery.trim(label.text());
         label.hide();
@@ -40,9 +40,7 @@
 
           } else {
             input.css("font-style", "");
-          }
-        }).hover(function () {
-          if (input.val() == labelTxt) {
+          } }).hover(function () { if (input.val() == labelTxt) {
             input.stop().fadeTo(300, 0.7);
           }
         }, function () {
@@ -173,7 +171,7 @@
 
       var bottomMargin = 0;
       if (top + endHeight + 30 > screenHeight) {
-        bottomMargin = 30;
+        bottomMargin = 0;
       }
 
 			// prevents scroll-position jumping
@@ -299,3 +297,28 @@
 
 	module.exports = autosize;
 });
+
+(function ($) {
+  $.fn.extend({
+    disable: function() {
+      return this.each(function() {
+        var $this = $(this);
+        if($this.is('input, button, textarea')) {
+          this.disabled = true;
+        } else {
+          $this.toggleClass('disabled', true);
+        }
+      });
+    },
+    enable: function() {
+      return this.each(function() {
+        var $this = $(this);
+        if($this.is('input, button, textarea')) {
+          this.disabled = false;
+        } else {
+          $this.toggleClass('disabled', false);
+        }
+      });
+    }
+  });
+})(jQuery);
