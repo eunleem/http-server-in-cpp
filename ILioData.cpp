@@ -118,7 +118,7 @@ lifeid_t ILioData::GetLifeIdBySessionId(std::string sid) {
 
   try {
     Session& session = this->sessions_.GetSession(sid);
-    session.expiration = std::chrono::steady_clock::now() + std::chrono::hours(2);
+    session.expiration = std::chrono::steady_clock::now() + std::chrono::hours(48);
     return session.lifeid;
 
   } catch (Sessions::Exception& ex) {

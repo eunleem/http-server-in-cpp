@@ -240,7 +240,14 @@
   JournalModule.prototype.constructor = JournalModule;
 
   JournalModule.prototype.onEveryMinute = function(time) {
-    this.elems.get("WriteTime").text(time.getTimeStr());
+    this.elems.get("WriteTime").text(time.getTimeStr())
+      .attr("datetime", time.toISOString());
+  };
+
+  JournalModule.prototype.onLeave = function() {
+    if (this.elems.get("Textarea").val() !== "") {
+      return false;
+    }
   };
 
   JournalModule.prototype.SetState = function(state, options) {
@@ -262,13 +269,30 @@
 
     if (state === "normal") {
       txt.enable();
-      txt.val("");
-      txt.blur();
+      if (this.state === "posting") {
+        txt.val("");
+      }
       txt.removeClass("error");
       postbtn.text(postbtn.data("orgtext"));
       postbtn.enable();
       editBtns.text("save edits");
       editBtns.enable();
+
+      this.section.find("ins,del,time").each(function() {
+        var $this = $(this);
+        //console.log(this.tagName);
+        var time = new Date($this.attr("datetime"));
+        var title = "";
+        if (this.tagName === "INS") {
+          title = "Inserted at ";
+        } else if (this.tagName === "DEL") {
+          title = "Deleted at ";
+        } else if (this.tagName === "TIME") {
+          title = "";
+        }
+        title += time.toString();
+        $this.attr("title", title);
+      });
 
       if (this.state === "posting" ||
           this.state === "editing")
@@ -328,6 +352,7 @@
 
     function addEventsToElements() {
       console.log('addEvents');
+
       section.on("click", "#btnJournalPost", postIdea);
       section.on("focus", "#txtJournalWrite", function(event) {
         $(this).removeClass("error");
@@ -343,6 +368,7 @@
         var skip = module.currentPage * module.numIdeasToLoad;
         if (skip < 0) {
           module.currentPage = 0;
+          skip = 0;
         }
         getIdeas(module.numIdeasToLoad, skip);
       });
@@ -400,6 +426,10 @@
       }).done(function(result) {
         console.log(result);
         if (result["code"] === 0) {
+          if (result["ideas"].length === 0) {
+            module.currentPage -= 1;
+            return;
+          }
           var list = EntryList(result["ideas"]);
           if (list == null) {
             module.SetState("failed-gettingideas");
@@ -480,7 +510,7 @@
 
       var ideaid = idea.ideaid;
       var content = JsonStringToViewFriendly(idea.content);
-      content = module.autolinker.link(content);
+      //content = module.autolinker.link(content);
       var time = new Date(idea.created);
       var entry = $("<li>", {
         "id": "entry-" + ideaid.toString(),
@@ -752,7 +782,7 @@
     return jsonStr.fromJsonStringToPrettyHtml();
   }
   function ViewFriendlyToEditable(viewFriendlyStr) {
-    return viewFriendlyStr.replace(/<a(.*?)>(.*?)<\/a>/ig, "$2").toEditable();
+    return viewFriendlyStr.toEditable();
   }
 
 

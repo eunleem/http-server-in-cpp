@@ -7,22 +7,22 @@
 
   Last Modified Date
     December 25, 2014
-  
+
   History
     December 25, 2014
       Created
 
   ToDos
-    
+
 
 
   Milestones
     1.0
-      
+
 
   Learning Resources
     http://
-  
+
   Copyright (c) All rights reserved to LIFEINO.
 */
 
@@ -38,7 +38,7 @@
 
     if (typeof config == "undefined") {
       config = {};
-    } 
+    }
 
     function Genesis() {
       this.config = $.extend({}, defConfig, config);
@@ -55,7 +55,7 @@
       var code = querystring["code"];
       if (typeof code !== "undefined") {
         jGet("#txtInvitationCode").val(code);
-      } 
+      }
     };
 
     try {
@@ -83,13 +83,13 @@ $(function() {
   jGet("#txtInvitationCode").focus(function() {
     if (jGet("#txtInvitationCode").val() == txtInvitationCodeDefTxt) {
       jGet("#txtInvitationCode").val("");
-    } 
+    }
   });
 
   jGet("#txtInvitationCode").blur(function() {
     if (jGet("#txtInvitationCode").val().trim() == "") {
       jGet("#txtInvitationCode").val(txtInvitationCodeDefTxt);
-    } 
+    }
   });
 
   currentMessage = jGet("#lblInvitationOpenMessage");
@@ -131,7 +131,7 @@ function showMessage(target, message, type) {
   var messageDisplayTime = message.length * 100;
   if (messageDisplayTime < 5000) {
     messageDisplayTime = 5000;
-  } 
+  }
 
   clearTimeout(msgTimers[target.selector]);
   msgTimers[target.selector] = setTimeout(function() {
@@ -146,7 +146,7 @@ function openInvitation(code) {
     // invalid code
     invalidCode("코드가 너무 짧아요!")
     return;
-  } 
+  }
 
   disableButton(jGet("#btnInvitationOpen"), "OPENING...");
 
@@ -205,10 +205,10 @@ function showInvitation(description) {
 
   if (description == "") {
     description = "No Description has been provided for this Invitation..."
-  } 
+  }
 
   jGet("#lblInvitationDescription").html(description);
-  
+
   // Callback when CSS3 transition finishes.
   // #REF: http://stackoverflow.com/questions/9255279/callback-when-css3-transition-finishes
   jGet("#sect-cover").bind("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function() {
@@ -288,4 +288,3 @@ function showKey(tempkey) {
   });
 
 }
-

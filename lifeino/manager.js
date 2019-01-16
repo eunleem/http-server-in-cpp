@@ -93,6 +93,7 @@
       }, 60 * 1000);
     }, (60 - that.timer.getSeconds()) * 1000);
 
+
     console.time("Run Modules");
     this.modules.forEach(function(module, name) {
       console.log("Running " + name.toString() + " Module!");
@@ -104,6 +105,18 @@
       console.timeEnd("Run Module " + name.toString());
     });
     console.timeEnd("Run Modules");
+    
+    $(window).on("beforeunload", function() {
+      var flag = true;
+      that.modules.forEach(function(module) {
+        if (module.onLeave() === false) {
+          flag = false;
+        }
+      });
+      if (flag === false) {
+        return "Unsaved Changes";
+      }
+    });
   };
 
   Manager.prototype.Stop = function() {
@@ -125,8 +138,8 @@
     this.modules.forEach(function(module) {
       module.onEveryMinute(that.timer);
     });
-
   };
+
 
   window.Manager = Manager;
 })(window, $);
@@ -162,6 +175,11 @@
 
   Module.prototype.onEveryMinute = function(time) {
     console.log("Module has not implemented onEveryMinute function.");
+  };
+
+  Module.prototype.onLeave = function() {
+    console.log("Module has not implemented onLeave function.");
+    return true;
   };
 
   Module.prototype.onReceiveMessage = function(from, type, message) {

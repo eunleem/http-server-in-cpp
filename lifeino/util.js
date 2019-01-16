@@ -240,6 +240,7 @@ String.prototype.toPrettyHtml = function() {
 };
 
 String.prototype.fromJsonStringToPrettyHtml = function() {
+  var now = new Date();
   return this
         .replace(/&gt;/g, ">")
         .replace(/&lt;/g, "<")
@@ -248,9 +249,41 @@ String.prototype.fromJsonStringToPrettyHtml = function() {
         .replace(/  /g, "&nbsp;&nbsp;")
         //.replace(/\\/g, "\\")
         //.replace(/\"/g, "\"")
+      .replace(/\s?Title: (.*?)\\n/g, "<h2>$1</h2>")
+      .replace(/\s?Subtitle: (.*?)\\n/g, "<h3>$1</h3>")
+      .replace(/\s?Subsubtitle: (.*?)\\n/g, "<h4>$1</h4>")
+      .replace(/Center:\s?(.*?)\s?:Center/g, "<div class='textcenter'>$1</div>")
+      .replace(/Indent:(.*?):Indent/g, "<div class='indent15'>$1</div>")
+      .replace(/Code:(.*?):Code/g, "<code>$1</code>")
+      .replace(/BQ:(.*?):BQ/g, "<blockquote>$1</blockquote>")
+      .replace(/(\s+)Cite:/g, "$1<cite>")
+      .replace(/:Cite(\s+)/g, "</cite>$1")
+      .replace(/(\s?)ST:(.*?):ST(\s?)/g, "$1<strong>$2</strong>$3")
+      .replace(/\\nST:(.*?)\\n/g, "\\n<strong>$1</strong>\\n")
+      .replace(/(\s?)EM:(.*?):EM(\s?)/g, "$1<em>$2</em>$3")
+      .replace(/(\s?)IT:(.*?):IT(\s?)/g, "$1<i>$2</i>$3")
+      .replace(/IMG:(.*?):IMG/g, "<img src='$1' />")
+      .replace(/:TS\[(.*?)\]\[(.*?)\]:/g, "<time datetime='$1'>$2</time>")
+      .replace(/:TS:/g, "<time datetime='" + now.toISOString() + "'>" +
+         now.getFullYear() + "-" + now.getMonthPad() + "-" + now.getDatePad() +
+         " " + now.getTimeStr() + " " + now.getWeekday() +
+         "</time>")
+      .replace(/(\s?)DEL\[(.*?)\]:(.*?):DEL/g, "$1<del datetime='$2'>$3</del>")
+      .replace(/(\s?)INS\[(.*?)\]:(.*?):INS/g, "$1<ins datetime='$2'>$3</ins>")
+      .replace(/(\s?)INS:(.*?):INS(\s?)/g, "$1<ins datetime='" + now.toISOString() + "'>$2</ins>$3")
+      .replace(/(\s?)DEL:(.*?):DEL(\s?)/g, "$1<del datetime='" + now.toISOString() + "'>$2</del>$3")
+      .replace(/(\s?)INS:(.*?):INS(\s?)/g, "$1<ins datetime='" + now.toISOString() + "'>$2</ins>$3")
+      .replace(/LINK\[(.*?)\]:(.*?):LINK/g, "<a href='$1' title='$1' target='_blank'>$2</a>")
+      .replace(/LINK:(.*?):LINK/g, "<a href='$1' target='_blank'>$1</a>")
+      .replace(/RED:(.*?):RED/g, "<span class='color-red'>$1</span>")
+      .replace(/ORG:(.*?):ORG/g, "<span class='color-orange'>$1</span>")
+      .replace(/li:(.*?):li\\n/g, "<li>$1</li>")
+      .replace(/(\s?)ol:(.*?):ol\s?/g, "$1<ol>$2</ol>")
+      .replace(/(\s?)ul:\\n(.*?):ul\s?/g, "$1<ul>$2</ul>")
+        .replace(/\\"/g, "\"")
         .replace(/\\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;")
-        .replace(/\\r/g, "<br>")
-        .replace(/\\n/g, "<br>")
+        .replace(/\\r/g, "<br/>")
+        .replace(/\\n/g, "<br/>")
         .replace(/\\\\/g, "\\");
 };
 
@@ -273,9 +306,32 @@ String.prototype.toEditable = function() {
         .replace(/&nbsp;&nbsp;&nbsp;&nbsp;/g, "\t")
         .replace(/&nbsp;/g, " ")
         .replace(/<br>/g, "\n")
+      .replace(/<a .*?href=\"(.*?)\".*?>\s?(.*?)\s?<\/a>/g, "LINK[$1]: $2 :LINK")
+      .replace(/<a(.*?)>(.*?)<\/a>/ig, "$2")
+      .replace(/<h2>(.*?)<\/h2>/ig, "Title: $1\n")
+      .replace(/<h3>(.*?)<\/h3>/ig, "Subtitle: $1\n")
+      .replace(/<h4>(.*?)<\/h4>/ig, "Subsubtitle: $1\n")
+      .replace(/<strong>(.*?)<\/strong>/g, "ST:$1:ST")
+      .replace(/<em>(.*?)<\/em>/g, "EM:$1:EM")
+      .replace(/<i>(.*?)<\/i>/g, "IT:$1:IT")
+      .replace(/<img src='(.*?)' \/>/g, "IMG:$1:IMG")
+      .replace(/<time .*?datetime=\"(.*?)\".*?>(.*?)<\/time>/g, ":TS[$1][$2]:")
+      .replace(/<del .*?datetime=\"(.*?)\".*?>(.*?)<\/del>/g, "DEL[$1]:$2:DEL")
+      .replace(/<ins .*?datetime=\"(.*?)\".*?>(.*?)<\/ins>/g, "INS[$1]:$2:INS")
+      .replace(/<a .*?href=\"(.*?)\".*?>(.*?)<\/a>/g, "LINK[$1]:$2:LINK")
+      .replace(/<span class=\"color-red\">(.*?)<\/span>/g, "RED:$1:RED")
+      .replace(/<div class=\"textcenter\">(.*?)<\/div>/g, "Center: $1 :Center")
+      .replace(/<code>/g, "Code:")
+      .replace(/<\/code>/g, ":Code")
+      .replace(/<ul>\s?/ig, "ul:\n")
+      .replace(/\s?<\/ul>/ig, ":ul")
+      .replace(/<ol>(\s?)/ig, "ol:")
+      .replace(/(\s?)<\/ol>/ig, ":ol")
+      .replace(/<li>(.*?)<\/li>/ig, "li:$1:li\n")
         .replace(/&gt;/g, ">")
         .replace(/&lt;/g, "<")
         .replace(/&amp;/g, "&");
+
 
 };
 

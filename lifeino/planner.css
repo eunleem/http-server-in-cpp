@@ -71,7 +71,8 @@ button.cancel {
   width: 40px;
 }
 
-#sect-notification #boxIcon:hover {
+#sect-notification #boxIcon:hover #imgLogo {
+  stroke: #333;
 }
 
 #sect-notification #boxIcon #imgLogo {
@@ -88,7 +89,6 @@ button.cancel {
 }
 
 #sect-notification #boxIcon #imgLogo:hover {
-  stroke: #333;
 }
 
 
@@ -186,10 +186,18 @@ button.cancel {
 
 #sect-steps {
   background-color: #62C2CC;
-  line-height: 200%;
-  font-size: 4em;
+  line-height: 170%;
+  font-size: 3em;
   font-weight: bold;
   color: white;
+}
+
+#sect-smallprogress {
+  background-color: #E0FACB;
+  line-height: 170%;
+  font-size: 3em;
+  font-weight: bold;
+  color: #00512E;
 }
 
 #sect-journal {
@@ -217,21 +225,22 @@ button.cancel {
   margin: 0;
   padding: 0;
   font-size: 3em;
-  color: #444;
+  color: #555;
 }
 
 #sect-journal #boxJournal {
   min-width: 500px;
+  max-width: 1200px;
   width: 96%;
-  margin-left: 2%;
-  margin-right: 2%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #sect-journal #boxJournal > #boxJournalWriteTime {
   text-align: left;
   margin: 0 0px;
   font-size: 2.3em;
-  color: #999;
+  color: #888;
   font-family: Lobster;
 }
 
@@ -304,19 +313,43 @@ button.cancel {
 
 #sect-journal #lstJournalEntriesRecent > li > .journal-entry-time {
   font-size: 1.3em;
-  color: #666;
+  color: #555;
   margin-bottom: 10px;
 }
 
 #sect-journal #lstJournalEntriesRecent > li > .journal-entry-content {
-  padding: 0 15px;
+  padding: 5px 15px;
   margin: 0px 0px;
-  font-size: 1.1em;
-  max-height: 500px;
+  font-size: 1.0em;
+  max-height: 1200px;
   overflow: auto;
   border-left: 3px solid rgba(230, 102, 101, 0.1);
   resize: vertical;
   transition: border 200ms ease-in;
+}
+
+#sect-journal #lstJournalEntriesRecent .journal-entry-content h2 {
+  margin: 0;
+  padding: 0;
+}
+
+#sect-journal #lstJournalEntriesRecent .journal-entry-content h3 {
+  margin: 0;
+  padding: 0;
+}
+
+#sect-journal #lstJournalEntriesRecent .journal-entry-content .textcenter {
+  text-align: center;
+}
+
+#sect-journal #lstJournalEntriesRecent .journal-entry-content time {
+  color: #666;
+  font-size: 0.8em;
+}
+
+#sect-journal #lstJournalEntriesRecent .journal-entry-content time:hover {
+  color: #000;
+  font-size: 0.8em;
 }
 
 #sect-journal #lstJournalEntriesRecent > li > .journal-entry-content:hover {
